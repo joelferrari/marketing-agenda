@@ -1,0 +1,28 @@
+.overlay{position:fixed;inset:0;background:rgba(26,26,46,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
+.modal{background:#fff;border-radius:12px;width:100%;max-width:520px;box-shadow:0 8px 40px rgba(59,91,219,.15);overflow:hidden}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.title{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir)}
+.close{background:none;border:none;font-size:18px;color:var(--gris);cursor:pointer;padding:4px}
+.body{padding:20px 24px;display:flex;flex-direction:column;gap:16px}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris);display:flex;align-items:center;gap:4px}
+.field input,.field textarea{border:1.5px solid var(--border);border-radius:6px;padding:9px 12px;font-size:14px;outline:none;width:100%;resize:vertical}
+.field input:focus,.field textarea:focus{border-color:var(--indigo)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.times{display:flex;align-items:center;gap:6px;margin-top:6px}
+.times input{padding:7px 10px;font-size:13px}
+.times span{color:var(--gris-lt)}
+.colors{display:flex;gap:8px;flex-wrap:wrap}
+.colorBtn{width:28px;height:28px;border-radius:50%;border:3px solid transparent;cursor:pointer;transition:transform .15s}
+.colorBtn:hover{transform:scale(1.15)}
+.colorBtnOn{border-color:#fff;box-shadow:0 0 0 2px var(--noir);transform:scale(1.1)}
+.rappel{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--gris)}
+.toggle{width:38px;height:22px;border-radius:11px;background:var(--border);position:relative;transition:background .2s;flex-shrink:0}
+.toggleOn{background:var(--indigo)}
+.thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.toggleOn .thumb{left:19px}
+.footer{display:flex;align-items:center;gap:8px;padding-top:4px;border-top:1px solid var(--border)}
+.btnDelete{background:none;border:1px solid #f03e3e;color:#e03131;padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer}
+.btnCancel{background:var(--fond);border:1px solid var(--border);color:var(--gris);padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer}
+.btnSave{color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.btnSave:disabled{opacity:.6}

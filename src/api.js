@@ -1,0 +1,11 @@
+const BASE = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const h = () => ({ 'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}` });
+export const login       = (d)   => fetch(`${BASE}/auth/login`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const getMe       = ()    => fetch(`${BASE}/auth/me`,{headers:h()}).then(r=>r.json());
+export const getEvents   = (p={})=> fetch(`${BASE}/events?${new URLSearchParams(p)}`,{headers:h()}).then(r=>r.json());
+export const createEvent = (d)   => fetch(`${BASE}/events`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const updateEvent = (id,d)=> fetch(`${BASE}/events/${id}`,{method:'PUT',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const deleteEvent = (id)  => fetch(`${BASE}/events/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+export const getTransactions    = ()    => fetch(`${BASE}/transactions`,{headers:h()}).then(r=>r.json());
+export const addTransaction     = (d)   => fetch(`${BASE}/transactions`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const deleteTransaction  = (id)  => fetch(`${BASE}/transactions/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
