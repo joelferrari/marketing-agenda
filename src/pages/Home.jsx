@@ -51,6 +51,7 @@ const INTERNAL = [
   { id:'agenda',         Icon:IconCalendar, titre:'Agenda Marketing', desc:'Campagnes, newsletters et événements marketing', color:'#3b5bdb' },
   { id:'carte',          Icon:IconCard,     titre:'Carte de crédit',  desc:'Dépenses et virements de la carte du spa',       color:'#c4737c' },
   { id:'factures-frais', Icon:IconReceipt,  titre:'Factures frais',   desc:'Upload et gestion des factures de frais',        color:'#6b8a5e' },
+  { id:'rh',             Icon:IconRH,       titre:'RH — Emilie',      desc:'Heures travaillées, heures sup. et vacances',     color:'#1098ad' },
   { id:'caisse',         Icon:IconCaisse,   titre:'Caisse cash',      desc:'Suivi de la caisse espèces avec import POS auto', color:'#2b8a3e' },
 ];
 
