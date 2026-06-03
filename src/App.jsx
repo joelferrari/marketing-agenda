@@ -6,6 +6,7 @@ import Calendar from './pages/Calendar';
 import CreditCard from './pages/CreditCard';
 import FacturesFrais from './pages/FacturesFrais';
 import Caisse from './pages/Caisse';
+import RH from './pages/RH';
 import './index.css';
 
 export default function App() {
@@ -32,5 +33,6 @@ export default function App() {
   if (page === 'carte')   return <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>
   if (page === 'factures-frais') return <FacturesFrais user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
   if (page === 'caisse') return <Caisse user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
+  if (page === 'rh') return <RH user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
   return <Home user={user} onNavigate={setPage} onLogout={logout}/>;
 }
