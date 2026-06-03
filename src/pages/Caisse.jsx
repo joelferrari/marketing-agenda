@@ -40,7 +40,7 @@ export default function Caisse({ user, onBack, onLogout }) {
   };
 
   const remove = async (id) => {
-    if (id < 0) { toast$('Les entrées POS ne peuvent pas être supprimées ici', false); return; }
+    if (id === null || id === undefined) { toast$('Les entrées POS sont importées automatiquement', false); return; }
     if (!window.confirm('Supprimer cette ligne ?')) return;
     await deleteCaisse(id);
     toast$('Supprimé'); load();
