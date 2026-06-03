@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getTransactions, addTransaction, deleteTransaction } from '../api';
+import { getTransactions, addTransaction, deleteTransaction, addInvoiceJSON } from '../api';
 import styles from './CreditCard.module.css';
 
 const fmt = (n) => new Intl.NumberFormat('fr-CH',{style:'currency',currency:'CHF'}).format(n);
@@ -29,6 +29,17 @@ export default function CreditCard({ user, onBack, onLogout }) {
     e.preventDefault();
     if (!form.description||!form.montant) return;
     await addTransaction({ ...form, montant: parseFloat(form.montant) });
+    // Créer automatiquement une facture frais pour les dépenses
+    if (form.type === 'depense') {
+      await addInvoiceJSON({
+        description: form.description,
+        montant: parseFloat(form.montant),
+        date_facture: form.date_transaction,
+        categorie: 'Carte de crédit',
+        source: 'carte_credit',
+        user_id: user?.id || null,
+      }).catch(()=>{}); // silencieux si erreur
+    }
     toast$(`${form.type==='virement'?'Virement':'Dépense'} ajouté·e ✓`);
     setModal(false);
     setForm({ date_transaction:today(), description:'', type:'depense', montant:'' });
