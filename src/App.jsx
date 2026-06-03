@@ -29,6 +29,6 @@ export default function App() {
 
   if (page === 'agenda')  return <Calendar user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
   if (page === 'carte')   return <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>
-  if (page === 'factures-frais') return <FacturesFrais user={user} onBack={()=>setPage('home')}/>;
+  if (page === 'factures-frais') return <FacturesFrais user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
   return <Home user={user} onNavigate={setPage} onLogout={logout}/>;
 }
