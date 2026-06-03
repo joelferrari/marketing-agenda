@@ -45,14 +45,14 @@ export default function RH({ user, onBack, onLogout }) {
 
   const loadPointage = async (a=annee, m=mois) => {
     setLoading(true);
-    try { setEntries(await getPointage({annee:a,mois:m}) || []); }
+    try { const d=await getPointage({annee:a,mois:m}); setEntries(Array.isArray(d)?d:[]); }
     catch { setEntries([]); }
     finally { setLoading(false); }
   };
 
   const loadBilan = async (a=annee) => {
     setLoading(true);
-    try { setBilan(await getBilan({annee:a}) || []); }
+    try { const d=await getBilan({annee:a}); setBilan(Array.isArray(d)?d:[]); }
     catch { setBilan([]); }
     finally { setLoading(false); }
   };
