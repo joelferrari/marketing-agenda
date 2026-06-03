@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Home from './pages/Home';
 import Calendar from './pages/Calendar';
 import CreditCard from './pages/CreditCard';
+import FacturesFrais from './pages/FacturesFrais';
 import './index.css';
 
 export default function App() {
@@ -27,6 +28,7 @@ export default function App() {
   if (!user) return <Login onLogin={u => { setUser(u); setPage('home'); }}/>;
 
   if (page === 'agenda')  return <Calendar user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
-  if (page === 'carte')   return <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
+  if (page === 'carte')   return <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>
+  if (page === 'factures-frais') return <FacturesFrais user={user} onBack={()=>setPage('home')}/>;
   return <Home user={user} onNavigate={setPage} onLogout={logout}/>;
 }
