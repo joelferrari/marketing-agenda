@@ -21,7 +21,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const [showCats,  setShowCats]  = useState(false);
   const [dragOver,  setDragOver]  = useState(false);
   const [file,      setFile]      = useState(null);
-  const [form,      setForm]      = useState({description:'',montant:'',categorie:''});
+  const [form,      setForm]      = useState({description:'',montant:'',categorie:'',date_facture:''});
   const [filters,   setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'});
   const [newCat,    setNewCat]    = useState('');
   const fileRef = useRef();
@@ -64,12 +64,13 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       fd.append('file',file);
       fd.append('description',form.description);
       fd.append('montant',form.montant);
+      fd.append('date_facture',form.date_facture);
       fd.append('categorie',form.categorie);
       fd.append('user_id',user?.id||'');
       const d = await uploadInvoice(fd);
       if (d.erreur) throw new Error(d.erreur);
       toast$('Facture uploadée ✓');
-      setFile(null); setForm({description:'',montant:'',categorie:''}); setShowUpload(false);
+      setFile(null); setForm({description:'',montant:'',categorie:'',date_facture:''}); setShowUpload(false);
       loadInvoices();
     } catch(e) { toast$(e.message,false); }
     finally { setUploading(false); }
@@ -110,6 +111,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
           <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>Factures frais</h1></div>
         </div>
         <div className={styles.headerRight}>
+          <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>⚙ Catégories</button>
           <button className={styles.addBtn} onClick={()=>setShowUpload(true)}>+ Ajouter</button>
           <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
           <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
@@ -176,6 +178,11 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
               </select>
             </div>
             {hasFilters && <button className={styles.clearBtn} onClick={()=>{const r={dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'};setFilters(r);loadInvoices(r);}}>✕ Effacer</button>}
+            <div style={{flex:1}}/>
+            <div className={styles.filterTotal}>
+              <span>{invoices.length} facture{invoices.length!==1?'s':''}</span>
+              {total>0&&<strong style={{color:'var(--rouge)'}}>{total.toFixed(2)} CHF</strong>}
+            </div>
           </div>
         </div>
 
@@ -242,6 +249,9 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 )}
               </div>
               {/* Champs */}
+              <div className={styles.mf}><label>Date de facture</label>
+                <input type="date" value={form.date_facture} onChange={e=>setForm(p=>({...p,date_facture:e.target.value}))}/>
+              </div>
               <div className={styles.mf}><label>Catégorie</label>
                 <select value={form.categorie} onChange={e=>setForm(p=>({...p,categorie:e.target.value}))}>
                   <option value="">— Sans catégorie —</option>

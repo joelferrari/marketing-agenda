@@ -89,3 +89,6 @@
   .listHeader span:nth-child(3),.rowCat,.listHeader span:nth-child(4),.rowDesc{display:none}
   .header{padding:12px 16px}.main{padding:16px}
 }
+
+.filterTotal{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:var(--gris);white-space:nowrap}
+.filterTotal strong{font-size:15px}
