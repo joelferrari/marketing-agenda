@@ -28,7 +28,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
 
   const toast$ = (txt,ok=true) => { setToast({txt,ok}); setTimeout(()=>setToast(null),3500); };
 
-  const loadCats     = async () => { try { setCats(await getInvCats()); } catch(e) { console.error(e); } };
+  const loadCats     = async () => { try { const d=await getInvCats(); setCats(Array.isArray(d)?d:[]); } catch(e) { console.error(e); } };
   const loadInvoices = async (f=filters) => {
     setLoading(true);
     try {
@@ -37,7 +37,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       if (f.dateFin)   p.dateFin   = f.dateFin;
       if (f.categorie) p.categorie = f.categorie;
       if (f.sort)      p.sort      = f.sort;
-      setInvoices(await getInvoices(p));
+      const d = await getInvoices(p); setInvoices(Array.isArray(d)?d:[]);
     } catch { setInvoices([]); }
     finally { setLoading(false); }
   };
