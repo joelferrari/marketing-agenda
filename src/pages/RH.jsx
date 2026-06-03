@@ -67,8 +67,8 @@ export default function RH({ user, onBack, onLogout }) {
   const openDay = (dateStr) => {
     const e = entriesByDate[dateStr];
     setForm({
-      heure_arrivee: e?.heure_arrivee?.slice(0,5) || '09:00',
-      heure_depart:  e?.heure_depart?.slice(0,5)  || '18:00',
+      heure_arrivee: e?.heure_arrivee?.slice(0,5) || '10:00',
+      heure_depart:  e?.heure_depart?.slice(0,5)  || '19:00',
       notes:         e?.notes || '',
     });
     setModal({ date_jour: dateStr, entry: e });
