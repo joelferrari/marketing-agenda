@@ -120,18 +120,6 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
 
       <main className={styles.main}>
 
-        {/* Solde / résumé */}
-        <div className={styles.soldeCard}>
-          <p className={styles.soldeLabel}>Total des frais</p>
-          <p className={styles.soldeVal} style={{color: total>0?'var(--rouge)':'var(--gris)'}}>
-            {total.toFixed(2)} CHF
-          </p>
-          <div className={styles.soldeMeta}>
-            <span className={styles.soldeDebit}>{invoices.length} facture{invoices.length!==1?'s':''}</span>
-            <button className={styles.catLink} onClick={()=>setShowCats(s=>!s)}>
-              ⚙ {showCats?'Fermer':'Gérer les catégories'}
-            </button>
-          </div>
         </div>
 
         {/* Gestion catégories */}
