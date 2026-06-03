@@ -26,3 +26,8 @@
 .btnCancel{background:var(--fond);border:1px solid var(--border);color:var(--gris);padding:8px 14px;border-radius:6px;font-size:12px;cursor:pointer}
 .btnSave{color:#fff;border:none;padding:8px 20px;border-radius:6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 .btnSave:disabled{opacity:.6}
+
+.catBtns{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.catBtn{padding:5px 12px;border:1.5px solid var(--border);border-radius:20px;background:#fff;font-size:12px;cursor:pointer;color:var(--gris);transition:.15s;font-family:inherit}
+.catBtn:hover{border-color:var(--indigo);color:var(--indigo)}
+.catBtnOn{font-weight:500}
