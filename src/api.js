@@ -21,3 +21,9 @@ export const getCaisse      = ()    => fetch(`${BASE}/caisse`,{headers:h(),cache
 export const addCaisse      = (d)   => fetch(`${BASE}/caisse`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const deleteCaisse   = (id)  => fetch(`${BASE}/caisse/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
+export const getBudget      = (p={}) => fetch(`${BASE}/budget?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const addBudget      = (d)    => fetch(`${BASE}/budget`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const uploadBudget   = (fd)   => fetch(`${BASE}/budget/upload`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
+export const updateBudget   = (id,d) => fetch(`${BASE}/budget/${id}`,{method:'PUT',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const deleteBudget   = (id)   => fetch(`${BASE}/budget/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+
