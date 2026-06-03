@@ -17,6 +17,13 @@ const IconReceipt = () => (
     <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
   </svg>
 );
+const IconCaisse = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+    <rect x="2" y="7" width="20" height="15" rx="2"/>
+    <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
+    <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+  </svg>
+);
 const IconAdmin = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
     <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
@@ -39,6 +46,7 @@ const INTERNAL = [
   { id:'agenda',         Icon:IconCalendar, titre:'Agenda Marketing', desc:'Campagnes, newsletters et événements marketing', color:'#3b5bdb' },
   { id:'carte',          Icon:IconCard,     titre:'Carte de crédit',  desc:'Dépenses et virements de la carte du spa',       color:'#c4737c' },
   { id:'factures-frais', Icon:IconReceipt,  titre:'Factures frais',   desc:'Upload et gestion des factures de frais',        color:'#6b8a5e' },
+  { id:'caisse',         Icon:IconCaisse,   titre:'Caisse cash',      desc:'Suivi de la caisse espèces avec import POS auto', color:'#2b8a3e' },
 ];
 
 const EXTERNAL = [

@@ -16,3 +16,8 @@ export const deleteInvoice  = (id)   => fetch(`${BASE}/invoices/${id}`,{method:'
 export const getInvCats     = ()     => fetch(`${BASE}/invoices/categories`,{headers:h()}).then(r=>r.json());
 export const addInvCat      = (nom)  => fetch(`${BASE}/invoices/categories`,{method:'POST',headers:h(),body:JSON.stringify({nom})}).then(r=>r.json());
 export const delInvCat      = (id)   => fetch(`${BASE}/invoices/categories/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+
+export const getCaisse      = ()    => fetch(`${BASE}/caisse`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const addCaisse      = (d)   => fetch(`${BASE}/caisse`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const deleteCaisse   = (id)  => fetch(`${BASE}/caisse/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+
