@@ -27,7 +27,8 @@ export const uploadBudget   = (fd)   => fetch(`${BASE}/budget/upload`,{method:'P
 export const updateBudget   = (id,d) => fetch(`${BASE}/budget/${id}`,{method:'PUT',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const deleteBudget   = (id)   => fetch(`${BASE}/budget/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
-export const getHeures    = (p={}) => fetch(`${BASE}/rh/heures?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
-export const saveHeures   = (d)    => fetch(`${BASE}/rh/heures`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
-export const deleteHeures = (id)   => fetch(`${BASE}/rh/heures/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+export const getPointage   = (p={}) => fetch(`${BASE}/rh/pointage?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const savePointage  = (d)    => fetch(`${BASE}/rh/pointage`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const delPointage   = (id)   => fetch(`${BASE}/rh/pointage/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+export const getBilan      = (p={}) => fetch(`${BASE}/rh/bilan?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 
