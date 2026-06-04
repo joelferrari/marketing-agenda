@@ -99,6 +99,7 @@ export default function RH({ user, onBack, onLogout }) {
   const openDay = (dateStr) => {
     const e = entriesByDate[dateStr];
     setForm({
+      type:          e?.type || 'travail',
       heure_arrivee: e?.heure_arrivee?.slice(0,5) || '10:00',
       heure_depart:  e?.heure_depart?.slice(0,5)  || '19:00',
       notes:         e?.notes || '',
@@ -108,7 +109,7 @@ export default function RH({ user, onBack, onLogout }) {
 
   const submit = async (e) => {
     e.preventDefault();
-    const d = await savePointage({ date_jour: modal.date_jour, ...form });
+    const d = await savePointage({ date_jour: modal.date_jour, ...form, type: form.type || 'travail' });
     if (d?.erreur) { toast$(d.erreur,false); return; }
     toast$('Pointage enregistré ✓');
     setModal(null);
@@ -148,15 +149,19 @@ export default function RH({ user, onBack, onLogout }) {
   const maxH = bilan.length ? Math.max(...bilan.map(m=>parseFloat(m.total_heures||0))) : 0;
 
   const dayColor = (entry) => {
-    if (!entry || !entry.heures) return 'var(--fond)';
+    if (!entry) return 'var(--fond)';
+    if (entry.type === 'recup') return '#ede7f6';
+    if (!entry.heures) return 'var(--fond)';
     const h = parseFloat(entry.heures);
-    if (h >= CIBLE)       return '#e8f4e8';
-    if (h >= CIBLE * 0.6) return '#fff8e1';
+    if (h >= CIBLE)        return '#e8f4e8';
+    if (h >= CIBLE * 0.6)  return '#fff8e1';
     return '#fde8e8';
   };
 
   const dayTextColor = (entry) => {
-    if (!entry || !entry.heures) return 'var(--gris-lt)';
+    if (!entry) return 'var(--gris-lt)';
+    if (entry.type === 'recup') return '#7950f2';
+    if (!entry.heures) return 'var(--gris-lt)';
     const h = parseFloat(entry.heures);
     if (h >= CIBLE) return 'var(--vert)';
     if (h >= CIBLE * 0.6) return '#b08020';
@@ -213,7 +218,7 @@ export default function RH({ user, onBack, onLogout }) {
                 const fin   = new Date(v.date_fin);
                 return s + Math.round((fin - debut) / 86400000) + 1;
               }, 0);
-            const DROIT = 25; // jours de vacances annuels
+            const DROIT = 20; // jours de vacances annuels
             const restant = DROIT - totalJours;
             return (
               <div className={styles.soldeCard} style={{marginBottom:'20px'}}>
@@ -292,11 +297,13 @@ export default function RH({ user, onBack, onLogout }) {
                     style={{background: isSun||isFuture ? '' : dayColor(entry)}}
                     onClick={()=>!isFuture && openDay(dateStr)}>
                     <span className={rh.calDayNum}>{day}</span>
-                    {entry?.heures && (
+                    {entry?.type === 'recup' ? (
+                      <span className={rh.calHours} style={{color:'#7950f2',fontSize:'12px'}}>Récup</span>
+                    ) : entry?.heures ? (
                       <span className={rh.calHours} style={{color: dayTextColor(entry)}}>
                         {fmtH(parseFloat(entry.heures))}
                       </span>
-                    )}
+                    ) : null}
                     {entry?.heure_arrivee && (
                       <span className={rh.calTimes}>
                         {entry.heure_arrivee.slice(0,5)}→{entry.heure_depart?.slice(0,5)}
@@ -404,35 +411,55 @@ export default function RH({ user, onBack, onLogout }) {
               <button className={styles.modalClose} onClick={()=>setModal(null)}>✕</button>
             </div>
             <form onSubmit={submit} className={styles.modalBody}>
-              <div className={rh.timeRow}>
-                <div className={styles.mf}>
-                  <label>Arrivée</label>
-                  <input type="time" value={form.heure_arrivee} step="300"
-                    onChange={e=>setForm(p=>({...p,heure_arrivee:e.target.value}))} required/>
-                </div>
-                <div className={rh.timeSep}>→</div>
-                <div className={styles.mf}>
-                  <label>Départ</label>
-                  <input type="time" value={form.heure_depart} step="300"
-                    onChange={e=>setForm(p=>({...p,heure_depart:e.target.value}))} required/>
-                </div>
+              {/* Toggle Travail / Récupération */}
+              <div className={rh.typeToggle}>
+                {[{id:'travail',label:'🕐 Travail',color:'var(--rose)'},{id:'recup',label:'💜 Récupération',color:'#7950f2'}].map(t=>(
+                  <button key={t.id} type="button"
+                    className={rh.typeBtn}
+                    style={form.type===t.id?{background:t.color,borderColor:t.color,color:'#fff'}:{}}
+                    onClick={()=>setForm(p=>({...p,type:t.id}))}>
+                    {t.label}
+                  </button>
+                ))}
               </div>
-              {(() => {
-                const [ha, ma] = form.heure_arrivee.split(':').map(Number);
-                const [hd, md] = form.heure_depart.split(':').map(Number);
-                const total = (hd + md/60) - (ha + ma/60);
-                const delta = total - CIBLE;
-                if (total > 0) return (
-                  <div className={rh.preview} style={{background:delta>=0?'#e8f4e8':'#fde8e8',color:delta>=0?'var(--vert)':'var(--rouge)'}}>
-                    <span>{fmtH(total)} travaillées</span>
-                    <span style={{fontWeight:600}}>{fmtH(delta,true)} vs cible {CIBLE}h</span>
+
+              {form.type==='recup' ? (
+                <div className={rh.preview} style={{background:'#ede7f6',color:'#7950f2'}}>
+                  <span>Journée de récupération</span>
+                  <span style={{fontWeight:600}}>-9h00 du solde heures sup.</span>
+                </div>
+              ) : (<>
+                <div className={rh.timeRow}>
+                  <div className={styles.mf}>
+                    <label>Arrivée</label>
+                    <input type="time" value={form.heure_arrivee} step="300"
+                      onChange={e=>setForm(p=>({...p,heure_arrivee:e.target.value}))}/>
                   </div>
-                );
-              })()}
+                  <div className={rh.timeSep}>→</div>
+                  <div className={styles.mf}>
+                    <label>Départ</label>
+                    <input type="time" value={form.heure_depart} step="300"
+                      onChange={e=>setForm(p=>({...p,heure_depart:e.target.value}))}/>
+                  </div>
+                </div>
+                {(() => {
+                  const [ha,ma]=(form.heure_arrivee||'10:00').split(':').map(Number);
+                  const [hd,md]=(form.heure_depart||'19:00').split(':').map(Number);
+                  const total=(hd+md/60)-(ha+ma/60);
+                  const delta=total-CIBLE;
+                  if(total>0) return (
+                    <div className={rh.preview} style={{background:delta>=0?'#e8f4e8':'#fde8e8',color:delta>=0?'var(--vert)':'var(--rouge)'}}>
+                      <span>{fmtH(total)} travaillées</span>
+                      <span style={{fontWeight:600}}>{fmtH(delta,true)} vs cible {CIBLE}h</span>
+                    </div>
+                  );
+                })()}
+              </>)}
+
               <div className={styles.mf}>
                 <label>Notes (optionnel)</label>
                 <input value={form.notes} onChange={e=>setForm(p=>({...p,notes:e.target.value}))}
-                  placeholder="Formation, déplacement…"/>
+                  placeholder={form.type==='recup'?'Journée récup., matin seulement…':'Formation, déplacement…'}/>
               </div>
               <div className={styles.modalFooter}>
                 {modal.entry && (
@@ -442,7 +469,8 @@ export default function RH({ user, onBack, onLogout }) {
                 )}
                 <div style={{flex:1}}/>
                 <button type="button" className={styles.btnCancel} onClick={()=>setModal(null)}>Annuler</button>
-                <button type="submit" className={styles.btnSubmit} style={{background:'var(--rose)'}}>Enregistrer</button>
+                <button type="submit" className={styles.btnSubmit}
+                  style={{background:form.type==='recup'?'#7950f2':'var(--rose)'}}>Enregistrer</button>
               </div>
             </form>
           </div>
