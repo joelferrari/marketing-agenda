@@ -34,3 +34,7 @@ export const savePointage  = (d)    => fetch(`${BASE}/rh/pointage`,{method:'POST
 export const delPointage   = (id)   => fetch(`${BASE}/rh/pointage/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 export const getBilan      = (p={}) => fetch(`${BASE}/rh/bilan?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 
+export const getVacances    = ()    => fetch(`${BASE}/rh/vacances`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const addVacances    = (d)   => fetch(`${BASE}/rh/vacances`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const deleteVacances = (id)  => fetch(`${BASE}/rh/vacances/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+

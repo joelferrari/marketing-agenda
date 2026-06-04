@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPointage, savePointage, delPointage, getBilan } from '../api';
+import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances } from '../api';
 import styles from './CreditCard.module.css';
 import rh from './RH.module.css';
 
@@ -38,6 +38,10 @@ export default function RH({ user, onBack, onLogout }) {
   const [bilan,    setBilan]   = useState([]);
   const [loading,  setLoading] = useState(true);
   const [modal,    setModal]   = useState(null); // {date_jour, entry?}
+  const [vacances,  setVacances] = useState([]);
+  const [vacModal,  setVacModal] = useState(false);
+  const [vacForm,   setVacForm]  = useState({date_debut:'',date_fin:'',description:''});
+  const [vacSaving, setVacSaving]= useState(false);
   const [toast,    setToast]   = useState(null);
   const [form,     setForm]    = useState({heure_arrivee:'09:00',heure_depart:'18:00',notes:''});
 
@@ -50,6 +54,10 @@ export default function RH({ user, onBack, onLogout }) {
     finally { setLoading(false); }
   };
 
+  const loadVacances = async () => {
+    try { const d = await getVacances(); setVacances(Array.isArray(d)?d:[]); } catch{}
+  };
+
   const loadBilan = async (a=annee) => {
     setLoading(true);
     try { const d=await getBilan({annee:a}); setBilan(Array.isArray(d)?d:[]); }
@@ -60,9 +68,33 @@ export default function RH({ user, onBack, onLogout }) {
   useEffect(() => {
     if (tab==='pointage') loadPointage();
     else if (tab==='resume') loadBilan();
+    else if (tab==='vacances') loadVacances();
   }, [tab, annee, mois]);
 
   const entriesByDate = Object.fromEntries(entries.map(e => [e.date_jour?.slice(0,10), e]));
+
+  const addVac = async (e) => {
+    e.preventDefault();
+    if (!vacForm.date_debut || !vacForm.date_fin) return;
+    setVacSaving(true);
+    try {
+      const d = await addVacances(vacForm);
+      if (d.erreur) throw new Error(d.erreur);
+      toast$(`✓ Vacances enregistrées — ${d.jours} jours bloqués dans l'agenda`);
+      setVacModal(false);
+      setVacForm({date_debut:'',date_fin:'',description:''});
+      loadVacances();
+    } catch(e) { toast$(e.message, false); }
+    finally { setVacSaving(false); }
+  };
+
+  const delVac = async (id) => {
+    if (!window.confirm('Supprimer ces vacances ? Les jours seront débloqués dans l'agenda.')) return;
+    const d = await deleteVacances(id);
+    if (d.erreur) { toast$(d.erreur, false); return; }
+    toast$(`✓ Vacances supprimées — ${d.jours} jours débloqués`);
+    loadVacances();
+  };
 
   const openDay = (dateStr) => {
     const e = entriesByDate[dateStr];
@@ -160,7 +192,42 @@ export default function RH({ user, onBack, onLogout }) {
         </div>
 
         {/* ── VACANCES ── */}
-        {tab==='vacances' && <p className={styles.empty}>Section vacances — à venir</p>}
+        {tab==='vacances' && (<>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
+            <p style={{fontSize:'13px',color:'var(--gris)',margin:0}}>
+              Les vacances bloquent automatiquement l'agenda du spa et apparaissent dans le calendrier marketing.
+            </p>
+            <button className={styles.addBtn} style={{marginLeft:'16px',flexShrink:0}} onClick={()=>setVacModal(true)}>
+              + Ajouter vacances
+            </button>
+          </div>
+
+          {vacances.length === 0 && <p className={styles.empty}>Aucune période de vacances enregistrée</p>}
+
+          <div className={styles.list}>
+            {vacances.length > 0 && (
+              <div className={rh.bilanHeader}>
+                <span>Du</span><span>Au</span><span>Durée</span><span>Description</span><span/>
+              </div>
+            )}
+            {vacances.map(v => {
+              const debut = new Date(v.date_debut);
+              const fin   = new Date(v.date_fin);
+              const jours = Math.round((fin - debut) / 86400000) + 1;
+              const isPast = fin < new Date();
+              return (
+                <div key={v.id} className={`${styles.row} ${rh.bilanRow}`}
+                  style={{opacity: isPast ? 0.6 : 1}}>
+                  <span className={styles.rowDate}>{debut.toLocaleDateString('fr-CH')}</span>
+                  <span className={styles.rowDate}>{fin.toLocaleDateString('fr-CH')}</span>
+                  <span style={{color:'#b08020',fontWeight:500}}>{jours} jour{jours>1?'s':''}</span>
+                  <span className={styles.rowAuteur}>{v.description || '—'}</span>
+                  <button className={styles.rowDel} onClick={()=>delVac(v.id)}>×</button>
+                </div>
+              );
+            })}
+          </div>
+        </>)}
 
         {/* ── POINTAGE ── */}
         {tab==='pointage' && (<>
@@ -353,6 +420,49 @@ export default function RH({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
+    {/* Modal ajout vacances */}
+    {vacModal && (
+      <div className={styles.overlay} onClick={()=>setVacModal(false)}>
+        <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
+          <div className={styles.modalHeader}>
+            <h2 className={styles.modalTitle}>Nouvelle période de vacances</h2>
+            <button className={styles.modalClose} onClick={()=>setVacModal(false)}>✕</button>
+          </div>
+          <form onSubmit={addVac} className={styles.modalBody}>
+            <div className={rh.formRow}>
+              <div className={styles.mf}>
+                <label>Du</label>
+                <input type="date" value={vacForm.date_debut} required
+                  onChange={e=>setVacForm(p=>({...p,date_debut:e.target.value,date_fin:p.date_fin||e.target.value}))}/>
+              </div>
+              <div className={styles.mf}>
+                <label>Au</label>
+                <input type="date" value={vacForm.date_fin} min={vacForm.date_debut} required
+                  onChange={e=>setVacForm(p=>({...p,date_fin:e.target.value}))}/>
+              </div>
+            </div>
+            {vacForm.date_debut && vacForm.date_fin && vacForm.date_fin >= vacForm.date_debut && (
+              <div className={rh.preview} style={{background:'#fff8e1',color:'#b08020'}}>
+                <span>📅 {Math.round((new Date(vacForm.date_fin)-new Date(vacForm.date_debut))/86400000)+1} jours</span>
+                <span style={{fontSize:'12px'}}>Agenda spa bloqué + événement marketing créé</span>
+              </div>
+            )}
+            <div className={styles.mf}>
+              <label>Description (optionnel)</label>
+              <input value={vacForm.description}
+                onChange={e=>setVacForm(p=>({...p,description:e.target.value}))}
+                placeholder="Vacances été, Noël…"/>
+            </div>
+            <div className={styles.modalFooter}>
+              <button type="button" className={styles.btnCancel} onClick={()=>setVacModal(false)}>Annuler</button>
+              <button type="submit" className={styles.btnSubmit} style={{background:'#fab005'}} disabled={vacSaving}>
+                {vacSaving ? '…' : '✓ Enregistrer et bloquer l'agenda'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
     </div>
   );
 }
