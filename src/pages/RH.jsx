@@ -295,7 +295,7 @@ export default function RH({ user, onBack, onLogout }) {
                   <div key={i}
                     className={`${rh.calCell} ${isSun?rh.calSun:''} ${isFuture?rh.calFuture:''}`}
                     style={{background: isSun||isFuture ? '' : dayColor(entry)}}
-                    onClick={()=>!isFuture && openDay(dateStr)}>
+                    onClick={()=>openDay(dateStr)}>
                     <span className={rh.calDayNum}>{day}</span>
                     {entry?.type === 'recup' ? (
                       <span className={rh.calHours} style={{color:'#7950f2',fontSize:'12px'}}>Récup</span>
