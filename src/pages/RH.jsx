@@ -456,7 +456,7 @@ export default function RH({ user, onBack, onLogout }) {
             <div className={styles.modalFooter}>
               <button type="button" className={styles.btnCancel} onClick={()=>setVacModal(false)}>Annuler</button>
               <button type="submit" className={styles.btnSubmit} style={{background:'#fab005'}} disabled={vacSaving}>
-                {vacSaving ? '…' : '✓ Enregistrer et bloquer l'agenda'}
+                {vacSaving ? '…' : "✓ Enregistrer et bloquer l'agenda"}
               </button>
             </div>
           </form>
