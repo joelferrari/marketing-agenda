@@ -344,9 +344,11 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 <span className={styles.rowMontant} style={{color:r.montant?'var(--rouge)':'var(--gris-lt)'}}>
                   {r.montant?`${parseFloat(r.montant).toFixed(2)} CHF`:'—'}
                 </span>
-                <button className={styles.btnView} onClick={e=>{e.stopPropagation();openEdit(r);}}
-                  style={{fontSize:'11px',padding:'4px 8px',marginRight:'4px'}}>✎</button>
-                <button className={styles.rowDel} onClick={e=>{e.stopPropagation();doDelRow(r.id);}}>×</button>
+                <div style={{display:'flex',gap:'4px',justifyContent:'flex-end'}}>
+                  <button className={styles.btnView} onClick={e=>{e.stopPropagation();openEdit(r);}}
+                    style={{fontSize:'11px',padding:'4px 8px'}}>✎</button>
+                  <button className={styles.rowDel} onClick={e=>{e.stopPropagation();doDelRow(r.id);}}>×</button>
+                </div>
               </div>
             ))}
           </div>

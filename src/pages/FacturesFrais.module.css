@@ -51,8 +51,8 @@
 .loading{text-align:center;color:var(--gris-lt);padding:40px}
 .empty{text-align:center;color:var(--gris-lt);padding:32px;font-size:14px;margin:0}
 .list{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.listHeader{display:grid;grid-template-columns:90px 1fr 110px 1fr 100px 36px;gap:12px;padding:12px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
-.row{display:grid;grid-template-columns:90px 1fr 110px 1fr 100px 36px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
+.listHeader{display:grid;grid-template-columns:90px 1fr 110px 1fr 100px 72px;gap:12px;padding:12px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.row{display:grid;grid-template-columns:90px 1fr 110px 1fr 100px 72px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
 .row:hover{background:#fdf7f6}
 .rowDate{font-size:12px;color:var(--gris)}
 .rowFile{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--rose);text-decoration:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -97,7 +97,7 @@
 .tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:'Open Sans',sans-serif;color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
 .tab:hover{color:var(--gris)}
 .tabOn{color:var(--rose);border-bottom-color:var(--rose);font-weight:600}
-.listHeaderBudget{grid-template-columns:90px 1fr 110px 1fr 90px 100px 36px}
+.listHeaderBudget{grid-template-columns:90px 1fr 110px 1fr 90px 100px 72px}
 .rowBudget{grid-template-columns:90px 1fr 110px 1fr 90px 100px 36px}
 .rowStatut{font-size:11px;padding:2px 6px;border-radius:4px;background:var(--fond);color:var(--gris);white-space:nowrap;align-self:center}
 .rowStatut[data-s="Confirmé"]{background:#e8f4e8;color:var(--vert)}
