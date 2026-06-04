@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  getInvoices, uploadInvoice, deleteInvoice, getInvCats, addInvCat, delInvCat,
-  getBudget, addBudget, deleteBudget,
+  getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat,
+  getBudget, addBudget, deleteBudget, updateBudget,
 } from '../api';
 import styles from './FacturesFrais.module.css';
 
@@ -79,6 +79,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const [uploading,  setUploading] = useState(false);
   const [toast,      setToast]     = useState(null);
   const [showUpload, setShowUpload]= useState(false);
+  const [editing,    setEditing]    = useState(null); // {id, tab} en cours d'édition
   const [showCats,   setShowCats]  = useState(false);
   const [dragOver,   setDragOver]  = useState(false);
   const [file,       setFile]      = useState(null);
@@ -165,6 +166,40 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       toast$('Enregistré ✓');
       resetForm(); setShowUpload(false); loadData(filters, tab);
     } catch(e) { toast$(e.message,false); }
+    finally { setUploading(false); }
+  };
+
+  const openEdit = (r) => {
+    setEditing(r);
+    setForm({
+      description: r.description || '',
+      montant:     r.montant ? String(r.montant) : '',
+      categorie:   r.categorie || '',
+      date_facture: r.date_facture?.slice(0,10) || r.created_at?.slice(0,10) || '',
+      date_prevue:  r.date_prevue?.slice(0,10) || '',
+      statut:       r.statut || 'Prévu',
+    });
+    setShowUpload(true);
+  };
+
+  const saveEdit = async () => {
+    if (!editing) return;
+    setUploading(true);
+    try {
+      if (tab === 'budget') {
+        await updateBudget(editing.id, {
+          description: form.description, montant: form.montant,
+          categorie: form.categorie, date_prevue: form.date_prevue, statut: form.statut,
+        });
+      } else {
+        await updateInvoice(editing.id, {
+          description: form.description, montant: form.montant,
+          categorie: form.categorie, date_facture: form.date_facture,
+        });
+      }
+      toast$('Modifié ✓');
+      setShowUpload(false); setEditing(null); resetForm(); loadData(filters, tab);
+    } catch(e) { toast$(e.message, false); }
     finally { setUploading(false); }
   };
 
@@ -305,7 +340,9 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 <span className={styles.rowMontant} style={{color:r.montant?'var(--rouge)':'var(--gris-lt)'}}>
                   {r.montant?`${parseFloat(r.montant).toFixed(2)} CHF`:'—'}
                 </span>
-                <button className={styles.rowDel} onClick={()=>doDelRow(r.id)}>×</button>
+                <button className={styles.btnView} onClick={e=>{e.stopPropagation();openEdit(r);}}
+                  style={{fontSize:'11px',padding:'4px 8px',marginRight:'4px'}}>✎</button>
+                <button className={styles.rowDel} onClick={e=>{e.stopPropagation();doDelRow(r.id);}}>×</button>
               </div>
             ))}
           </div>
@@ -314,15 +351,15 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
 
       {/* Modal ajout */}
       {showUpload && (
-        <div className={styles.overlay} onClick={()=>{setShowUpload(false);resetForm();}}>
+        <div className={styles.overlay} onClick={()=>{setShowUpload(false);setEditing(null);resetForm();}}>
           <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
             <div className={styles.modalHeader}>
-              <span className={styles.modalTitle}>{tab==='budget'?'Ajouter au budget':'Ajouter une facture'}</span>
-              <button className={styles.modalClose} onClick={()=>{setShowUpload(false);resetForm();}}>✕</button>
+              <span className={styles.modalTitle}>{editing ? 'Modifier' : tab==='budget'?'Ajouter au budget':'Ajouter une facture'}</span>
+              <button className={styles.modalClose} onClick={()=>{setShowUpload(false);setEditing(null);resetForm();}}>✕</button>
             </div>
             <div className={styles.modalBody}>
-              {/* Drop zone — seulement pour factures */}
-              {tab==='factures' && (
+              {/* Drop zone — seulement pour factures en création */}
+              {tab==='factures' && !editing && (
                 <div className={styles.dropZone}
                   style={{borderColor:dragOver?'var(--rose)':file?'var(--vert)':'var(--border)',background:dragOver?'#fdf0f1':file?'#f3f8f0':'#fff'}}
                   onDragOver={e=>{e.preventDefault();setDragOver(true);}}
@@ -377,7 +414,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
             </div>
             <div className={styles.modalFooter}>
               <button className={styles.btnCancel} onClick={()=>{setShowUpload(false);resetForm();}}>Annuler</button>
-              <button className={styles.btnSubmit} style={{background:'var(--rose)'}} onClick={upload} disabled={uploading}>
+              <button className={styles.btnSubmit} style={{background:'var(--rose)'}} onClick={editing ? saveEdit : upload} disabled={uploading}>
                 {uploading?'…':'Enregistrer'}
               </button>
             </div>
