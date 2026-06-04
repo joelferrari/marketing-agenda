@@ -202,6 +202,34 @@ export default function RH({ user, onBack, onLogout }) {
             </button>
           </div>
 
+          {/* Carte solde total */}
+          {(() => {
+            const now = new Date();
+            const anneeVac = now.getFullYear();
+            const totalJours = vacances
+              .filter(v => new Date(v.date_debut).getFullYear() === anneeVac || new Date(v.date_fin).getFullYear() === anneeVac)
+              .reduce((s,v) => {
+                const debut = new Date(v.date_debut);
+                const fin   = new Date(v.date_fin);
+                return s + Math.round((fin - debut) / 86400000) + 1;
+              }, 0);
+            const DROIT = 25; // jours de vacances annuels
+            const restant = DROIT - totalJours;
+            return (
+              <div className={styles.soldeCard} style={{marginBottom:'20px'}}>
+                <p className={styles.soldeLabel}>Vacances prises en {anneeVac}</p>
+                <p className={styles.soldeVal} style={{color: totalJours > DROIT ? 'var(--rouge)' : 'var(--vert)'}}>
+                  {totalJours} <span style={{fontSize:'24px',fontWeight:'normal'}}>/ {DROIT} jours</span>
+                </p>
+                <div className={styles.soldeMeta}>
+                  <span style={{color: restant >= 0 ? 'var(--vert)' : 'var(--rouge)', fontWeight:500}}>
+                    {restant >= 0 ? `${restant} jour${restant!==1?'s':''} restants` : `${Math.abs(restant)} jour${Math.abs(restant)!==1?'s':''} de dépassement`}
+                  </span>
+                </div>
+              </div>
+            );
+          })()}
+
           {vacances.length === 0 && <p className={styles.empty}>Aucune période de vacances enregistrée</p>}
 
           <div className={styles.list}>
@@ -220,10 +248,7 @@ export default function RH({ user, onBack, onLogout }) {
                   style={{opacity: isPast ? 0.6 : 1}}>
                   <span className={styles.rowDate}>{debut.toLocaleDateString('fr-CH')}</span>
                   <span className={styles.rowDate}>{fin.toLocaleDateString('fr-CH')}</span>
-                  <div className={rh.joursBadge} style={{color: jours>14?'var(--rouge)':jours>7?'#b08020':'var(--vert)'}}>
-                    <span className={rh.joursNum}>{jours}</span>
-                    <span className={rh.joursLbl}>jour{jours>1?'s':''}</span>
-                  </div>
+                  <span style={{fontWeight:500,color:'var(--gris)'}}>{jours}j</span>
                   <span className={styles.rowAuteur}>{v.description || '—'}</span>
                   <button className={styles.rowDel} onClick={()=>delVac(v.id)}>×</button>
                 </div>
