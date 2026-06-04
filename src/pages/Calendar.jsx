@@ -35,7 +35,7 @@ export default function Calendar({ user, onLogout, onBack }) {
 
   useEffect(()=>{ load(); },[load]);
 
-  const evForDate = (d) => events.filter(e=>e.date_debut?.slice(0,10)===d);
+  const evForDate = (d) => events.filter(e => e.date_debut?.slice(0,10) <= d && (e.date_fin?.slice(0,10) || e.date_debut?.slice(0,10)) >= d);
   const nav = (dir) => {
     if(vue==='jour') setDate(d=>d.add(dir,'day'));
     if(vue==='semaine') setDate(d=>d.add(dir,'week'));

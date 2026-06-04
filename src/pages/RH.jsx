@@ -206,8 +206,8 @@ export default function RH({ user, onBack, onLogout }) {
 
           <div className={styles.list}>
             {vacances.length > 0 && (
-              <div className={rh.bilanHeader}>
-                <span>Du</span><span>Au</span><span>Durée</span><span>Description</span><span/>
+              <div className={rh.vacHeader}>
+                <span>Du</span><span>Au</span><span>Jours</span><span>Description</span><span/>
               </div>
             )}
             {vacances.map(v => {
@@ -216,11 +216,14 @@ export default function RH({ user, onBack, onLogout }) {
               const jours = Math.round((fin - debut) / 86400000) + 1;
               const isPast = fin < new Date();
               return (
-                <div key={v.id} className={`${styles.row} ${rh.bilanRow}`}
+                <div key={v.id} className={`${styles.row} ${rh.vacRow}`}
                   style={{opacity: isPast ? 0.6 : 1}}>
                   <span className={styles.rowDate}>{debut.toLocaleDateString('fr-CH')}</span>
                   <span className={styles.rowDate}>{fin.toLocaleDateString('fr-CH')}</span>
-                  <span style={{color:'#b08020',fontWeight:500}}>{jours} jour{jours>1?'s':''}</span>
+                  <div className={rh.joursBadge} style={{color: jours>14?'var(--rouge)':jours>7?'#b08020':'var(--vert)'}}>
+                    <span className={rh.joursNum}>{jours}</span>
+                    <span className={rh.joursLbl}>jour{jours>1?'s':''}</span>
+                  </div>
                   <span className={styles.rowAuteur}>{v.description || '—'}</span>
                   <button className={styles.rowDel} onClick={()=>delVac(v.id)}>×</button>
                 </div>
