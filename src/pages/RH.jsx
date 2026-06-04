@@ -89,7 +89,7 @@ export default function RH({ user, onBack, onLogout }) {
   };
 
   const delVac = async (id) => {
-    if (!window.confirm('Supprimer ces vacances ? Les jours seront débloqués dans l'agenda.')) return;
+    if (!window.confirm('Supprimer ces vacances ? Les jours seront débloqués dans l\'agenda.')) return;
     const d = await deleteVacances(id);
     if (d.erreur) { toast$(d.erreur, false); return; }
     toast$(`✓ Vacances supprimées — ${d.jours} jours débloqués`);
