@@ -100,6 +100,7 @@ export default function RH({ user, onBack, onLogout }) {
     const e = entriesByDate[dateStr];
     setForm({
       type:          e?.type || 'travail',
+      heures_recup:  e?.heures ? String(Math.abs(parseFloat(e.heures))) : '9',
       heure_arrivee: e?.heure_arrivee?.slice(0,5) || '10:00',
       heure_depart:  e?.heure_depart?.slice(0,5)  || '19:00',
       notes:         e?.notes || '',
@@ -109,7 +110,10 @@ export default function RH({ user, onBack, onLogout }) {
 
   const submit = async (e) => {
     e.preventDefault();
-    const d = await savePointage({ date_jour: modal.date_jour, ...form, type: form.type || 'travail' });
+    const d = await savePointage({
+      date_jour: modal.date_jour, ...form, type: form.type || 'travail',
+      heures_recup: form.type==='recup' ? form.heures_recup : undefined,
+    });
     if (d?.erreur) { toast$(d.erreur,false); return; }
     toast$('Pointage enregistré ✓');
     setModal(null);
@@ -423,12 +427,26 @@ export default function RH({ user, onBack, onLogout }) {
                 ))}
               </div>
 
-              {form.type==='recup' ? (
-                <div className={rh.preview} style={{background:'#ede7f6',color:'#7950f2'}}>
-                  <span>Journée de récupération</span>
-                  <span style={{fontWeight:600}}>-9h00 du solde heures sup.</span>
+              {form.type==='recup' ? (<>
+                <div className={styles.mf}>
+                  <label>Heures à récupérer</label>
+                  <input value={form.heures_recup}
+                    onChange={e=>setForm(p=>({...p,heures_recup:e.target.value}))}
+                    placeholder="ex: 4:30 ou 4.5"
+                    style={{fontSize:'18px',fontWeight:'600',textAlign:'center'}}/>
+                  <span style={{fontSize:'11px',color:'var(--gris-lt)',marginTop:'4px',display:'block'}}>Format HH:MM ou décimal. Journée complète = 9h</span>
                 </div>
-              ) : (<>
+                {(() => {
+                  let h = form.heures_recup?.toString().trim();
+                  if (h?.includes(':')) { const [hh,mm]=h.split(':').map(Number); h=hh+mm/60; } else h=parseFloat(h?.replace(',','.'));
+                  if (!isNaN(h) && h > 0) return (
+                    <div className={rh.preview} style={{background:'#ede7f6',color:'#7950f2'}}>
+                      <span>Récupération</span>
+                      <span style={{fontWeight:600}}>-{fmtHabs(h)} du solde</span>
+                    </div>
+                  );
+                })()}
+              </>) : (<>
                 <div className={rh.timeRow}>
                   <div className={styles.mf}>
                     <label>Arrivée</label>
