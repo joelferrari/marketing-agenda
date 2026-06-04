@@ -192,10 +192,14 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
           categorie: form.categorie, date_prevue: form.date_prevue, statut: form.statut,
         });
       } else {
-        await updateInvoice(editing.id, {
-          description: form.description, montant: form.montant,
-          categorie: form.categorie, date_facture: form.date_facture,
-        });
+        // FormData pour supporter l'ajout/remplacement de fichier
+        const fd = new FormData();
+        fd.append('description', form.description);
+        fd.append('montant',     form.montant);
+        fd.append('categorie',   form.categorie);
+        fd.append('date_facture',form.date_facture);
+        if (file) fd.append('file', file);
+        await updateInvoice(editing.id, fd);
       }
       toast$('Modifié ✓');
       setShowUpload(false); setEditing(null); resetForm(); loadData(filters, tab);
@@ -358,8 +362,8 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
               <button className={styles.modalClose} onClick={()=>{setShowUpload(false);setEditing(null);resetForm();}}>✕</button>
             </div>
             <div className={styles.modalBody}>
-              {/* Drop zone — seulement pour factures en création */}
-              {tab==='factures' && !editing && (
+              {/* Drop zone — pour factures (création et édition) */}
+              {tab==='factures' && (
                 <div className={styles.dropZone}
                   style={{borderColor:dragOver?'var(--rose)':file?'var(--vert)':'var(--border)',background:dragOver?'#fdf0f1':file?'#f3f8f0':'#fff'}}
                   onDragOver={e=>{e.preventDefault();setDragOver(true);}}

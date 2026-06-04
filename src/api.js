@@ -10,7 +10,7 @@ export const getTransactions    = ()    => fetch(`${BASE}/transactions`,{headers
 export const addTransaction     = (d)   => fetch(`${BASE}/transactions`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const deleteTransaction  = (id)  => fetch(`${BASE}/transactions/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
-export const updateInvoice  = (id,d) => fetch(`${BASE}/invoices/${id}`,{method:'PUT',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const updateInvoice  = (id,fd) => fetch(`${BASE}/invoices/${id}`,{method:'PUT',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
 export const addInvoiceJSON = (d) => fetch(`${BASE}/invoices`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const getInvoices    = (p={}) => fetch(`${BASE}/invoices?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const uploadInvoice  = (fd)   => fetch(`${BASE}/invoices/upload`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
