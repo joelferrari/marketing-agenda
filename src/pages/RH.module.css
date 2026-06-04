@@ -19,7 +19,7 @@
 .calCell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 6px;min-height:80px;cursor:pointer;transition:opacity .15s;display:flex;flex-direction:column;gap:2px}
 .calCell:hover{opacity:.85}
 .calSun{background:var(--fond)!important;cursor:default}
-.calFuture{opacity:.55;border-style:dashed}
+.calFuture{opacity:.55}
 .calEmpty{border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--fond)}
 .calDayNum{font-size:13px;font-weight:600;color:var(--gris);align-self:flex-start}
 .calHours{font-size:14px;font-weight:700;margin-top:auto;align-self:center}
