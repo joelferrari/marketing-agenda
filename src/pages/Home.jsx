@@ -24,6 +24,11 @@ const IconCaisse = () => (
     <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
   </svg>
 );
+const IconDepenses = () => (
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
+    <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+  </svg>
+);
 const IconRH = () => (
   <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round">
     <circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0113 0"/>
@@ -51,6 +56,7 @@ const INTERNAL = [
   { id:'agenda',         Icon:IconCalendar, titre:'Agenda Marketing', desc:'Campagnes, newsletters et événements marketing', color:'#3b5bdb' },
   { id:'carte',          Icon:IconCard,     titre:'Carte de crédit',  desc:'Dépenses et virements de la carte du spa',       color:'#c4737c' },
   { id:'factures-frais', Icon:IconReceipt,  titre:'Factures frais',   desc:'Upload et gestion des factures de frais',        color:'#6b8a5e' },
+  { id:'depenses',       Icon:IconDepenses,  titre:'Demandes de dépense', desc:'Soumettre une dépense à Nathalie pour validation', color:'#e67e22' },
   { id:'rh',             Icon:IconRH,       titre:'RH — Emilie',      desc:'Heures travaillées, heures sup. et vacances',     color:'#1098ad' },
   { id:'caisse',         Icon:IconCaisse,   titre:'Caisse cash',      desc:'Suivi de la caisse espèces avec import POS auto', color:'#2b8a3e' },
 ];
