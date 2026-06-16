@@ -52,8 +52,10 @@ export default function Depenses({ user, onBack, onLogout }) {
 
       <header className={styles.header}>
         <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-4 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <polyline points="9 15 11 17 15 13" strokeWidth="1.6"/>
           </svg>
           <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>Demandes de dépense</h1></div>
         </div>
