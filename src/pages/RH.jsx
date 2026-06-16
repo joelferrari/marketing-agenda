@@ -439,12 +439,15 @@ export default function RH({ user, onBack, onLogout }) {
                 {(() => {
                   let h = form.heures_recup?.toString().trim();
                   if (h?.includes(':')) { const [hh,mm]=h.split(':').map(Number); h=hh+mm/60; } else h=parseFloat(h?.replace(',','.'));
-                  if (!isNaN(h) && h > 0) return (
-                    <div className={rh.preview} style={{background:'#ede7f6',color:'#7950f2'}}>
-                      <span>Récupération</span>
-                      <span style={{fontWeight:600}}>-{fmtHabs(h)} du solde</span>
-                    </div>
-                  );
+                  if (!isNaN(h) && h > 0) {
+                    const hh=Math.floor(h), mm=Math.round((h-hh)*60);
+                    return (
+                      <div className={rh.preview} style={{background:'#ede7f6',color:'#7950f2'}}>
+                        <span>Récupération</span>
+                        <span style={{fontWeight:600}}>-{hh}h{String(mm).padStart(2,'0')} du solde</span>
+                      </div>
+                    );
+                  }
                 })()}
               </>) : (<>
                 <div className={rh.timeRow}>
