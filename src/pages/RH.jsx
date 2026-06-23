@@ -66,7 +66,7 @@ export default function RH({ user, onBack, onLogout }) {
   };
 
   useEffect(() => {
-    if (tab==='pointage') loadPointage();
+    if (tab==='pointage') { loadPointage(); loadBilan(); }
     else if (tab==='resume') loadBilan();
     else if (tab==='vacances') loadVacances();
   }, [tab, annee, mois]);
@@ -134,9 +134,15 @@ export default function RH({ user, onBack, onLogout }) {
     if (mois === 12) { setAnnee(a=>a+1); setMois(1); } else setMois(m=>m+1);
   };
 
+  // Cumul depuis le début de l'année jusqu'au mois affiché (inclus)
+  const cumulYTD = bilan
+    .filter(m => parseInt(m.mois) <= mois)
+    .reduce((s,m) => s + parseFloat(m.heures_sup||0), 0);
+
   // Stats mois courant
-  const totalH     = entries.reduce((s,e) => s + (parseFloat(e.heures)||0), 0);
-  const nbJours    = entries.filter(e => e.heures).length;
+  const totalH     = entries.filter(e=>e.type!=='recup').reduce((s,e) => s + (parseFloat(e.heures)||0), 0);
+  const nbJours    = entries.filter(e=>e.type!=='recup' && e.heures).length;
+  const nbRecup    = entries.filter(e=>e.type==='recup').length;
   const heuresSup  = entries.reduce((s,e) => s + (e.delta||0), 0);
 
   // Calendrier
@@ -277,8 +283,12 @@ export default function RH({ user, onBack, onLogout }) {
             <div className={rh.statsPills}>
               <span className={rh.pill}>{nbJours} jour{nbJours!==1?'s':''}</span>
               <span className={rh.pill}>{fmtH(totalH)} travaillées</span>
+              {nbRecup>0 && <span className={rh.pill} style={{color:'#7950f2'}}>{nbRecup} récup.</span>}
               <span className={rh.pill} style={{color:heuresSup>=0?'var(--vert)':'var(--rouge)',fontWeight:600}}>
-                {fmtH(heuresSup,true)} sup.
+                {fmtH(heuresSup,true)} ce mois
+              </span>
+              <span className={rh.pill} style={{color:cumulYTD>=0?'var(--vert)':'var(--rouge)',fontWeight:700,border:'1.5px solid '+(cumulYTD>=0?'var(--vert)':'var(--rouge)')}}>
+                Cumul {annee} : {fmtH(cumulYTD,true)}
               </span>
             </div>
           </div>
@@ -379,27 +389,36 @@ export default function RH({ user, onBack, onLogout }) {
 
           {/* Tableau mensuel */}
           <div className={styles.list}>
-            <div className={rh.bilanHeader}>
+            <div className={rh.bilanHeaderCumul}>
               <span>Mois</span>
               <span style={{textAlign:'center'}}>Jours</span>
               <span style={{textAlign:'right'}}>Heures</span>
-              <span style={{textAlign:'right'}}>Heures sup.</span>
+              <span style={{textAlign:'right'}}>Sup. du mois</span>
+              <span style={{textAlign:'right'}}>Cumul depuis janvier</span>
             </div>
             {!bilan.length && <p className={styles.empty}>Aucune donnée pour {annee}</p>}
-            {bilan.map(m => {
-              const sup = parseFloat(m.heures_sup||0);
-              return (
-                <div key={m.mois} className={`${styles.row} ${rh.bilanRow}`}
-                  onClick={()=>{ setMois(parseInt(m.mois)); setTab('pointage'); }}>
-                  <span className={styles.rowDate}>{MOIS_FR[m.mois-1]} {annee}</span>
-                  <span style={{textAlign:'center',color:'var(--gris)'}}>{m.jours_travailles}j</span>
-                  <span style={{textAlign:'right',fontWeight:600}}>{fmtH(parseFloat(m.total_heures))}</span>
-                  <span style={{textAlign:'right',fontWeight:600,color:sup>=0?'var(--vert)':'var(--rouge)'}}>
-                    {fmtH(sup,true)}
-                  </span>
-                </div>
-              );
-            })}
+            {(() => {
+              let cumul = 0;
+              return bilan.map(m => {
+                const sup = parseFloat(m.heures_sup||0);
+                cumul += sup;
+                const cumulSnapshot = cumul; // capture pour cette ligne
+                return (
+                  <div key={m.mois} className={`${styles.row} ${rh.bilanRowCumul}`}
+                    onClick={()=>{ setMois(parseInt(m.mois)); setTab('pointage'); }}>
+                    <span className={styles.rowDate}>{MOIS_FR[m.mois-1]} {annee}</span>
+                    <span style={{textAlign:'center',color:'var(--gris)'}}>{m.jours_travailles}j</span>
+                    <span style={{textAlign:'right',fontWeight:600}}>{fmtH(parseFloat(m.total_heures))}</span>
+                    <span style={{textAlign:'right',fontWeight:600,color:sup>=0?'var(--vert)':'var(--rouge)'}}>
+                      {fmtH(sup,true)}
+                    </span>
+                    <span style={{textAlign:'right',fontWeight:700,color:cumulSnapshot>=0?'var(--vert)':'var(--rouge)'}}>
+                      {fmtH(cumulSnapshot,true)}
+                    </span>
+                  </div>
+                );
+              });
+            })()}
           </div>
         </>)}
       </main>
