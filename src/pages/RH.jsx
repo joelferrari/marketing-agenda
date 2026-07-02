@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances, getDemandesVacances, addDemandeVacances } from '../api';
+import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances, getDemandesVacances, addDemandeVacances, emailRH, getAttestations, uploadAttestation, deleteAttestation, emailAttestations, getAttestationUrl } from '../api';
 import styles from './CreditCard.module.css';
 import rh from './RH.module.css';
 
@@ -17,6 +17,38 @@ const DEM_STATUT = {
   validee:    { label: "Validée",    color: '#2d7a4f', bg: '#e8f4e8' },
   refusee:    { label: "Refusée",    color: '#c62828', bg: '#fde8e8' },
 };
+
+const ATT_TYPES = { maladie: 'Maladie', accident: 'Accident', autre: 'Autre' };
+const ATT_COLORS = { maladie: 'var(--rouge)', accident: '#b08020', autre: 'var(--gris)' };
+
+const VERT = '#4a7c5f';
+
+function openPrint(title, sub, tableHTML) {
+  const w = window.open('', '_blank', 'width=900,height=700');
+  if (!w) return;
+  w.document.write(`<!DOCTYPE html><html lang="fr"><head>
+    <meta charset="utf-8"><title>${title}</title>
+    <style>
+      *{box-sizing:border-box;margin:0;padding:0}
+      body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:32px 40px;color:#2a2825;font-size:13px}
+      h1{color:#c4737c;font-weight:normal;font-size:22px;margin-bottom:4px}
+      .sub{color:#888;margin-bottom:24px;margin-top:4px}
+      table{width:100%;border-collapse:collapse;margin:12px 0}
+      th{background:#faf8f6;padding:9px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#888;border-bottom:2px solid #e8e0dc}
+      td{padding:9px 12px;border-bottom:1px solid #f0ebe8}
+      .toolbar{text-align:right;margin-bottom:20px}
+      .toolbar button{background:${VERT};color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:13px;cursor:pointer;font-family:sans-serif}
+      footer{color:#aaa;font-size:11px;margin-top:32px;padding-top:14px;border-top:1px solid #eee}
+      @media print{.toolbar{display:none}}
+    </style>
+  </head><body>
+    <div class="toolbar"><button onclick="window.print()">Imprimer / Enregistrer PDF</button></div>
+    <h1>${title}</h1><p class="sub">${sub}</p>
+    ${tableHTML}
+    <footer>Rubis SPA &middot; Sentier de Beau-Site 3, 1802 Corseaux &middot; rubisspa.ch</footer>
+  </body></html>`);
+  w.document.close();
+}
 
 const fmtH = (h, forceSign=false) => {
   if (h === null || h === undefined || isNaN(h)) return '—';
@@ -52,10 +84,16 @@ export default function RH({ user, onBack, onLogout }) {
   const [vacModal,  setVacModal] = useState(false);
   const [vacForm,   setVacForm]  = useState({date_debut:'',date_fin:'',description:''});
   const [vacSaving, setVacSaving]= useState(false);
-  const [demandes,  setDemandes] = useState([]);
-  const [demModal,  setDemModal] = useState(false);
-  const [demForm,   setDemForm]  = useState({date_debut:'',date_fin:'',commentaire:''});
-  const [demSaving, setDemSaving]= useState(false);
+  const [demandes,      setDemandes]     = useState([]);
+  const [demModal,      setDemModal]     = useState(false);
+  const [demForm,       setDemForm]      = useState({date_debut:'',date_fin:'',commentaire:''});
+  const [demSaving,     setDemSaving]    = useState(false);
+  const [attestations,  setAttestations] = useState([]);
+  const [attModal,      setAttModal]     = useState(false);
+  const [attForm,       setAttForm]      = useState({titre:'',type_doc:'maladie',date_doc:''});
+  const [attFile,       setAttFile]      = useState(null);
+  const [attSaving,     setAttSaving]    = useState(false);
+  const [emailing,      setEmailing]     = useState(false);
   const [toast,    setToast]   = useState(null);
   const [form,     setForm]    = useState({heure_arrivee:'09:00',heure_depart:'18:00',notes:''});
 
@@ -76,6 +114,110 @@ export default function RH({ user, onBack, onLogout }) {
     try { const d = await getDemandesVacances(); setDemandes(Array.isArray(d)?d:[]); } catch{}
   };
 
+  const loadAttestations = async () => {
+    try { const d = await getAttestations(); setAttestations(Array.isArray(d)?d:[]); } catch{}
+  };
+
+  const sendExport = async (type) => {
+    setEmailing(true);
+    try {
+      const d = type === 'attestations'
+        ? await emailAttestations()
+        : await emailRH({ type, annee, mois });
+      if (d.erreur) throw new Error(d.erreur);
+      toast$('Email envoyé à info@rubisspa.ch ✓');
+    } catch(err) { toast$(err.message, false); }
+    finally { setEmailing(false); }
+  };
+
+  const openFile = async (id) => {
+    try {
+      const url = getAttestationUrl(id);
+      const r = await fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('mkt_token')||''}` } });
+      if (!r.ok) throw new Error('Fichier introuvable');
+      const blob = await r.blob();
+      window.open(URL.createObjectURL(blob), '_blank');
+    } catch(err) { toast$(err.message, false); }
+  };
+
+  const printPointage = () => {
+    const rows = entries.map(e => {
+      const h   = parseFloat(e.heures) || 0;
+      const sup = e.type === 'recup' ? h : (e.heures ? h - CIBLE : null);
+      const hCol = e.type==='recup'?'#7950f2':h>=CIBLE?VERT:h>=CIBLE*0.6?'#b08020':'var(--rouge)';
+      const dStr = new Date(e.date_jour+'T12:00:00').toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
+      return `<tr>
+        <td>${dStr}</td>
+        <td>${e.heure_arrivee?.slice(0,5)||'—'}</td>
+        <td>${e.heure_depart?.slice(0,5)||'—'}</td>
+        <td style="font-weight:600;color:${hCol}">${e.type==='recup'?'Récup.':e.heures?fmtH(h):'—'}</td>
+        <td style="color:${sup!==null&&sup>=0?VERT:'#c62828'}">${sup!==null?fmtH(sup,true):'—'}</td>
+        <td style="color:#888">${e.notes||''}</td>
+      </tr>`;
+    }).join('');
+    openPrint('Pointage Emilie', `${MOIS_FR[mois-1]} ${annee}`,
+      `<table><thead><tr><th>Date</th><th>Arrivée</th><th>Départ</th><th>Heures</th><th>Sup.</th><th>Notes</th></tr></thead>
+       <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">Aucun pointage ce mois</td></tr>'}</tbody></table>`);
+  };
+
+  const printResume = () => {
+    let cumul = 0;
+    const rows = bilan.map(m => {
+      const sup = parseFloat(m.heures_sup||0); cumul += sup; const snap = cumul;
+      return `<tr>
+        <td>${MOIS_FR[m.mois-1]}</td>
+        <td style="text-align:center">${m.jours_travailles}j</td>
+        <td style="text-align:right;font-weight:600">${fmtH(parseFloat(m.total_heures||0))}</td>
+        <td style="text-align:right;font-weight:600;color:${sup>=0?VERT:'#c62828'}">${fmtH(sup,true)}</td>
+        <td style="text-align:right;font-weight:700;color:${snap>=0?VERT:'#c62828'}">${fmtH(snap,true)}</td>
+      </tr>`;
+    }).join('');
+    openPrint('Résumé annuel RH Emilie', String(annee),
+      `<table><thead><tr><th>Mois</th><th style="text-align:center">Jours</th><th style="text-align:right">Heures</th><th style="text-align:right">Sup.</th><th style="text-align:right">Cumul</th></tr></thead>
+       <tbody>${rows||'<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">Aucune donnée</td></tr>'}</tbody></table>`);
+  };
+
+  const printAttestations = () => {
+    const rows = attestations.map(a => `<tr>
+      <td>${a.date_doc?new Date(a.date_doc+'T12:00:00').toLocaleDateString('fr-CH'):'—'}</td>
+      <td>${ATT_TYPES[a.type_doc]||a.type_doc}</td>
+      <td style="font-weight:500">${a.titre}</td>
+      <td style="color:#888;font-size:12px">${a.original_name}</td>
+    </tr>`).join('');
+    openPrint('Attestations Emilie', `${attestations.length} document${attestations.length!==1?'s':''}`,
+      `<table><thead><tr><th>Date</th><th>Type</th><th>Titre</th><th>Fichier</th></tr></thead>
+       <tbody>${rows||'<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Aucune attestation</td></tr>'}</tbody></table>`);
+  };
+
+  const uploadAtt = async (e) => {
+    e.preventDefault();
+    if (!attFile) { toast$('Choisissez un fichier', false); return; }
+    setAttSaving(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', attFile);
+      fd.append('titre', attForm.titre);
+      fd.append('type_doc', attForm.type_doc);
+      if (attForm.date_doc) fd.append('date_doc', attForm.date_doc);
+      const d = await uploadAttestation(fd);
+      if (d.erreur) throw new Error(d.erreur);
+      toast$('Attestation enregistrée ✓');
+      setAttModal(false);
+      setAttForm({titre:'',type_doc:'maladie',date_doc:''});
+      setAttFile(null);
+      loadAttestations();
+    } catch(err) { toast$(err.message, false); }
+    finally { setAttSaving(false); }
+  };
+
+  const delAtt = async (id) => {
+    if (!window.confirm('Supprimer cette attestation ?')) return;
+    const d = await deleteAttestation(id);
+    if (d.erreur) { toast$(d.erreur, false); return; }
+    toast$('Attestation supprimée');
+    loadAttestations();
+  };
+
   const loadBilan = async (a=annee) => {
     setLoading(true);
     try { const d=await getBilan({annee:a}); setBilan(Array.isArray(d)?d:[]); }
@@ -87,6 +229,7 @@ export default function RH({ user, onBack, onLogout }) {
     if (tab==='pointage') { loadPointage(); loadBilan(); }
     else if (tab==='resume') loadBilan();
     else if (tab==='vacances') { loadVacances(); loadDemandes(); }
+    else if (tab==='attestations') loadAttestations();
   }, [tab, annee, mois]);
 
   const entriesByDate = Object.fromEntries(entries.map(e => [e.date_jour?.slice(0,10), e]));
@@ -232,9 +375,9 @@ export default function RH({ user, onBack, onLogout }) {
       <main className={styles.main}>
         {/* Onglets */}
         <div className={rh.tabs}>
-          {['pointage','resume','vacances'].map(t => (
+          {['pointage','resume','vacances','attestations'].map(t => (
             <button key={t} className={`${rh.tab} ${tab===t?rh.tabOn:''}`} onClick={()=>setTab(t)}>
-              {t==='pointage'?'Pointage':t==='resume'?'Résumé annuel':'Vacances'}
+              {t==='pointage'?'Pointage':t==='resume'?'Résumé annuel':t==='vacances'?'Vacances':'Attestations'}
             </button>
           ))}
         </div>
@@ -247,7 +390,7 @@ export default function RH({ user, onBack, onLogout }) {
             </p>
             <div style={{display:'flex',gap:'8px',flexShrink:0,marginLeft:'16px'}}>
               <button className={styles.addBtn}
-                style={{background:'#3b5bdb',borderColor:'#3b5bdb'}}
+                style={{background:VERT,borderColor:VERT}}
                 onClick={()=>setDemModal(true)}>
                 📋 Demander
               </button>
@@ -428,6 +571,14 @@ export default function RH({ user, onBack, onLogout }) {
             </div>
           </div>
 
+          {/* Barre export */}
+          <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'12px'}}>
+            <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF">📄 PDF</button>
+            <button className={rh.exportBtn} onClick={()=>sendExport('pointage')} disabled={emailing}>
+              📧 {emailing ? '…' : 'Email'}
+            </button>
+          </div>
+
           {/* Grille calendrier */}
           <div className={rh.calCard}>
             <div className={rh.calHeader}>
@@ -481,6 +632,14 @@ export default function RH({ user, onBack, onLogout }) {
               <button key={a} className={`${rh.anneeBtn} ${annee===a?rh.anneeBtnOn:''}`}
                 onClick={()=>setAnnee(a)}>{a}</button>
             ))}
+          </div>
+
+          {/* Barre export */}
+          <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'16px'}}>
+            <button className={rh.exportBtn} onClick={printResume} title="Télécharger PDF">📄 PDF</button>
+            <button className={rh.exportBtn} onClick={()=>sendExport('resume')} disabled={emailing}>
+              📧 {emailing ? '…' : 'Email'}
+            </button>
           </div>
 
           {/* Solde global */}
@@ -555,6 +714,55 @@ export default function RH({ user, onBack, onLogout }) {
               });
             })()}
           </div>
+        </>)}
+
+        {/* ── ATTESTATIONS ── */}
+        {tab==='attestations' && (<>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
+            <p style={{fontSize:'13px',color:'var(--gris)',margin:0}}>
+              Certificats médicaux, attestations maladie et accident.
+            </p>
+            <div style={{display:'flex',gap:'6px',flexShrink:0,marginLeft:'16px'}}>
+              <button className={rh.exportBtn} onClick={printAttestations}>📄 PDF</button>
+              <button className={rh.exportBtn} onClick={()=>sendExport('attestations')} disabled={emailing}>
+                📧 {emailing?'…':'Email'}
+              </button>
+              <button className={styles.addBtn} onClick={()=>setAttModal(true)}>+ Ajouter</button>
+            </div>
+          </div>
+
+          {attestations.length === 0 && <p className={styles.empty}>Aucune attestation enregistrée</p>}
+
+          {attestations.length > 0 && (
+            <div className={styles.list}>
+              <div className={rh.attHeader}>
+                <span>Date</span><span>Type</span><span>Titre</span><span/>
+              </div>
+              {attestations.map(a => {
+                const d = a.date_doc ? new Date(a.date_doc+'T12:00:00') : null;
+                return (
+                  <div key={a.id} className={`${styles.row} ${rh.attRow}`}>
+                    <span className={styles.rowDate}>{d ? d.toLocaleDateString('fr-CH') : '—'}</span>
+                    <span style={{fontSize:'11px',fontWeight:600,color:ATT_COLORS[a.type_doc]||'var(--gris)'}}>
+                      {ATT_TYPES[a.type_doc]||a.type_doc}
+                    </span>
+                    <div>
+                      <span style={{fontSize:'14px',fontWeight:500,color:'var(--noir)',display:'block'}}>{a.titre}</span>
+                      <span style={{fontSize:'11px',color:'var(--gris-lt)'}}>{a.original_name}</span>
+                    </div>
+                    <div style={{display:'flex',gap:'6px',alignItems:'center',justifyContent:'flex-end'}}>
+                      <button
+                        onClick={()=>openFile(a.id)}
+                        style={{fontSize:'12px',color:VERT,background:'var(--vert-lt)',border:'none',padding:'4px 10px',borderRadius:'4px',cursor:'pointer',fontWeight:500}}>
+                        Voir
+                      </button>
+                      <button className={styles.rowDel} onClick={()=>delAtt(a.id)}>×</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </>)}
       </main>
 
@@ -651,6 +859,60 @@ export default function RH({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
+
+      {/* Modal upload attestation */}
+      {attModal && (
+        <div className={styles.overlay} onClick={()=>setAttModal(false)}>
+          <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Nouvelle attestation</h2>
+              <button className={styles.modalClose} onClick={()=>setAttModal(false)}>✕</button>
+            </div>
+            <form onSubmit={uploadAtt} className={styles.modalBody}>
+              <div className={styles.mf}>
+                <label>Titre</label>
+                <input value={attForm.titre} required
+                  onChange={e=>setAttForm(p=>({...p,titre:e.target.value}))}
+                  placeholder="Certificat médical Dr. Martin…"/>
+              </div>
+              <div className={rh.formRow}>
+                <div className={styles.mf}>
+                  <label>Type</label>
+                  <select value={attForm.type_doc}
+                    onChange={e=>setAttForm(p=>({...p,type_doc:e.target.value}))}
+                    style={{border:'1.5px solid var(--border)',borderRadius:'6px',padding:'10px 12px',fontSize:'14px',background:'#fff',width:'100%'}}>
+                    <option value="maladie">Maladie</option>
+                    <option value="accident">Accident</option>
+                    <option value="autre">Autre</option>
+                  </select>
+                </div>
+                <div className={styles.mf}>
+                  <label>Date du document</label>
+                  <input type="date" value={attForm.date_doc}
+                    onChange={e=>setAttForm(p=>({...p,date_doc:e.target.value}))}/>
+                </div>
+              </div>
+              <div className={styles.mf}>
+                <label>Fichier (JPG ou PDF)</label>
+                <input type="file" accept=".jpg,.jpeg,.png,.pdf" required
+                  onChange={e=>setAttFile(e.target.files[0]||null)}
+                  style={{border:'1.5px solid var(--border)',borderRadius:'6px',padding:'10px 12px',fontSize:'13px',width:'100%'}}/>
+                {attFile && (
+                  <span style={{fontSize:'11px',color:'var(--gris-lt)',marginTop:'4px'}}>
+                    {attFile.name} — {(attFile.size/1024).toFixed(0)} Ko
+                  </span>
+                )}
+              </div>
+              <div className={styles.modalFooter}>
+                <button type="button" className={styles.btnCancel} onClick={()=>setAttModal(false)}>Annuler</button>
+                <button type="submit" className={styles.btnSubmit} style={{background:VERT}} disabled={attSaving}>
+                  {attSaving ? '…' : 'Enregistrer'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     {/* Modal demande de vacances */}
     {demModal && (
       <div className={styles.overlay} onClick={()=>setDemModal(false)}>
@@ -676,7 +938,7 @@ export default function RH({ user, onBack, onLogout }) {
               </div>
             </div>
             {demForm.date_debut && demForm.date_fin && demForm.date_fin >= demForm.date_debut && (
-              <div className={rh.preview} style={{background:'#e8eaf6',color:'#3b5bdb'}}>
+              <div className={rh.preview} style={{background:'#e8eaf6',color:VERT}}>
                 <span>📅 {Math.round((new Date(demForm.date_fin)-new Date(demForm.date_debut))/86400000)+1} jours</span>
                 <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
               </div>
@@ -689,7 +951,7 @@ export default function RH({ user, onBack, onLogout }) {
             </div>
             <div className={styles.modalFooter}>
               <button type="button" className={styles.btnCancel} onClick={()=>setDemModal(false)}>Annuler</button>
-              <button type="submit" className={styles.btnSubmit} style={{background:'#3b5bdb'}} disabled={demSaving}>
+              <button type="submit" className={styles.btnSubmit} style={{background:VERT}} disabled={demSaving}>
                 {demSaving ? '…' : 'Envoyer à Nathalie'}
               </button>
             </div>
