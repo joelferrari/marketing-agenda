@@ -94,6 +94,8 @@ export default function RH({ user, onBack, onLogout }) {
   const [attFile,       setAttFile]      = useState(null);
   const [attSaving,     setAttSaving]    = useState(false);
   const [emailing,      setEmailing]     = useState(false);
+  const [emailModal,    setEmailModal]   = useState(null); // null | 'pointage' | 'resume' | 'attestations'
+  const [emailTo,       setEmailTo]      = useState('info@rubisspa.ch');
   const [toast,    setToast]   = useState(null);
   const [form,     setForm]    = useState({heure_arrivee:'09:00',heure_depart:'18:00',notes:''});
 
@@ -118,14 +120,18 @@ export default function RH({ user, onBack, onLogout }) {
     try { const d = await getAttestations(); setAttestations(Array.isArray(d)?d:[]); } catch{}
   };
 
-  const sendExport = async (type) => {
+  const openEmailModal = (type) => { setEmailModal(type); setEmailTo('info@rubisspa.ch'); };
+
+  const sendExport = async () => {
+    if (!emailTo) return;
     setEmailing(true);
     try {
-      const d = type === 'attestations'
-        ? await emailAttestations()
-        : await emailRH({ type, annee, mois });
+      const d = emailModal === 'attestations'
+        ? await emailAttestations(emailTo)
+        : await emailRH({ type: emailModal, annee, mois, destinataire: emailTo });
       if (d.erreur) throw new Error(d.erreur);
-      toast$('Email envoyé à info@rubisspa.ch ✓');
+      toast$(`Email envoyé à ${emailTo} ✓`);
+      setEmailModal(null);
     } catch(err) { toast$(err.message, false); }
     finally { setEmailing(false); }
   };
@@ -574,7 +580,7 @@ export default function RH({ user, onBack, onLogout }) {
           {/* Barre export */}
           <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'12px'}}>
             <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF">📄 PDF</button>
-            <button className={rh.exportBtn} onClick={()=>sendExport('pointage')} disabled={emailing}>
+            <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}>
               📧 {emailing ? '…' : 'Email'}
             </button>
           </div>
@@ -637,7 +643,7 @@ export default function RH({ user, onBack, onLogout }) {
           {/* Barre export */}
           <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'16px'}}>
             <button className={rh.exportBtn} onClick={printResume} title="Télécharger PDF">📄 PDF</button>
-            <button className={rh.exportBtn} onClick={()=>sendExport('resume')} disabled={emailing}>
+            <button className={rh.exportBtn} onClick={()=>openEmailModal('resume')} disabled={emailing}>
               📧 {emailing ? '…' : 'Email'}
             </button>
           </div>
@@ -724,7 +730,7 @@ export default function RH({ user, onBack, onLogout }) {
             </p>
             <div style={{display:'flex',gap:'6px',flexShrink:0,marginLeft:'16px'}}>
               <button className={rh.exportBtn} onClick={printAttestations}>📄 PDF</button>
-              <button className={rh.exportBtn} onClick={()=>sendExport('attestations')} disabled={emailing}>
+              <button className={rh.exportBtn} onClick={()=>openEmailModal('attestations')} disabled={emailing}>
                 📧 {emailing?'…':'Email'}
               </button>
               <button className={styles.addBtn} onClick={()=>setAttModal(true)}>+ Ajouter</button>
@@ -860,6 +866,34 @@ export default function RH({ user, onBack, onLogout }) {
         </div>
       )}
 
+      {/* Modal choix destinataire email */}
+      {emailModal && (
+        <div className={styles.overlay} onClick={()=>setEmailModal(null)}>
+          <div className={styles.modalBox} style={{maxWidth:'360px'}} onClick={e=>e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h2 className={styles.modalTitle}>Envoyer par e-mail</h2>
+              <button className={styles.modalClose} onClick={()=>setEmailModal(null)}>✕</button>
+            </div>
+            <div className={styles.modalBody}>
+              <div className={styles.mf}>
+                <label>Destinataire</label>
+                <input type="email" value={emailTo} autoFocus
+                  onChange={e=>setEmailTo(e.target.value)}
+                  placeholder="email@exemple.com"
+                  onKeyDown={e=>e.key==='Enter'&&sendExport()}/>
+              </div>
+              <div className={styles.modalFooter}>
+                <button className={styles.btnCancel} onClick={()=>setEmailModal(null)}>Annuler</button>
+                <button className={styles.btnSubmit} style={{background:VERT}}
+                  disabled={emailing || !emailTo}
+                  onClick={sendExport}>
+                  {emailing ? '…' : 'Envoyer'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Modal upload attestation */}
       {attModal && (
         <div className={styles.overlay} onClick={()=>setAttModal(false)}>

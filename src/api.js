@@ -50,6 +50,6 @@ export const emailRH             = (d)  => fetch(`${BASE}/rh/email-export`,{meth
 export const getAttestations     = ()   => fetch(`${BASE}/attestations`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const uploadAttestation   = (fd) => fetch(`${BASE}/attestations`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
 export const deleteAttestation   = (id) => fetch(`${BASE}/attestations/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
-export const emailAttestations   = ()   => fetch(`${BASE}/attestations/email`,{method:'POST',headers:h()}).then(r=>r.json());
+export const emailAttestations   = (to) => fetch(`${BASE}/attestations/email`,{method:'POST',headers:h(),body:JSON.stringify({destinataire:to})}).then(r=>r.json());
 export const getAttestationUrl   = (id) => `${BASE}/attestations/${id}/file`;
 
