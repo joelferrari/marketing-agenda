@@ -12,6 +12,12 @@ dayjs.locale('fr');
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
+const CAT_COLORS = {
+  'Vacances':'#fab005','Maladie':'#e03131','Récup. heures sup.':'#7950f2',
+  'Marketing':'#3b5bdb','Autre':'#868e96',
+};
+const CAT_ORDER = ['Vacances','Maladie','Récup. heures sup.','Marketing','Autre'];
+
 export default function Calendar({ user, onLogout, onBack }) {
   const [date, setDate] = useState(dayjs());
   const [vue, setVue] = useState('mois');
@@ -57,6 +63,47 @@ export default function Calendar({ user, onLogout, onBack }) {
     if(vue==='jour') return date.format('dddd D MMMM YYYY');
     if(vue==='semaine') return `${date.isoWeekday(1).format('D MMM')} — ${date.isoWeekday(7).format('D MMM YYYY')}`;
     return `${MONTHS[date.month()]} ${date.year()}`;
+  };
+
+  const renderMoisSidePanel = () => {
+    const monthStart = date.startOf('month').format('YYYY-MM-DD');
+    const monthEnd   = date.endOf('month').format('YYYY-MM-DD');
+    const moisEvs = events
+      .filter(e => e.date_debut?.slice(0,10) <= monthEnd && (e.date_fin?.slice(0,10)||e.date_debut?.slice(0,10)) >= monthStart)
+      .sort((a,b) => a.date_debut < b.date_debut ? -1 : 1);
+    const byCat = {};
+    moisEvs.forEach(ev => {
+      const cat = ev.categorie || 'Autre';
+      if (!byCat[cat]) byCat[cat] = [];
+      byCat[cat].push(ev);
+    });
+    const present = CAT_ORDER.filter(c => byCat[c]);
+    return (
+      <div className={styles.sidePanel}>
+        <p className={styles.sidePanelTitle}>{MONTHS[date.month()]}</p>
+        {present.length === 0 && <p className={styles.sidePanelEmpty}>Aucun événement ce mois</p>}
+        {present.map(cat => (
+          <div key={cat} className={styles.sidePanelGroup}>
+            <div className={styles.sidePanelCatRow}>
+              <span className={styles.sidePanelCatDot} style={{background:CAT_COLORS[cat]||'#868e96'}}/>
+              <span className={styles.sidePanelCat}>{cat}</span>
+              <span className={styles.sidePanelCatCount}>{byCat[cat].length}</span>
+            </div>
+            {byCat[cat].map(ev => (
+              <div key={ev.id} className={styles.sidePanelEvent}
+                style={{borderLeftColor:CAT_COLORS[cat]||'#868e96'}}
+                onClick={()=>setModal({event:ev})}>
+                <span className={styles.sidePanelDate}>
+                  {ev.date_debut?.slice(5,10).replace('-','/')}
+                  {ev.date_fin && ev.date_fin !== ev.date_debut ? ' → ' + ev.date_fin.slice(5,10).replace('-','/') : ''}
+                </span>
+                <span className={styles.sidePanelEvTitle}>{ev.titre}</span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   const renderMois = () => {
@@ -170,7 +217,12 @@ export default function Calendar({ user, onLogout, onBack }) {
       </header>
       <main className={styles.main}>
         {loading&&<div className={styles.loading}>Chargement…</div>}
-        {!loading&&vue==='mois'&&renderMois()}
+        {!loading&&vue==='mois'&&(
+          <div className={styles.moisOuter}>
+            {renderMois()}
+            {renderMoisSidePanel()}
+          </div>
+        )}
         {!loading&&vue==='semaine'&&renderSemaine()}
         {!loading&&vue==='jour'&&renderJour()}
       </main>

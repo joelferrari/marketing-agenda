@@ -245,6 +245,66 @@ export default function RH({ user, onBack, onLogout }) {
             );
           })()}
 
+          {/* Bilan mensuel vacances */}
+          {(() => {
+            const anneeVacBilan = NOW.getFullYear();
+            const moisMax = NOW.getMonth() + 1;
+            const CREDIT_MENSUEL = 1.67;
+            const debitParMois = {};
+            vacances.forEach(v => {
+              const debut = new Date(v.date_debut + 'T12:00:00');
+              const fin   = new Date((v.date_fin || v.date_debut) + 'T12:00:00');
+              const cur = new Date(debut);
+              while (cur <= fin) {
+                if (cur.getFullYear() === anneeVacBilan) {
+                  const m = cur.getMonth() + 1;
+                  debitParMois[m] = (debitParMois[m] || 0) + 1;
+                }
+                cur.setDate(cur.getDate() + 1);
+              }
+            });
+            let balanceCumul = 0;
+            const lignes = [];
+            for (let m = 1; m <= moisMax; m++) {
+              const debit = debitParMois[m] || 0;
+              balanceCumul = Math.round((balanceCumul + CREDIT_MENSUEL - debit) * 100) / 100;
+              lignes.push({ mois: m, credit: CREDIT_MENSUEL, debit, balance: balanceCumul });
+            }
+            const balFinale = lignes.length ? lignes[lignes.length-1].balance : 0;
+            return (
+              <div style={{marginBottom:'20px'}}>
+                <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'8px'}}>
+                  <p style={{fontSize:'11px',letterSpacing:'.08em',textTransform:'uppercase',color:'var(--gris-lt)',margin:0}}>
+                    Bilan mensuel {anneeVacBilan}
+                  </p>
+                  <span style={{fontSize:'12px',fontWeight:700,color:balFinale>=0?'var(--vert)':'var(--rouge)'}}>
+                    Solde : {balFinale>=0?'+':''}{balFinale.toFixed(2)} j
+                  </span>
+                </div>
+                <div className={styles.list}>
+                  <div style={{display:'grid',gridTemplateColumns:'1fr 80px 80px 90px',gap:'12px',padding:'10px 20px',background:'var(--beige)',fontSize:'11px',letterSpacing:'.06em',textTransform:'uppercase',color:'var(--gris-lt)'}}>
+                    <span>Mois</span>
+                    <span style={{textAlign:'right'}}>Crédit</span>
+                    <span style={{textAlign:'right'}}>Débit</span>
+                    <span style={{textAlign:'right'}}>Balance</span>
+                  </div>
+                  {lignes.map(({mois:m, credit, debit, balance}) => (
+                    <div key={m} style={{display:'grid',gridTemplateColumns:'1fr 80px 80px 90px',gap:'12px',padding:'11px 20px',alignItems:'center',borderTop:'1px solid var(--border)'}}>
+                      <span style={{fontSize:'13px',color:'var(--gris)'}}>{MOIS_FR[m-1]}</span>
+                      <span style={{textAlign:'right',fontSize:'13px',color:'var(--vert)',fontWeight:500}}>+{credit.toFixed(2)} j</span>
+                      <span style={{textAlign:'right',fontSize:'13px',color:debit>0?'var(--rouge)':'var(--gris-lt)'}}>
+                        {debit > 0 ? '-'+debit+' j' : '—'}
+                      </span>
+                      <span style={{textAlign:'right',fontSize:'13px',fontWeight:700,color:balance>=0?'var(--vert)':'var(--rouge)'}}>
+                        {balance>=0?'+':''}{balance.toFixed(2)} j
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           {vacances.length === 0 && <p className={styles.empty}>Aucune période de vacances enregistrée</p>}
 
           <div className={styles.list}>

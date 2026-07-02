@@ -38,3 +38,8 @@ export const getVacances    = ()    => fetch(`${BASE}/rh/vacances`,{headers:h(),
 export const addVacances    = (d)   => fetch(`${BASE}/rh/vacances`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const deleteVacances = (id)  => fetch(`${BASE}/rh/vacances/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
+export const getAbonnements   = ()    => fetch(`${BASE}/abonnements`,{headers:h()}).then(r=>r.json());
+export const addAbonnement    = (d)   => fetch(`${BASE}/abonnements`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const toggleAbonnement = (id)  => fetch(`${BASE}/abonnements/${id}/toggle`,{method:'PUT',headers:h()}).then(r=>r.json());
+export const deleteAbonnement = (id)  => fetch(`${BASE}/abonnements/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+
