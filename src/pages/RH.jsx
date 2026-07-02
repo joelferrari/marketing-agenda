@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances } from '../api';
+import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances, getDemandesVacances, addDemandeVacances } from '../api';
 import styles from './CreditCard.module.css';
 import rh from './RH.module.css';
 
@@ -11,6 +11,12 @@ const NOW     = new Date();
 // Jours pris sur quota 2025 (stockés en 2025 en DB, absents du bilan 2026) à ajouter manuellement
 // { [mois]: nombre_de_jours }
 const JOURS_QUOTA_2025 = { 5: 5 }; // mai 2026 : 5 jours (05-09 mai, sur quota 2025)
+
+const DEM_STATUT = {
+  en_attente: { label: 'En attente', color: '#b08020', bg: '#fff8e1' },
+  validee:    { label: "Validée",    color: '#2d7a4f', bg: '#e8f4e8' },
+  refusee:    { label: "Refusée",    color: '#c62828', bg: '#fde8e8' },
+};
 
 const fmtH = (h, forceSign=false) => {
   if (h === null || h === undefined || isNaN(h)) return '—';
@@ -46,6 +52,10 @@ export default function RH({ user, onBack, onLogout }) {
   const [vacModal,  setVacModal] = useState(false);
   const [vacForm,   setVacForm]  = useState({date_debut:'',date_fin:'',description:''});
   const [vacSaving, setVacSaving]= useState(false);
+  const [demandes,  setDemandes] = useState([]);
+  const [demModal,  setDemModal] = useState(false);
+  const [demForm,   setDemForm]  = useState({date_debut:'',date_fin:'',commentaire:''});
+  const [demSaving, setDemSaving]= useState(false);
   const [toast,    setToast]   = useState(null);
   const [form,     setForm]    = useState({heure_arrivee:'09:00',heure_depart:'18:00',notes:''});
 
@@ -62,6 +72,10 @@ export default function RH({ user, onBack, onLogout }) {
     try { const d = await getVacances(); setVacances(Array.isArray(d)?d:[]); } catch{}
   };
 
+  const loadDemandes = async () => {
+    try { const d = await getDemandesVacances(); setDemandes(Array.isArray(d)?d:[]); } catch{}
+  };
+
   const loadBilan = async (a=annee) => {
     setLoading(true);
     try { const d=await getBilan({annee:a}); setBilan(Array.isArray(d)?d:[]); }
@@ -72,10 +86,25 @@ export default function RH({ user, onBack, onLogout }) {
   useEffect(() => {
     if (tab==='pointage') { loadPointage(); loadBilan(); }
     else if (tab==='resume') loadBilan();
-    else if (tab==='vacances') loadVacances();
+    else if (tab==='vacances') { loadVacances(); loadDemandes(); }
   }, [tab, annee, mois]);
 
   const entriesByDate = Object.fromEntries(entries.map(e => [e.date_jour?.slice(0,10), e]));
+
+  const addDem = async (e) => {
+    e.preventDefault();
+    if (!demForm.date_debut || !demForm.date_fin) return;
+    setDemSaving(true);
+    try {
+      const d = await addDemandeVacances(demForm);
+      if (d.erreur) throw new Error(d.erreur);
+      toast$('Demande envoyée à Nathalie pour validation ✓');
+      setDemModal(false);
+      setDemForm({date_debut:'',date_fin:'',commentaire:''});
+      loadDemandes();
+    } catch(err) { toast$(err.message, false); }
+    finally { setDemSaving(false); }
+  };
 
   const addVac = async (e) => {
     e.preventDefault();
@@ -216,9 +245,16 @@ export default function RH({ user, onBack, onLogout }) {
             <p style={{fontSize:'13px',color:'var(--gris)',margin:0}}>
               Les vacances bloquent automatiquement l'agenda du spa et apparaissent dans le calendrier marketing.
             </p>
-            <button className={styles.addBtn} style={{marginLeft:'16px',flexShrink:0}} onClick={()=>setVacModal(true)}>
-              + Ajouter vacances
-            </button>
+            <div style={{display:'flex',gap:'8px',flexShrink:0,marginLeft:'16px'}}>
+              <button className={styles.addBtn}
+                style={{background:'#3b5bdb',borderColor:'#3b5bdb'}}
+                onClick={()=>setDemModal(true)}>
+                📋 Demander
+              </button>
+              <button className={styles.addBtn} onClick={()=>setVacModal(true)}>
+                + Ajouter
+              </button>
+            </div>
           </div>
 
           {/* Carte solde total */}
@@ -337,6 +373,37 @@ export default function RH({ user, onBack, onLogout }) {
                 </div>
               );
             })}
+          </div>
+
+          {/* Demandes de vacances */}
+          <div style={{marginTop:'28px'}}>
+            <p style={{fontSize:'11px',letterSpacing:'.08em',textTransform:'uppercase',color:'var(--gris-lt)',margin:'0 0 8px'}}>
+              Demandes de vacances
+            </p>
+            {demandes.length === 0 && <p className={styles.empty}>Aucune demande envoyée</p>}
+            {demandes.length > 0 && (
+              <div className={styles.list}>
+                {demandes.map(dm => {
+                  const debut = new Date(dm.date_debut + 'T12:00:00');
+                  const fin   = new Date(dm.date_fin   + 'T12:00:00');
+                  const jours = Math.round((fin - debut) / 86400000) + 1;
+                  const s     = DEM_STATUT[dm.statut] || DEM_STATUT.en_attente;
+                  return (
+                    <div key={dm.id} className={styles.row} style={{alignItems:'center',gap:'8px'}}>
+                      <span className={styles.rowDate}>{debut.toLocaleDateString('fr-CH')}</span>
+                      <span style={{color:'var(--gris-lt)'}}>→</span>
+                      <span className={styles.rowDate}>{fin.toLocaleDateString('fr-CH')}</span>
+                      <span style={{color:'var(--gris)',fontWeight:500}}>{jours}j</span>
+                      {dm.commentaire && <span className={styles.rowAuteur}>{dm.commentaire}</span>}
+                      <div style={{flex:1}}/>
+                      <span style={{fontSize:'11px',fontWeight:600,color:s.color,background:s.bg,padding:'3px 8px',borderRadius:'4px',whiteSpace:'nowrap'}}>
+                        {s.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </>)}
 
@@ -584,6 +651,52 @@ export default function RH({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
+    {/* Modal demande de vacances */}
+    {demModal && (
+      <div className={styles.overlay} onClick={()=>setDemModal(false)}>
+        <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
+          <div className={styles.modalHeader}>
+            <h2 className={styles.modalTitle}>Demande de vacances</h2>
+            <button className={styles.modalClose} onClick={()=>setDemModal(false)}>✕</button>
+          </div>
+          <form onSubmit={addDem} className={styles.modalBody}>
+            <p style={{fontSize:'13px',color:'var(--gris)',marginTop:0,marginBottom:'16px'}}>
+              La demande sera envoyée à Nathalie par e-mail pour validation.
+            </p>
+            <div className={rh.formRow}>
+              <div className={styles.mf}>
+                <label>Du</label>
+                <input type="date" value={demForm.date_debut} required
+                  onChange={e=>setDemForm(p=>({...p,date_debut:e.target.value,date_fin:p.date_fin||e.target.value}))}/>
+              </div>
+              <div className={styles.mf}>
+                <label>Au</label>
+                <input type="date" value={demForm.date_fin} min={demForm.date_debut} required
+                  onChange={e=>setDemForm(p=>({...p,date_fin:e.target.value}))}/>
+              </div>
+            </div>
+            {demForm.date_debut && demForm.date_fin && demForm.date_fin >= demForm.date_debut && (
+              <div className={rh.preview} style={{background:'#e8eaf6',color:'#3b5bdb'}}>
+                <span>📅 {Math.round((new Date(demForm.date_fin)-new Date(demForm.date_debut))/86400000)+1} jours</span>
+                <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
+              </div>
+            )}
+            <div className={styles.mf}>
+              <label>Commentaire (optionnel)</label>
+              <input value={demForm.commentaire}
+                onChange={e=>setDemForm(p=>({...p,commentaire:e.target.value}))}
+                placeholder="Vacances été, semaine ski…"/>
+            </div>
+            <div className={styles.modalFooter}>
+              <button type="button" className={styles.btnCancel} onClick={()=>setDemModal(false)}>Annuler</button>
+              <button type="submit" className={styles.btnSubmit} style={{background:'#3b5bdb'}} disabled={demSaving}>
+                {demSaving ? '…' : 'Envoyer à Nathalie'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
     {/* Modal ajout vacances */}
     {vacModal && (
       <div className={styles.overlay} onClick={()=>setVacModal(false)}>
