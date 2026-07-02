@@ -8,8 +8,9 @@ const MOIS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Ao�
 const JOURS   = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const NOW     = new Date();
 
-// Jours physiquement pris en 2026 mais imputés sur le quota 2025 (hors décompte 2026)
-const HORS_QUOTA_2026 = new Set(['2026-05-05','2026-05-06','2026-05-07','2026-05-08','2026-05-09']);
+// Jours pris sur quota 2025 (stockés en 2025 en DB, absents du bilan 2026) à ajouter manuellement
+// { [mois]: nombre_de_jours }
+const JOURS_QUOTA_2025 = { 5: 5 }; // mai 2026 : 5 jours (05-09 mai, sur quota 2025)
 
 const fmtH = (h, forceSign=false) => {
   if (h === null || h === undefined || isNaN(h)) return '—';
@@ -225,21 +226,11 @@ export default function RH({ user, onBack, onLogout }) {
             const now = new Date();
             const anneeVac = now.getFullYear();
             const totalJours = vacances
-              .filter(v => {
-                const y1 = new Date(v.date_debut+'T12:00').getFullYear();
-                const y2 = new Date((v.date_fin||v.date_debut)+'T12:00').getFullYear();
-                return y1 === anneeVac || y2 === anneeVac;
-              })
+              .filter(v => new Date(v.date_debut).getFullYear() === anneeVac || new Date(v.date_fin).getFullYear() === anneeVac)
               .reduce((s,v) => {
-                const debut = new Date(v.date_debut+'T12:00');
-                const fin   = new Date((v.date_fin||v.date_debut)+'T12:00');
-                const cur = new Date(debut);
-                while (cur <= fin) {
-                  const ds = cur.toISOString().slice(0,10);
-                  if (new Date(ds+'T12:00').getFullYear() === anneeVac && !HORS_QUOTA_2026.has(ds)) s++;
-                  cur.setDate(cur.getDate() + 1);
-                }
-                return s;
+                const debut = new Date(v.date_debut);
+                const fin   = new Date(v.date_fin);
+                return s + Math.round((fin - debut) / 86400000) + 1;
               }, 0);
             const DROIT = 20; // jours de vacances annuels
             const restant = DROIT - totalJours;
@@ -269,13 +260,16 @@ export default function RH({ user, onBack, onLogout }) {
               const fin   = new Date((v.date_fin || v.date_debut) + 'T12:00:00');
               const cur = new Date(debut);
               while (cur <= fin) {
-                const ds = cur.toISOString().slice(0,10);
-                if (cur.getFullYear() === anneeVacBilan && !HORS_QUOTA_2026.has(ds)) {
+                if (cur.getFullYear() === anneeVacBilan) {
                   const m = cur.getMonth() + 1;
                   debitParMois[m] = (debitParMois[m] || 0) + 1;
                 }
                 cur.setDate(cur.getDate() + 1);
               }
+            });
+            // Jours pris sur quota 2025 (non stockés comme dates 2026 en DB)
+            Object.entries(JOURS_QUOTA_2025).forEach(([m, j]) => {
+              debitParMois[+m] = (debitParMois[+m] || 0) + j;
             });
             let balanceCumul = 0;
             const lignes = [];
