@@ -83,7 +83,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const [showCats,   setShowCats]  = useState(false);
   const [dragOver,   setDragOver]  = useState(false);
   const [file,       setFile]      = useState(null);
-  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',date_facture:'',date_prevue:'',statut:'Prévu'});
+  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu'});
   const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'});
   const [newCat,     setNewCat]    = useState('');
   const fileRef = useRef();
@@ -135,7 +135,8 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
     setFile(f);
   };
 
-  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',date_facture:'',date_prevue:'',statut:'Prévu'}); };
+  const ENTITES_FF = ["Mined'or", 'Rubis Spa'];
+  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu'}); };
 
   const upload = async () => {
     setUploading(true);
@@ -153,7 +154,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         const fd = new FormData();
         fd.append('file',file); fd.append('description',form.description);
         fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
-        fd.append('categorie',form.categorie); fd.append('user_id',user?.id||'');
+        fd.append('categorie',form.categorie); fd.append('entite',form.entite||''); fd.append('user_id',user?.id||'');
         const { uploadInvoice: up } = await import('../api');
         const r = await fetch(`${BASE}/invoices/upload`, {
           method:'POST',
@@ -175,6 +176,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       description: r.description || '',
       montant:     r.montant ? String(r.montant) : '',
       categorie:   r.categorie || '',
+      entite:      r.entite || '',
       date_facture: r.date_facture?.slice(0,10) || r.created_at?.slice(0,10) || '',
       date_prevue:  r.date_prevue?.slice(0,10) || '',
       statut:       r.statut || 'Prévu',
@@ -197,6 +199,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         fd.append('description', form.description);
         fd.append('montant',     form.montant);
         fd.append('categorie',   form.categorie);
+        fd.append('entite',      form.entite||'');
         fd.append('date_facture',form.date_facture);
         if (file) fd.append('file', file);
         await updateInvoice(editing.id, fd);
@@ -318,7 +321,8 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
             <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''}`}>
               <span>Date</span>
               <span>Fichier / Libellé</span>
-              <span>Catégorie</span>
+              <span>{"Entité"}</span>
+              <span>{"Catégorie"}</span>
               <span>Description</span>
               {tab==='budget' && <span>Statut</span>}
               <span style={{textAlign:'right'}}>Montant</span>
@@ -338,6 +342,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                     </a>
                   : <span className={styles.rowDesc} style={{fontStyle:'italic',color:'var(--gris-lt)'}}>—</span>
                 }
+                <span className={styles.rowCat} style={{background:'none',border:'none',padding:0,fontSize:'12px',color:'var(--gris)'}}>{r.entite||'—'}</span>
                 <span className={styles.rowCat}>{r.categorie||'—'}</span>
                 <span className={styles.rowDesc}>{r.description||'—'}</span>
                 {tab==='budget' && <span className={styles.rowStatut} data-s={r.statut}>{r.statut||'—'}</span>}
@@ -398,9 +403,15 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                     <input type="date" value={form.date_prevue} onChange={e=>setForm(p=>({...p,date_prevue:e.target.value}))}/>
                   </div>
               }
-              <div className={styles.mf}><label>Catégorie</label>
+              <div className={styles.mf}><label>{"Entité"}</label>
+                <select value={form.entite} onChange={e=>setForm(p=>({...p,entite:e.target.value}))}>
+                  <option value="">{"— Non spécifiée —"}</option>
+                  {ENTITES_FF.map(e=><option key={e} value={e}>{e}</option>)}
+                </select>
+              </div>
+              <div className={styles.mf}><label>{"Catégorie"}</label>
                 <select value={form.categorie} onChange={e=>setForm(p=>({...p,categorie:e.target.value}))}>
-                  <option value="">— Sans catégorie —</option>
+                  <option value="">{"— Sans catégorie —"}</option>
                   {cats.map(c=><option key={c.id} value={c.nom}>{c.nom}</option>)}
                 </select>
               </div>

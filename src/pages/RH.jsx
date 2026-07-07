@@ -8,9 +8,10 @@ const MOIS_FR = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Ao�
 const JOURS   = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 const NOW     = new Date();
 
-// Jours pris sur quota 2025 (stockés en 2025 en DB, absents du bilan 2026) à ajouter manuellement
-// { [mois]: nombre_de_jours }
-const JOURS_QUOTA_2025 = { 5: 5 }; // mai 2026 : 5 jours (05-09 mai, sur quota 2025)
+// Jours pris sur quota 2025 par Emilie (absents du bilan 2026, ajout manuel)
+const JOURS_QUOTA_2025_EMILIE = { 1: 2.96 }; // jan 2026 : 2.96j (→ balance -1.29)
+
+const PRENOMS = { emilie: 'Emilie', joel: 'Joël' };
 
 const DEM_STATUT = {
   en_attente: { label: 'En attente', color: '#b08020', bg: '#fff8e1' },
@@ -18,27 +19,61 @@ const DEM_STATUT = {
   refusee:    { label: "Refusée",    color: '#c62828', bg: '#fde8e8' },
 };
 
-const ATT_TYPES = { maladie: 'Maladie', accident: 'Accident', autre: 'Autre' };
+const ATT_TYPES  = { maladie: 'Maladie', accident: 'Accident', autre: 'Autre' };
 const ATT_COLORS = { maladie: 'var(--rouge)', accident: '#b08020', autre: 'var(--gris)' };
 
 const VERT = '#4a7c5f';
 
+// ── Icônes SVG minimalistes ───────────────────────────────────
+const IcoPdf = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+    <polyline points="14 2 14 8 20 8"/>
+    <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
+  </svg>
+);
+const IcoMail = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+    <polyline points="22,6 12,13 2,6"/>
+  </svg>
+);
+const IcoPlus = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{display:'block',flexShrink:0}}>
+    <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+  </svg>
+);
+const IcoCal = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <rect x="3" y="4" width="18" height="18" rx="2"/>
+    <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+    <line x1="3" y1="10" x2="21" y2="10"/>
+    <polyline points="9,16 11,18 15,14"/>
+  </svg>
+);
+
+// ── Fenêtre d'impression avec typographie portail Rubis SPA ───
 function openPrint(title, sub, tableHTML) {
   const w = window.open('', '_blank', 'width=900,height=700');
   if (!w) return;
   w.document.write(`<!DOCTYPE html><html lang="fr"><head>
     <meta charset="utf-8"><title>${title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
     <style>
       *{box-sizing:border-box;margin:0;padding:0}
-      body{font-family:Georgia,serif;max-width:800px;margin:0 auto;padding:32px 40px;color:#2a2825;font-size:13px}
-      h1{color:#c4737c;font-weight:normal;font-size:22px;margin-bottom:4px}
-      .sub{color:#888;margin-bottom:24px;margin-top:4px}
-      table{width:100%;border-collapse:collapse;margin:12px 0}
-      th{background:#faf8f6;padding:9px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#888;border-bottom:2px solid #e8e0dc}
-      td{padding:9px 12px;border-bottom:1px solid #f0ebe8}
-      .toolbar{text-align:right;margin-bottom:20px}
-      .toolbar button{background:${VERT};color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:13px;cursor:pointer;font-family:sans-serif}
-      footer{color:#aaa;font-size:11px;margin-top:32px;padding-top:14px;border-top:1px solid #eee}
+      body{font-family:'Open Sans',system-ui,sans-serif;font-weight:300;max-width:800px;margin:0 auto;padding:32px 40px;color:#2a2825;font-size:13px;-webkit-font-smoothing:antialiased}
+      h1{font-weight:300;font-size:22px;color:#c4737c;margin-bottom:4px;letter-spacing:.01em}
+      h2{font-weight:400;font-size:12px;color:#b0aaa7;margin:24px 0 8px;text-transform:uppercase;letter-spacing:.1em}
+      .sub{color:#b0aaa7;margin-bottom:28px;margin-top:6px;font-size:12px}
+      table{width:100%;border-collapse:collapse;margin:0 0 16px}
+      th{background:#f5ede8;padding:9px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#b0aaa7;border-bottom:1px solid #eeddd8;font-weight:600}
+      td{padding:9px 14px;border-bottom:1px solid #f5ede8;font-weight:300}
+      .pos{color:#4a7c5f;font-weight:500}.neg{color:#b56b65;font-weight:500}
+      .bold{font-weight:600}.gris{color:#b0aaa7}
+      .toolbar{text-align:right;margin-bottom:28px}
+      .toolbar button{background:#4a7c5f;color:#fff;border:none;padding:9px 22px;border-radius:6px;font-size:12px;cursor:pointer;font-family:'Open Sans',sans-serif;font-weight:500;letter-spacing:.04em}
+      footer{color:#b0aaa7;font-size:11px;margin-top:40px;padding-top:14px;border-top:1px solid #eeddd8}
       @media print{.toolbar{display:none}}
     </style>
   </head><body>
@@ -73,6 +108,16 @@ const getFirstDayOfMonth = (year, month) => {
 };
 
 export default function RH({ user, onBack, onLogout }) {
+  // viewKey = quel utilisateur on consulte : 'emilie' ou 'joel'
+  // Pour emilie/joel : fixe. Pour admin : sélectionnable.
+  const myKey = (user?.role === 'emilie' || user?.role === 'joel') ? user.role : 'emilie';
+  const [viewKey, setViewKey] = useState(myKey);
+  const isAdmin    = user?.role === 'admin';
+  const prenom     = PRENOMS[viewKey] || viewKey;
+  const DROIT_VAC   = viewKey === 'joel' ? 16 : 20;
+  const CREDIT_MENS = viewKey === 'joel' ? 1.33 : 1.67;
+  const MOIS_DEBUT  = viewKey === 'joel' ? 3 : 1;
+
   const [tab,      setTab]     = useState('pointage');
   const [annee,    setAnnee]   = useState(NOW.getFullYear());
   const [mois,     setMois]    = useState(NOW.getMonth()+1);
@@ -103,21 +148,21 @@ export default function RH({ user, onBack, onLogout }) {
 
   const loadPointage = async (a=annee, m=mois) => {
     setLoading(true);
-    try { const d=await getPointage({annee:a,mois:m}); setEntries(Array.isArray(d)?d:[]); }
+    try { const d=await getPointage({annee:a,mois:m,user:viewKey}); setEntries(Array.isArray(d)?d:[]); }
     catch { setEntries([]); }
     finally { setLoading(false); }
   };
 
   const loadVacances = async () => {
-    try { const d = await getVacances(); setVacances(Array.isArray(d)?d:[]); } catch{}
+    try { const d = await getVacances(viewKey); setVacances(Array.isArray(d)?d:[]); } catch{}
   };
 
   const loadDemandes = async () => {
-    try { const d = await getDemandesVacances(); setDemandes(Array.isArray(d)?d:[]); } catch{}
+    try { const d = await getDemandesVacances(viewKey); setDemandes(Array.isArray(d)?d:[]); } catch{}
   };
 
   const loadAttestations = async () => {
-    try { const d = await getAttestations(); setAttestations(Array.isArray(d)?d:[]); } catch{}
+    try { const d = await getAttestations(viewKey); setAttestations(Array.isArray(d)?d:[]); } catch{}
   };
 
   const openEmailModal = (type) => { setEmailModal(type); setEmailTo('info@rubisspa.ch'); };
@@ -127,8 +172,8 @@ export default function RH({ user, onBack, onLogout }) {
     setEmailing(true);
     try {
       const d = emailModal === 'attestations'
-        ? await emailAttestations(emailTo)
-        : await emailRH({ type: emailModal, annee, mois, destinataire: emailTo });
+        ? await emailAttestations(emailTo, viewKey)
+        : await emailRH({ type: emailModal, annee, mois, destinataire: emailTo, user: viewKey });
       if (d.erreur) throw new Error(d.erreur);
       toast$(`Email envoyé à ${emailTo} ✓`);
       setEmailModal(null);
@@ -161,7 +206,7 @@ export default function RH({ user, onBack, onLogout }) {
         <td style="color:#888">${e.notes||''}</td>
       </tr>`;
     }).join('');
-    openPrint('Pointage Emilie', `${MOIS_FR[mois-1]} ${annee}`,
+    openPrint(`Pointage ${prenom}`, `${MOIS_FR[mois-1]} ${annee}`,
       `<table><thead><tr><th>Date</th><th>Arrivée</th><th>Départ</th><th>Heures</th><th>Sup.</th><th>Notes</th></tr></thead>
        <tbody>${rows||'<tr><td colspan="6" style="text-align:center;color:#aaa;padding:20px">Aucun pointage ce mois</td></tr>'}</tbody></table>`);
   };
@@ -178,7 +223,7 @@ export default function RH({ user, onBack, onLogout }) {
         <td style="text-align:right;font-weight:700;color:${snap>=0?VERT:'#c62828'}">${fmtH(snap,true)}</td>
       </tr>`;
     }).join('');
-    openPrint('Résumé annuel RH Emilie', String(annee),
+    openPrint(`Résumé annuel RH ${prenom}`, String(annee),
       `<table><thead><tr><th>Mois</th><th style="text-align:center">Jours</th><th style="text-align:right">Heures</th><th style="text-align:right">Sup.</th><th style="text-align:right">Cumul</th></tr></thead>
        <tbody>${rows||'<tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">Aucune donnée</td></tr>'}</tbody></table>`);
   };
@@ -190,9 +235,31 @@ export default function RH({ user, onBack, onLogout }) {
       <td style="font-weight:500">${a.titre}</td>
       <td style="color:#888;font-size:12px">${a.original_name}</td>
     </tr>`).join('');
-    openPrint('Attestations Emilie', `${attestations.length} document${attestations.length!==1?'s':''}`,
+    openPrint(`Attestations ${prenom}`, `${attestations.length} document${attestations.length!==1?'s':''}`,
       `<table><thead><tr><th>Date</th><th>Type</th><th>Titre</th><th>Fichier</th></tr></thead>
        <tbody>${rows||'<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Aucune attestation</td></tr>'}</tbody></table>`);
+  };
+
+  const printVacances = () => {
+    const now = new Date();
+    const anneeVac = now.getFullYear();
+    const rows = vacances.map(v => {
+      const debut = new Date(v.date_debut+'T12:00:00');
+      const fin   = new Date(v.date_fin+'T12:00:00');
+      const jours = Math.round((fin-debut)/86400000)+1;
+      return `<tr>
+        <td>${debut.toLocaleDateString('fr-CH')}</td>
+        <td>${fin.toLocaleDateString('fr-CH')}</td>
+        <td style="text-align:center;font-weight:600">${jours}j</td>
+        <td style="color:#888">${v.notes||''}</td>
+      </tr>`;
+    }).join('');
+    const total = vacances
+      .filter(v=>new Date(v.date_debut).getFullYear()===anneeVac||new Date(v.date_fin).getFullYear()===anneeVac)
+      .reduce((s,v)=>{const d=new Date(v.date_debut+'T12:00:00'),f=new Date(v.date_fin+'T12:00:00');return s+Math.round((f-d)/86400000)+1;},0);
+    openPrint(`Vacances ${prenom}`, `${anneeVac} — ${total} / ${DROIT_VAC} jours pris`,
+      `<table><thead><tr><th>Début</th><th>Fin</th><th style="text-align:center">Jours</th><th>Notes</th></tr></thead>
+       <tbody>${rows||'<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Aucune vacance</td></tr>'}</tbody></table>`);
   };
 
   const uploadAtt = async (e) => {
@@ -205,7 +272,7 @@ export default function RH({ user, onBack, onLogout }) {
       fd.append('titre', attForm.titre);
       fd.append('type_doc', attForm.type_doc);
       if (attForm.date_doc) fd.append('date_doc', attForm.date_doc);
-      const d = await uploadAttestation(fd);
+      const d = await uploadAttestation(fd, viewKey);
       if (d.erreur) throw new Error(d.erreur);
       toast$('Attestation enregistrée ✓');
       setAttModal(false);
@@ -218,7 +285,7 @@ export default function RH({ user, onBack, onLogout }) {
 
   const delAtt = async (id) => {
     if (!window.confirm('Supprimer cette attestation ?')) return;
-    const d = await deleteAttestation(id);
+    const d = await deleteAttestation(id, viewKey);
     if (d.erreur) { toast$(d.erreur, false); return; }
     toast$('Attestation supprimée');
     loadAttestations();
@@ -226,7 +293,7 @@ export default function RH({ user, onBack, onLogout }) {
 
   const loadBilan = async (a=annee) => {
     setLoading(true);
-    try { const d=await getBilan({annee:a}); setBilan(Array.isArray(d)?d:[]); }
+    try { const d=await getBilan({annee:a,user:viewKey}); setBilan(Array.isArray(d)?d:[]); }
     catch { setBilan([]); }
     finally { setLoading(false); }
   };
@@ -236,7 +303,7 @@ export default function RH({ user, onBack, onLogout }) {
     else if (tab==='resume') loadBilan();
     else if (tab==='vacances') { loadVacances(); loadDemandes(); }
     else if (tab==='attestations') loadAttestations();
-  }, [tab, annee, mois]);
+  }, [tab, annee, mois, viewKey]);
 
   const entriesByDate = Object.fromEntries(entries.map(e => [e.date_jour?.slice(0,10), e]));
 
@@ -245,7 +312,7 @@ export default function RH({ user, onBack, onLogout }) {
     if (!demForm.date_debut || !demForm.date_fin) return;
     setDemSaving(true);
     try {
-      const d = await addDemandeVacances(demForm);
+      const d = await addDemandeVacances({ ...demForm, user: viewKey });
       if (d.erreur) throw new Error(d.erreur);
       toast$('Demande envoyée à Nathalie pour validation ✓');
       setDemModal(false);
@@ -260,9 +327,9 @@ export default function RH({ user, onBack, onLogout }) {
     if (!vacForm.date_debut || !vacForm.date_fin) return;
     setVacSaving(true);
     try {
-      const d = await addVacances(vacForm);
+      const d = await addVacances({ ...vacForm, user: viewKey });
       if (d.erreur) throw new Error(d.erreur);
-      toast$(`✓ Vacances enregistrées — ${d.jours} jours bloqués dans l'agenda`);
+      toast$(`Vacances enregistrées — ${d.jours} jours`);
       setVacModal(false);
       setVacForm({date_debut:'',date_fin:'',description:''});
       loadVacances();
@@ -271,10 +338,10 @@ export default function RH({ user, onBack, onLogout }) {
   };
 
   const delVac = async (id) => {
-    if (!window.confirm('Supprimer ces vacances ? Les jours seront débloqués dans l\'agenda.')) return;
-    const d = await deleteVacances(id);
+    if (!window.confirm('Supprimer ces vacances ?')) return;
+    const d = await deleteVacances(id, viewKey);
     if (d.erreur) { toast$(d.erreur, false); return; }
-    toast$(`✓ Vacances supprimées — ${d.jours} jours débloqués`);
+    toast$('Vacances supprimées');
     loadVacances();
   };
 
@@ -340,23 +407,34 @@ export default function RH({ user, onBack, onLogout }) {
   const totalSupAnnee = bilan.reduce((s,m) => s + parseFloat(m.heures_sup||0), 0);
   const maxH = bilan.length ? Math.max(...bilan.map(m=>parseFloat(m.total_heures||0))) : 0;
 
-  const dayColor = (entry) => {
+  const isExtraDay = (dateStr) => {
+    const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
+    return !wd.includes(new Date(dateStr + 'T12:00:00').getDay());
+  };
+
+  const dayColor = (entry, dateStr) => {
     if (!entry) return 'var(--fond)';
     if (entry.type === 'recup') return '#ede7f6';
     if (!entry.heures) return 'var(--fond)';
     const h = parseFloat(entry.heures);
-    if (h >= CIBLE)        return '#e8f4e8';
-    if (h >= CIBLE * 0.6)  return '#fff8e1';
+    const extra = isExtraDay(dateStr);
+    if (extra && viewKey !== 'joel') return '#f0f0ee'; // Emilie jour hors planning = neutre
+    const c = extra ? 0 : CIBLE; // Joel jour extra : cible 0 → tout vert
+    if (h >= c)       return '#e8f4e8';
+    if (h >= c * 0.6) return '#fff8e1';
     return '#fde8e8';
   };
 
-  const dayTextColor = (entry) => {
+  const dayTextColor = (entry, dateStr) => {
     if (!entry) return 'var(--gris-lt)';
     if (entry.type === 'recup') return '#7950f2';
     if (!entry.heures) return 'var(--gris-lt)';
     const h = parseFloat(entry.heures);
-    if (h >= CIBLE) return 'var(--vert)';
-    if (h >= CIBLE * 0.6) return '#b08020';
+    const extra = isExtraDay(dateStr);
+    if (extra && viewKey !== 'joel') return 'var(--gris)'; // Emilie jour hors planning = neutre
+    const c = extra ? 0 : CIBLE;
+    if (h >= c) return 'var(--vert)';
+    if (h >= c * 0.6) return '#b08020';
     return 'var(--rouge)';
   };
 
@@ -370,7 +448,7 @@ export default function RH({ user, onBack, onLogout }) {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
             <circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0113 0"/>
           </svg>
-          <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>RH — Emilie</h1></div>
+          <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>RH — {prenom}</h1></div>
         </div>
         <div className={styles.headerRight}>
           <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
@@ -379,6 +457,19 @@ export default function RH({ user, onBack, onLogout }) {
       </header>
 
       <main className={styles.main}>
+        {/* Sélecteur utilisateur (admin uniquement) */}
+        {isAdmin && (
+          <div className={rh.staffSwitch}>
+            {['emilie','joel'].map(k => (
+              <button key={k}
+                className={`${rh.staffBtn} ${viewKey===k ? rh.staffBtnOn : ''}`}
+                onClick={() => setViewKey(k)}>
+                {PRENOMS[k]}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Onglets */}
         <div className={rh.tabs}>
           {['pointage','resume','vacances','attestations'].map(t => (
@@ -395,13 +486,15 @@ export default function RH({ user, onBack, onLogout }) {
               Les vacances bloquent automatiquement l'agenda du spa et apparaissent dans le calendrier marketing.
             </p>
             <div style={{display:'flex',gap:'8px',flexShrink:0,marginLeft:'16px'}}>
+              <button className={rh.exportBtn} onClick={printVacances} title="Télécharger PDF"><IcoPdf/> PDF</button>
+              <button className={rh.exportBtn} onClick={()=>openEmailModal('vacances')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
               <button className={styles.addBtn}
                 style={{background:VERT,borderColor:VERT}}
                 onClick={()=>setDemModal(true)}>
-                📋 Demander
+                <IcoCal/> Demander
               </button>
               <button className={styles.addBtn} onClick={()=>setVacModal(true)}>
-                + Ajouter
+                <IcoPlus/> Ajouter
               </button>
             </div>
           </div>
@@ -417,7 +510,7 @@ export default function RH({ user, onBack, onLogout }) {
                 const fin   = new Date(v.date_fin);
                 return s + Math.round((fin - debut) / 86400000) + 1;
               }, 0);
-            const DROIT = 20; // jours de vacances annuels
+            const DROIT = DROIT_VAC;
             const restant = DROIT - totalJours;
             return (
               <div className={styles.soldeCard} style={{marginBottom:'20px'}}>
@@ -438,7 +531,7 @@ export default function RH({ user, onBack, onLogout }) {
           {(() => {
             const anneeVacBilan = NOW.getFullYear();
             const moisMax = NOW.getMonth() + 1;
-            const CREDIT_MENSUEL = 1.67;
+            const CREDIT_MENSUEL = CREDIT_MENS;
             const debitParMois = {};
             vacances.forEach(v => {
               const debut = new Date(v.date_debut + 'T12:00:00');
@@ -452,13 +545,14 @@ export default function RH({ user, onBack, onLogout }) {
                 cur.setDate(cur.getDate() + 1);
               }
             });
-            // Jours pris sur quota 2025 (non stockés comme dates 2026 en DB)
-            Object.entries(JOURS_QUOTA_2025).forEach(([m, j]) => {
+            // Jours pris sur quota 2025 par Emilie (non stockés comme dates 2026 en DB)
+            const quota2025 = viewKey === 'emilie' ? JOURS_QUOTA_2025_EMILIE : {};
+            Object.entries(quota2025).forEach(([m, j]) => {
               debitParMois[+m] = (debitParMois[+m] || 0) + j;
             });
             let balanceCumul = 0;
             const lignes = [];
-            for (let m = 1; m <= moisMax; m++) {
+            for (let m = MOIS_DEBUT; m <= moisMax; m++) {
               const debit = debitParMois[m] || 0;
               balanceCumul = Math.round((balanceCumul + CREDIT_MENSUEL - debit) * 100) / 100;
               lignes.push({ mois: m, credit: CREDIT_MENSUEL, debit, balance: balanceCumul });
@@ -579,9 +673,9 @@ export default function RH({ user, onBack, onLogout }) {
 
           {/* Barre export */}
           <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'12px'}}>
-            <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF">📄 PDF</button>
+            <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF"><IcoPdf/> PDF</button>
             <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}>
-              📧 {emailing ? '…' : 'Email'}
+              <IcoMail/> {emailing ? '…' : 'Email'}
             </button>
           </div>
 
@@ -600,13 +694,13 @@ export default function RH({ user, onBack, onLogout }) {
                 return (
                   <div key={i}
                     className={`${rh.calCell} ${isSun?rh.calSun:''} ${isFuture?rh.calFuture:''}`}
-                    style={{background: isSun||isFuture ? '' : dayColor(entry)}}
+                    style={{background: isSun||isFuture ? '' : dayColor(entry, dateStr)}}
                     onClick={()=>openDay(dateStr)}>
                     <span className={rh.calDayNum}>{day}</span>
                     {entry?.type === 'recup' ? (
                       <span className={rh.calHours} style={{color:'#7950f2',fontSize:'12px'}}>Récup</span>
                     ) : entry?.heures ? (
-                      <span className={rh.calHours} style={{color: dayTextColor(entry)}}>
+                      <span className={rh.calHours} style={{color: dayTextColor(entry, dateStr)}}>
                         {fmtH(parseFloat(entry.heures))}
                       </span>
                     ) : null}
@@ -642,9 +736,9 @@ export default function RH({ user, onBack, onLogout }) {
 
           {/* Barre export */}
           <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'16px'}}>
-            <button className={rh.exportBtn} onClick={printResume} title="Télécharger PDF">📄 PDF</button>
+            <button className={rh.exportBtn} onClick={printResume} title="Télécharger PDF"><IcoPdf/> PDF</button>
             <button className={rh.exportBtn} onClick={()=>openEmailModal('resume')} disabled={emailing}>
-              📧 {emailing ? '…' : 'Email'}
+              <IcoMail/> {emailing ? '…' : 'Email'}
             </button>
           </div>
 
@@ -729,11 +823,11 @@ export default function RH({ user, onBack, onLogout }) {
               Certificats médicaux, attestations maladie et accident.
             </p>
             <div style={{display:'flex',gap:'6px',flexShrink:0,marginLeft:'16px'}}>
-              <button className={rh.exportBtn} onClick={printAttestations}>📄 PDF</button>
+              <button className={rh.exportBtn} onClick={printAttestations}><IcoPdf/> PDF</button>
               <button className={rh.exportBtn} onClick={()=>openEmailModal('attestations')} disabled={emailing}>
-                📧 {emailing?'…':'Email'}
+                <IcoMail/> {emailing?'…':'Email'}
               </button>
-              <button className={styles.addBtn} onClick={()=>setAttModal(true)}>+ Ajouter</button>
+              <button className={styles.addBtn} onClick={()=>setAttModal(true)}><IcoPlus/> Ajouter</button>
             </div>
           </div>
 
@@ -835,11 +929,16 @@ export default function RH({ user, onBack, onLogout }) {
                   const [ha,ma]=(form.heure_arrivee||'10:00').split(':').map(Number);
                   const [hd,md]=(form.heure_depart||'19:00').split(':').map(Number);
                   const total=(hd+md/60)-(ha+ma/60);
-                  const delta=total-CIBLE;
+                  const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
+                  const dow = modal?.date_jour ? new Date(modal.date_jour + 'T12:00:00').getDay() : -1;
+                  const extra = !wd.includes(dow);
+                  const cibleEff = extra ? 0 : CIBLE;
+                  const delta = extra && viewKey !== 'joel' ? 0 : total - cibleEff;
+                  const isNeutre = extra && viewKey !== 'joel';
                   if(total>0) return (
-                    <div className={rh.preview} style={{background:delta>=0?'#e8f4e8':'#fde8e8',color:delta>=0?'var(--vert)':'var(--rouge)'}}>
+                    <div className={rh.preview} style={{background:isNeutre?'#f0f0ee':delta>=0?'#e8f4e8':'#fde8e8',color:isNeutre?'var(--gris)':delta>=0?'var(--vert)':'var(--rouge)'}}>
                       <span>{fmtH(total)} travaillées</span>
-                      <span style={{fontWeight:600}}>{fmtH(delta,true)} vs cible {CIBLE}h</span>
+                      <span style={{fontWeight:600}}>{isNeutre ? 'Jour hors planning — non comptabilisé' : `${fmtH(delta,true)} vs cible ${cibleEff}h`}</span>
                     </div>
                   );
                 })()}
@@ -1017,7 +1116,7 @@ export default function RH({ user, onBack, onLogout }) {
             {vacForm.date_debut && vacForm.date_fin && vacForm.date_fin >= vacForm.date_debut && (
               <div className={rh.preview} style={{background:'#fff8e1',color:'#b08020'}}>
                 <span>📅 {Math.round((new Date(vacForm.date_fin)-new Date(vacForm.date_debut))/86400000)+1} jours</span>
-                <span style={{fontSize:'12px'}}>Agenda spa bloqué + événement marketing créé</span>
+                <span style={{fontSize:'12px'}}>{viewKey === 'joel' ? "Agenda personnel + calendrier marketing" : "Agenda spa bloque + calendrier marketing"}</span>
               </div>
             )}
             <div className={styles.mf}>
