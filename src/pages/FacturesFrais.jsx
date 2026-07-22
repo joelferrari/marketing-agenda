@@ -370,7 +370,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
           <div className={styles.list}>
             <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''} ${tab==='celine'?styles.listHeaderCeline:''}`}>
               <span>Date</span>
-              <span>Fichier / Libellé</span>
+              <span>Fichier</span>
               <span>{"Entité"}</span>
               <span>{"Catégorie"}</span>
               <span>Description</span>
