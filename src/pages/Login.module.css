@@ -1,0 +1,16 @@
+.page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--fond)}
+.card{background:var(--blanc);border:1px solid var(--border);border-radius:8px;padding:48px 40px;width:100%;max-width:360px;box-shadow:0 2px 16px rgba(42,40,37,.06)}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:36px}
+.logoImg{height:30px;object-fit:contain}
+.logoIcon{font-size:18px;color:var(--rose)}
+.logoSub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gris-lt);display:block;margin-bottom:2px}
+.logoTitle{font-size:15px;font-weight:400;color:var(--noir);letter-spacing:.04em}
+.form{display:flex;flex-direction:column;gap:18px}
+.field{display:flex;flex-direction:column;gap:7px}
+.field label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);font-weight:400}
+.field input{border:1px solid var(--border);border-radius:4px;padding:11px 14px;font-size:14px;outline:none;transition:border-color .15s;font-weight:300;background:var(--fond);color:var(--noir)}
+.field input:focus{border-color:var(--rose);background:var(--blanc)}
+.error{font-size:12px;color:var(--rouge);background:var(--rouge-lt);padding:9px 12px;border-radius:4px}
+.btn{background:var(--rose);color:#fff;border:none;border-radius:4px;padding:13px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;margin-top:4px;font-weight:400;transition:background .15s}
+.btn:hover:not(:disabled){background:var(--rose-dk)}
+.btn:disabled{opacity:.5;cursor:not-allowed}

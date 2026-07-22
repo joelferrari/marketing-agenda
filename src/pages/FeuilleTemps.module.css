@@ -1,0 +1,111 @@
+.page{min-height:100vh;display:flex;flex-direction:column;background:var(--fond)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;font-size:13px;border-radius:8px;z-index:200;white-space:nowrap}
+.toastOk{background:var(--vert);color:#fff}.toastErr{background:var(--rouge);color:#fff}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:var(--blanc);border-bottom:1px solid var(--border)}
+.headerLeft{display:flex;align-items:center;gap:12px}
+.headerSub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);margin-bottom:2px}
+.headerTitle{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir);margin:0}
+.headerRight{display:flex;align-items:center;gap:8px}
+.navSecondary{background:none;border:1px solid var(--border);border-radius:3px;padding:6px 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);cursor:pointer}
+.navSecondary:hover{color:var(--gris)}
+
+.main{flex:1;padding:28px 32px;max-width:none;margin:0;width:100%;box-sizing:border-box}
+
+/* Navigation semaine */
+.weekNav{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.navBtn{background:var(--blanc);border:1px solid var(--border);border-radius:6px;width:36px;height:36px;font-size:20px;cursor:pointer;color:var(--gris);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.navBtn:hover{border-color:var(--rose);color:var(--rose)}
+.weekLabel{display:flex;align-items:center;gap:12px;flex:1}
+.weekTitle{font-family:var(--font-disp);font-size:17px;font-weight:normal;color:var(--noir)}
+.todayBtn{background:none;border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:11px;color:var(--gris-lt);cursor:pointer;letter-spacing:.06em}
+.todayBtn:hover{color:var(--rose);border-color:var(--rose)}
+
+/* Résumé entités */
+.summaryRow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.summaryChip{display:flex;align-items:center;gap:8px;background:var(--blanc);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px}
+.summaryLabel{color:var(--gris);letter-spacing:.04em}
+.summaryH{font-weight:600;color:var(--noir);font-family:monospace}
+
+/* Tableau */
+.tableWrap{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:auto;margin-bottom:16px}
+.table{width:100%;border-collapse:collapse;min-width:900px}
+
+/* Headers */
+.thTask{padding:13px 18px;text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);background:var(--beige);font-weight:normal;border-bottom:1px solid var(--border);min-width:220px}
+.thEntite{padding:13px 14px;text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);background:var(--beige);font-weight:normal;border-bottom:1px solid var(--border);width:120px}
+.thDay{padding:13px 8px;text-align:center;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-lt);background:var(--beige);font-weight:normal;border-bottom:1px solid var(--border)}
+.thDayDate{font-size:10px;color:var(--gris-lt);margin-top:2px;font-weight:normal;letter-spacing:0;text-transform:none}
+.thDayToday{color:var(--rose)}
+.thTotal{padding:10px 12px;text-align:right;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);background:var(--beige);font-weight:normal;border-bottom:1px solid var(--border);width:70px}
+
+/* Lignes */
+.row{border-bottom:1px solid var(--border);transition:background .1s}
+.row:hover{background:#fdf9f8}
+.tdTask{padding:15px 18px;vertical-align:middle}
+.taskName{font-size:14px;color:var(--noir);font-weight:500}
+.taskProjet{font-size:11px;color:var(--gris-lt);margin-top:3px}
+.tdEntite{padding:15px 14px;vertical-align:middle}
+.entiteChip{font-size:11px;background:var(--fond);border:1px solid var(--border);border-radius:10px;padding:3px 10px;color:var(--gris);white-space:nowrap}
+.entiteNone{font-size:12px;color:var(--gris-lt)}
+.tdDay{padding:11px 6px;text-align:center;vertical-align:middle}
+.tdDayToday{background:#fff9f5}
+.tdTotal{padding:15px 14px;text-align:right;font-size:13px;font-weight:600;color:var(--rouge);font-family:monospace;vertical-align:middle}
+.delBtn{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:18px;padding:4px 8px;line-height:1}
+.delBtn:hover{color:var(--rouge)}
+
+/* Saisie cellule */
+.cellInput{width:68px;border:1.5px solid transparent;border-radius:5px;padding:5px 6px;font-size:13px;text-align:center;font-family:monospace;background:transparent;color:var(--noir);outline:none;transition:.1s}
+.cellInput:hover{border-color:var(--border);background:#fff}
+.cellInput:focus{border-color:var(--rose);background:#fff}
+.cellInput::placeholder{color:#ccc}
+
+/* Footer totaux */
+.footerRow{background:var(--beige)}
+.footerLabel{padding:10px 16px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--gris)}
+.footerCell{padding:10px 8px;text-align:center;font-size:13px;font-weight:600;color:var(--gris);font-family:monospace}
+.footerTotal{padding:10px 12px;text-align:right;font-size:14px;font-weight:700;color:var(--rouge);font-family:monospace}
+
+/* Chargement / vide */
+.loadingCell{padding:40px;text-align:center;color:var(--gris-lt);font-size:14px}
+.emptyCell{padding:40px;text-align:center;color:var(--gris-lt);font-size:14px}
+
+/* Ajouter ligne — menu déroulant type Clockify */
+.addWrap{position:relative;margin-bottom:12px;max-width:520px}
+.addBtn{background:none;border:1.5px dashed var(--border);border-radius:8px;padding:10px 20px;font-size:13px;color:var(--gris-lt);cursor:pointer;transition:.15s}
+.addBtn:hover{border-color:var(--rose);color:var(--rose)}
+
+.addPanel{background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 8px 30px rgba(0,0,0,.1);overflow:hidden}
+.addSearch{width:100%;border:none;border-bottom:1px solid var(--border);padding:13px 16px;font-size:14px;outline:none;font-family:inherit;color:var(--noir);box-sizing:border-box;background:#fff}
+.addSearch::placeholder{color:var(--gris-lt)}
+
+.suggList{max-height:340px;overflow-y:auto}
+.suggEmpty{padding:20px 16px;text-align:center;color:var(--gris-lt);font-size:13px}
+.suggGroup{border-bottom:1px solid var(--border)}
+.suggGroup:last-child{border-bottom:none}
+.suggGroupTitle{display:flex;align-items:center;gap:8px;padding:8px 16px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--gris-lt);background:var(--beige);position:sticky;top:0}
+.suggCount{margin-left:auto;background:var(--fond);border-radius:10px;padding:1px 8px;font-size:11px;color:var(--gris);letter-spacing:0}
+.suggDot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.suggItem{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;padding:10px 16px 10px 34px;font-size:14px;color:var(--noir);cursor:pointer;font-family:inherit}
+.suggItem:hover{background:#fdf3f4}
+.suggName{color:var(--noir)}
+.suggProjet{font-size:11px;color:var(--gris-lt);background:var(--fond);border-radius:6px;padding:1px 7px}
+.suggNew{display:block;width:100%;text-align:left;background:none;border:none;border-top:1px solid var(--border);padding:12px 16px;font-size:13px;color:var(--rose);cursor:pointer;font-family:inherit}
+.suggNew:hover{background:#fdf3f4}
+
+.newForm{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:14px 16px}
+.addInput{border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;outline:none;background:#fff;color:var(--noir);font-family:inherit}
+.addInput:focus{border-color:var(--rose)}
+.newForm .addInput:first-child{flex:2;min-width:160px}
+.newForm .addInput:nth-child(2){flex:1;min-width:120px}
+.addSelect{border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;outline:none;background:#fff;color:var(--noir);font-family:inherit;min-width:130px}
+.addSelect:focus{border-color:var(--rose)}
+.addConfirm{background:var(--rose);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap;letter-spacing:.06em}
+.addCancel{background:none;border:1px solid var(--border);color:var(--gris);border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer}
+
+/* Actions bas */
+.actions{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding-top:8px}
+.savingDot{font-size:12px;color:var(--gris-lt)}
+.emailBtn{background:var(--rose);color:#fff;border:none;border-radius:6px;padding:10px 22px;font-size:13px;cursor:pointer;letter-spacing:.04em}
+.emailBtn:hover:not(:disabled){background:var(--rose-dk)}
+.emailBtn:disabled{opacity:.45;cursor:not-allowed}

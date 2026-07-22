@@ -1,0 +1,18 @@
+.card{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:24px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.cardTitle{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir);margin:0 0 20px}
+.form{display:flex;flex-direction:column;gap:14px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.submitBtn{background:var(--rose);color:#fff;border:none;border-radius:8px;padding:13px 20px;font-size:14px;font-family:inherit;cursor:pointer;font-weight:500;margin-top:4px;transition:.15s}
+.submitBtn:hover:not(:disabled){opacity:.9}
+.submitBtn:disabled{opacity:.5;cursor:default}
+.depRow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}
+.depRow:last-child{border-bottom:none}
+.depInfo{display:flex;flex-direction:column;gap:3px;flex:1}
+.depTitre{font-size:14px;font-weight:600;color:var(--noir)}
+.depMeta{font-size:12px;color:var(--gris)}
+.depLink{font-size:12px;color:var(--rose);text-decoration:none}
+.depDate{font-size:11px;color:var(--gris-lt);margin-top:2px}
+.depRight{display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0}
+.depPrix{font-size:16px;font-weight:700;color:var(--rouge)}
+.statut{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.04em}
+@media(max-width:600px){.row2{grid-template-columns:1fr}}
