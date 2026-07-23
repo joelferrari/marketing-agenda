@@ -104,13 +104,10 @@
 .rowStatut[data-s="Payé"]{background:#e8f4e8;color:var(--vert)}
 .rowStatut[data-s="Annulé"]{background:#fde8e8;color:var(--rouge)}
 
-/* Onglets avec suivi de paiement (Céline / Factures) — la liste devient plus
-   large que 1100px : on laisse défiler horizontalement plutôt que d'écraser
-   les colonnes (ce qui n'était pas géré correctement dans le 1er jet). */
+/* Onglet Factures avec suivi de paiement — la liste devient plus large que
+   1100px : on laisse défiler horizontalement plutôt que d'écraser les
+   colonnes. */
 .listScroll{overflow-x:auto}
-
-.listHeaderCeline{grid-template-columns:78px minmax(150px,1.3fr) 80px 100px minmax(170px,1.5fr) 108px 100px 108px 85px 132px;min-width:1180px}
-.rowCeline{grid-template-columns:78px minmax(150px,1.3fr) 80px 100px minmax(170px,1.5fr) 108px 100px 108px 85px 132px;min-width:1180px}
 
 .listHeaderFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 132px;min-width:1260px}
 .rowFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 132px;min-width:1260px}
@@ -121,3 +118,4 @@
 .btnEnvoyer{background:none;border:1px solid var(--rose);color:var(--rose);border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer;white-space:nowrap}
 .btnEnvoyer:hover{background:var(--rose);color:#fff}
 .btnEnvoyer:disabled{opacity:.5;cursor:not-allowed}
+.vuBadge{font-size:10px;font-weight:600;color:var(--vert);background:#e8f4e8;border-radius:4px;padding:3px 7px;white-space:nowrap}
