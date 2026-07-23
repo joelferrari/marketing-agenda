@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat,
+  getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat, envoyerInvoice,
   getBudget, addBudget, deleteBudget, updateBudget,
   getFacturesCeline, uploadFactureCeline, updateFactureCeline, deleteFactureCeline, envoyerFactureCeline,
 } from '../api';
@@ -87,7 +87,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const [dragOver,   setDragOver]  = useState(false);
   const [file,       setFile]      = useState(null);
   const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:''});
-  const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'});
+  const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'});
   const [newCat,     setNewCat]    = useState('');
   const fileRef = useRef();
 
@@ -95,7 +95,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const rows      = tab === 'budget' ? budget : tab === 'celine' ? celine : invoices;
   const setRows   = tab === 'budget' ? setBudget : tab === 'celine' ? setCeline : setInvoices;
   const total     = rows.reduce((s,i) => s + parseFloat(i.montant||0), 0);
-  const hasFilters = filters.dateDebut || filters.dateFin || filters.categorie;
+  const hasFilters = filters.dateDebut || filters.dateFin || filters.categorie || filters.moyenPaiement;
 
   const loadCats = async () => {
     try { const d = await getInvCats(); setCats(Array.isArray(d) ? d : []); } catch{}
@@ -108,6 +108,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       if (f.dateDebut) p.dateDebut = f.dateDebut;
       if (f.dateFin)   p.dateFin   = f.dateFin;
       if (f.categorie) p.categorie = f.categorie;
+      if (f.moyenPaiement) p.moyenPaiement = f.moyenPaiement;
       if (f.sort)      p.sort      = f.sort;
       const fn = t === 'budget' ? getBudget : t === 'celine' ? getFacturesCeline : getInvoices;
       const d  = await fn(p);
@@ -122,7 +123,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   useEffect(() => { loadCats(); loadData(); }, []);
   useEffect(() => { loadData(filters, tab); }, [tab]);
 
-  const switchTab = (t) => { setTab(t); setFilters({dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'}); };
+  const switchTab = (t) => { setTab(t); setFilters({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'}); };
 
   const setFilter = (key, val) => {
     const next = {...filters, [key]: val};
@@ -130,7 +131,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   };
 
   const clearFilters = () => {
-    const r = {dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'};
+    const r = {dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'};
     setFilters(r); loadData(r, tab);
   };
 
@@ -155,26 +156,15 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
           categorie: form.categorie, date_prevue: form.date_prevue,
           statut: form.statut,
         });
-      } else if (tab === 'celine') {
+      } else {
+        // Factures et Suivi Factures Céline — même logique d'upload
         if (!file) { toast$('Sélectionnez un fichier',false); setUploading(false); return; }
         const fd = new FormData();
         fd.append('file',file); fd.append('description',form.description);
         fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
         fd.append('categorie',form.categorie); fd.append('entite',form.entite||'');
         fd.append('recu_le',form.recu_le||''); fd.append('user_id',user?.id||'');
-        d = await uploadFactureCeline(fd);
-      } else {
-        if (!file) { toast$('Sélectionnez un fichier',false); setUploading(false); return; }
-        const fd = new FormData();
-        fd.append('file',file); fd.append('description',form.description);
-        fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
-        fd.append('categorie',form.categorie); fd.append('entite',form.entite||''); fd.append('user_id',user?.id||'');
-        const r = await fetch(`${BASE}/invoices/upload`, {
-          method:'POST',
-          headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},
-          body:fd,
-        });
-        d = await r.json();
+        d = tab === 'celine' ? await uploadFactureCeline(fd) : await uploadInvoice(fd);
       }
       if (d?.erreur) throw new Error(d.erreur);
       toast$('Enregistré ✓');
@@ -207,16 +197,6 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
           description: form.description, montant: form.montant,
           categorie: form.categorie, date_prevue: form.date_prevue, statut: form.statut,
         });
-      } else if (tab === 'celine') {
-        const fd = new FormData();
-        fd.append('description', form.description);
-        fd.append('montant',     form.montant);
-        fd.append('categorie',   form.categorie);
-        fd.append('entite',      form.entite||'');
-        fd.append('date_facture',form.date_facture);
-        fd.append('recu_le',     form.recu_le||'');
-        if (file) fd.append('file', file);
-        await updateFactureCeline(editing.id, fd);
       } else {
         // FormData pour supporter l'ajout/remplacement de fichier
         const fd = new FormData();
@@ -225,8 +205,9 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         fd.append('categorie',   form.categorie);
         fd.append('entite',      form.entite||'');
         fd.append('date_facture',form.date_facture);
+        fd.append('recu_le',     form.recu_le||'');
         if (file) fd.append('file', file);
-        await updateInvoice(editing.id, fd);
+        await (tab === 'celine' ? updateFactureCeline(editing.id, fd) : updateInvoice(editing.id, fd));
       }
       toast$('Modifié ✓');
       setShowUpload(false); setEditing(null); resetForm(); loadData(filters, tab);
@@ -244,11 +225,12 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
 
   // Édition instantanée d'un seul champ dans la ligne (Reçu le / Statut / Payée le)
   const updateInlineField = async (id, field, value) => {
-    setCeline(rs => rs.map(r => r.id === id ? { ...r, [field]: value } : r));
+    setRows(rs => rs.map(r => r.id === id ? { ...r, [field]: value } : r));
     try {
       const fd = new FormData();
       fd.append(field, value);
-      const d = await updateFactureCeline(id, fd);
+      const updateFn = tab === 'celine' ? updateFactureCeline : updateInvoice;
+      const d = await updateFn(id, fd);
       if (d?.erreur) throw new Error(d.erreur);
     } catch(e) { toast$(e.message || 'Erreur', false); loadData(filters, tab); }
   };
@@ -256,7 +238,8 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const doEnvoyer = async (id) => {
     setEnvoyingId(id);
     try {
-      const d = await envoyerFactureCeline(id);
+      const envoyerFn = tab === 'celine' ? envoyerFactureCeline : envoyerInvoice;
+      const d = await envoyerFn(id);
       if (d?.erreur) throw new Error(d.erreur);
       toast$('Facture envoyée ✓');
     } catch(e) { toast$(e.message || 'Erreur envoi', false); }
@@ -272,7 +255,9 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const doDelCat = async (id) => { await delInvCat(id); await loadCats(); };
 
   const dateField = tab === 'budget' ? (r) => r.date_prevue : (r) => r.date_facture || r.created_at;
-  const STATUT_CELINE_LABELS = { non_payee: 'Non payée', payee: 'Payée' };
+  const STATUT_PAIEMENT_LABELS = { non_payee: 'Non payée', payee: 'Payée' };
+  const showSuivi = tab === 'factures' || tab === 'celine'; // Reçu le / Statut / Payée le / Envoyer
+  const showMoyen = tab === 'factures'; // colonne + filtre Facture / Carte de crédit
 
   return (
     <div className={styles.page}>
@@ -299,7 +284,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         </div>
       </header>
 
-      <main className={styles.main}>
+      <main className={styles.main} style={(tab==='factures'||tab==='celine')?{maxWidth:'1400px'}:undefined}>
 
         {/* Onglets */}
         <div className={styles.tabs}>
@@ -351,6 +336,15 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 {cats.map(c=><option key={c.id} value={c.nom}>{c.nom}</option>)}
               </select>
             </div>
+            {showMoyen && (
+              <div className={styles.mf}><label>Facture / Carte de crédit</label>
+                <select value={filters.moyenPaiement} onChange={e=>setFilter('moyenPaiement',e.target.value)}>
+                  <option value="">Toutes</option>
+                  <option value="facture">Facture</option>
+                  <option value="carte_credit">Carte de crédit</option>
+                </select>
+              </div>
+            )}
             <div className={styles.mf}><label>Trier par</label>
               <select value={filters.sort} onChange={e=>setFilter('sort',e.target.value)}>
                 {SORT_OPTS.map(o=><option key={o.val} value={o.val}>{o.lbl}</option>)}
@@ -367,23 +361,24 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
 
         {/* Liste */}
         {loading ? <p className={styles.loading}>Chargement…</p> : (
-          <div className={styles.list}>
-            <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''} ${tab==='celine'?styles.listHeaderCeline:''}`}>
+          <div className={`${styles.list} ${showSuivi?styles.listScroll:''}`}>
+            <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''} ${tab==='celine'?styles.listHeaderCeline:''} ${tab==='factures'?styles.listHeaderFactures:''}`}>
               <span>Date</span>
               <span>Fichier</span>
               <span>{"Entité"}</span>
               <span>{"Catégorie"}</span>
+              {showMoyen && <span>Facture / Carte de crédit</span>}
               <span>Description</span>
-              {tab==='celine' && <span>Reçu le</span>}
+              {showSuivi && <span>Reçu le</span>}
               {tab==='budget' && <span>Statut</span>}
-              {tab==='celine' && <span>Statut</span>}
-              {tab==='celine' && <span>Payée le</span>}
+              {showSuivi && <span>Statut</span>}
+              {showSuivi && <span>Payée le</span>}
               <span style={{textAlign:'right'}}>Montant</span>
               <span/>
             </div>
             {!rows.length && <p className={styles.empty}>Aucune ligne trouvée</p>}
             {rows.map(r => (
-              <div key={r.id} className={`${styles.row} ${tab==='budget'?styles.rowBudget:''} ${tab==='celine'?styles.rowCeline:''}`}>
+              <div key={r.id} className={`${styles.row} ${tab==='budget'?styles.rowBudget:''} ${tab==='celine'?styles.rowCeline:''} ${tab==='factures'?styles.rowFactures:''}`}>
                 <span className={styles.rowDate}>{fmt(dateField(r))}</span>
                 {r.filename
                   ? <a href={fileUrl(r.id,tab)} target="_blank" rel="noreferrer" className={styles.rowFile}>
@@ -397,19 +392,22 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 }
                 <span className={styles.rowCat} style={{background:'none',border:'none',padding:0,fontSize:'12px',color:'var(--gris)'}}>{r.entite||'—'}</span>
                 <span className={styles.rowCat}>{r.categorie||'—'}</span>
+                {showMoyen && (
+                  <span className={styles.rowCat}>{r.source==='carte_credit' ? 'Carte de crédit' : 'Facture'}</span>
+                )}
                 <span className={styles.rowDesc}>{r.description||'—'}</span>
-                {tab==='celine' && (
+                {showSuivi && (
                   <input type="date" className={styles.rowDateInput} value={r.recu_le?.slice(0,10)||''}
                     onChange={e=>updateInlineField(r.id,'recu_le',e.target.value)}/>
                 )}
                 {tab==='budget' && <span className={styles.rowStatut} data-s={r.statut}>{r.statut||'—'}</span>}
-                {tab==='celine' && (
+                {showSuivi && (
                   <select className={styles.rowSelect} data-s={r.statut||'non_payee'} value={r.statut||'non_payee'}
                     onChange={e=>updateInlineField(r.id,'statut',e.target.value)}>
-                    {Object.entries(STATUT_CELINE_LABELS).map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                    {Object.entries(STATUT_PAIEMENT_LABELS).map(([v,l])=><option key={v} value={v}>{l}</option>)}
                   </select>
                 )}
-                {tab==='celine' && (
+                {showSuivi && (
                   <input type="date" className={styles.rowDateInput} value={r.payee_le?.slice(0,10)||''}
                     onChange={e=>updateInlineField(r.id,'payee_le',e.target.value)}/>
                 )}
@@ -417,7 +415,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                   {r.montant?`${parseFloat(r.montant).toFixed(2)} CHF`:'—'}
                 </span>
                 <div style={{display:'flex',gap:'4px',justifyContent:'flex-end',alignItems:'center'}}>
-                  {tab==='celine' && (
+                  {showSuivi && (
                     <button className={styles.btnEnvoyer} disabled={envoyingId===r.id}
                       onClick={e=>{e.stopPropagation();doEnvoyer(r.id);}}>
                       {envoyingId===r.id ? '…' : 'Envoyer'}
@@ -476,7 +474,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                     <input type="date" value={form.date_facture} onChange={e=>setForm(p=>({...p,date_facture:e.target.value}))}/>
                   </div>
               }
-              {tab==='celine' && (
+              {showSuivi && (
                 <div className={styles.mf}><label>Reçu le</label>
                   <input type="date" value={form.recu_le} onChange={e=>setForm(p=>({...p,recu_le:e.target.value}))}/>
                 </div>
