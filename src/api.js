@@ -20,6 +20,13 @@ export const deleteInvoice  = (id)   => fetch(`${BASE}/invoices/${id}`,{method:'
 export const getInvCats     = ()     => fetch(`${BASE}/invoices/categories`,{headers:h()}).then(r=>r.json());
 export const addInvCat      = (nom)  => fetch(`${BASE}/invoices/categories`,{method:'POST',headers:h(),body:JSON.stringify({nom})}).then(r=>r.json());
 export const delInvCat      = (id)   => fetch(`${BASE}/invoices/categories/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+export const envoyerInvoice = (id)   => fetch(`${BASE}/invoices/${id}/envoyer`,{method:'POST',headers:h()}).then(r=>r.json());
+
+export const getFacturesCeline    = (p={}) => fetch(`${BASE}/factures-celine?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const uploadFactureCeline  = (fd)   => fetch(`${BASE}/factures-celine/upload`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
+export const updateFactureCeline  = (id,fd)=> fetch(`${BASE}/factures-celine/${id}`,{method:'PUT',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
+export const deleteFactureCeline  = (id)   => fetch(`${BASE}/factures-celine/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+export const envoyerFactureCeline = (id)   => fetch(`${BASE}/factures-celine/${id}/envoyer`,{method:'POST',headers:h()}).then(r=>r.json());
 
 export const getCaisse      = ()    => fetch(`${BASE}/caisse`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const addCaisse      = (d)   => fetch(`${BASE}/caisse`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());

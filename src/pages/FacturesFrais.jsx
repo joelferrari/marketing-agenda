@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import {
-  getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat,
+  getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat, envoyerInvoice,
   getBudget, addBudget, deleteBudget, updateBudget,
 } from '../api';
 import styles from './FacturesFrais.module.css';
@@ -77,14 +77,15 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const [cats,       setCats]      = useState([]);
   const [loading,    setLoading]   = useState(true);
   const [uploading,  setUploading] = useState(false);
+  const [envoyingId, setEnvoyingId]= useState(null);
   const [toast,      setToast]     = useState(null);
   const [showUpload, setShowUpload]= useState(false);
   const [editing,    setEditing]    = useState(null); // {id, tab} en cours d'édition
   const [showCats,   setShowCats]  = useState(false);
   const [dragOver,   setDragOver]  = useState(false);
   const [file,       setFile]      = useState(null);
-  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu'});
-  const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'});
+  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:'',moyen:'facture'});
+  const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'});
   const [newCat,     setNewCat]    = useState('');
   const fileRef = useRef();
 
@@ -92,7 +93,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const rows      = tab === 'budget' ? budget : invoices;
   const setRows   = tab === 'budget' ? setBudget : setInvoices;
   const total     = rows.reduce((s,i) => s + parseFloat(i.montant||0), 0);
-  const hasFilters = filters.dateDebut || filters.dateFin || filters.categorie;
+  const hasFilters = filters.dateDebut || filters.dateFin || filters.categorie || filters.moyenPaiement;
 
   const loadCats = async () => {
     try { const d = await getInvCats(); setCats(Array.isArray(d) ? d : []); } catch{}
@@ -105,18 +106,22 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       if (f.dateDebut) p.dateDebut = f.dateDebut;
       if (f.dateFin)   p.dateFin   = f.dateFin;
       if (f.categorie) p.categorie = f.categorie;
+      if (f.moyenPaiement) p.moyenPaiement = f.moyenPaiement;
       if (f.sort)      p.sort      = f.sort;
       const fn = t === 'budget' ? getBudget : getInvoices;
       const d  = await fn(p);
-      (t === 'budget' ? setBudget : setInvoices)(Array.isArray(d) ? d : []);
-    } catch { (t === 'budget' ? setBudget : setInvoices)([]); }
+      const setFn = t === 'budget' ? setBudget : setInvoices;
+      setFn(Array.isArray(d) ? d : []);
+    } catch {
+      (t === 'budget' ? setBudget : setInvoices)([]);
+    }
     finally { setLoading(false); }
   };
 
   useEffect(() => { loadCats(); loadData(); }, []);
   useEffect(() => { loadData(filters, tab); }, [tab]);
 
-  const switchTab = (t) => { setTab(t); setFilters({dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'}); };
+  const switchTab = (t) => { setTab(t); setFilters({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'}); };
 
   const setFilter = (key, val) => {
     const next = {...filters, [key]: val};
@@ -124,7 +129,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   };
 
   const clearFilters = () => {
-    const r = {dateDebut:'',dateFin:'',categorie:'',sort:'date_desc'};
+    const r = {dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'};
     setFilters(r); loadData(r, tab);
   };
 
@@ -136,7 +141,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   };
 
   const ENTITES_FF = ["Mined'or", 'Rubis Spa'];
-  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu'}); };
+  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:'',moyen:'facture'}); };
 
   const upload = async () => {
     setUploading(true);
@@ -154,14 +159,9 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         const fd = new FormData();
         fd.append('file',file); fd.append('description',form.description);
         fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
-        fd.append('categorie',form.categorie); fd.append('entite',form.entite||''); fd.append('user_id',user?.id||'');
-        const { uploadInvoice: up } = await import('../api');
-        const r = await fetch(`${BASE}/invoices/upload`, {
-          method:'POST',
-          headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},
-          body:fd,
-        });
-        d = await r.json();
+        fd.append('categorie',form.categorie); fd.append('entite',form.entite||'');
+        fd.append('recu_le',form.recu_le||''); fd.append('user_id',user?.id||'');
+        d = await uploadInvoice(fd);
       }
       if (d?.erreur) throw new Error(d.erreur);
       toast$('Enregistré ✓');
@@ -180,6 +180,8 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       date_facture: r.date_facture?.slice(0,10) || r.created_at?.slice(0,10) || '',
       date_prevue:  r.date_prevue?.slice(0,10) || '',
       statut:       r.statut || 'Prévu',
+      recu_le:      r.recu_le?.slice(0,10) || '',
+      moyen:        r.source === 'carte_credit' ? 'carte_credit' : 'facture',
     });
     setShowUpload(true);
   };
@@ -201,6 +203,8 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         fd.append('categorie',   form.categorie);
         fd.append('entite',      form.entite||'');
         fd.append('date_facture',form.date_facture);
+        fd.append('recu_le',     form.recu_le||'');
+        if (tab === 'factures') fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
         if (file) fd.append('file', file);
         await updateInvoice(editing.id, fd);
       }
@@ -217,6 +221,28 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
     toast$('Supprimé'); loadData(filters, tab);
   };
 
+  // Édition instantanée d'un seul champ dans la ligne (Reçu le / Statut / Payée le)
+  const updateInlineField = async (id, field, value) => {
+    setRows(rs => rs.map(r => r.id === id ? { ...r, [field]: value } : r));
+    try {
+      const fd = new FormData();
+      fd.append(field, value);
+      const d = await updateInvoice(id, fd);
+      if (d?.erreur) throw new Error(d.erreur);
+    } catch(e) { toast$(e.message || 'Erreur', false); loadData(filters, tab); }
+  };
+
+  const doEnvoyer = async (id) => {
+    setEnvoyingId(id);
+    try {
+      const d = await envoyerInvoice(id);
+      if (d?.erreur) throw new Error(d.erreur);
+      toast$('Facture envoyée ✓');
+      setRows(rs => rs.map(r => r.id === id ? { ...r, envoye_le: new Date().toISOString() } : r));
+    } catch(e) { toast$(e.message || 'Erreur envoi', false); }
+    finally { setEnvoyingId(null); }
+  };
+
   const doAddCat = async () => {
     if (!newCat.trim()) return;
     try { const d = await addInvCat(newCat.trim()); if(d.erreur) throw new Error(d.erreur); setNewCat(''); await loadCats(); toast$('Catégorie ajoutée'); }
@@ -226,6 +252,9 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const doDelCat = async (id) => { await delInvCat(id); await loadCats(); };
 
   const dateField = tab === 'budget' ? (r) => r.date_prevue : (r) => r.date_facture || r.created_at;
+  const STATUT_PAIEMENT_LABELS = { non_payee: 'Non payée', payee: 'Payée' };
+  const showSuivi = tab === 'factures'; // Reçu le / Statut / Payée le / Envoyer
+  const showMoyen = tab === 'factures'; // colonne + filtre Facture / Carte de crédit
 
   return (
     <div className={styles.page}>
@@ -252,7 +281,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         </div>
       </header>
 
-      <main className={styles.main}>
+      <main className={styles.main} style={tab==='factures'?{maxWidth:'1400px'}:undefined}>
 
         {/* Onglets */}
         <div className={styles.tabs}>
@@ -301,6 +330,15 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 {cats.map(c=><option key={c.id} value={c.nom}>{c.nom}</option>)}
               </select>
             </div>
+            {showMoyen && (
+              <div className={styles.mf}><label>Facture / Carte de crédit</label>
+                <select value={filters.moyenPaiement} onChange={e=>setFilter('moyenPaiement',e.target.value)}>
+                  <option value="">Toutes</option>
+                  <option value="facture">Facture</option>
+                  <option value="carte_credit">Carte de crédit</option>
+                </select>
+              </div>
+            )}
             <div className={styles.mf}><label>Trier par</label>
               <select value={filters.sort} onChange={e=>setFilter('sort',e.target.value)}>
                 {SORT_OPTS.map(o=><option key={o.val} value={o.val}>{o.lbl}</option>)}
@@ -317,20 +355,24 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
 
         {/* Liste */}
         {loading ? <p className={styles.loading}>Chargement…</p> : (
-          <div className={styles.list}>
-            <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''}`}>
+          <div className={`${styles.list} ${showSuivi?styles.listScroll:''}`}>
+            <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''} ${tab==='factures'?styles.listHeaderFactures:''}`}>
               <span>Date</span>
-              <span>Fichier / Libellé</span>
+              <span>Fichier</span>
               <span>{"Entité"}</span>
               <span>{"Catégorie"}</span>
+              {showMoyen && <span>Facture / Carte de crédit</span>}
               <span>Description</span>
+              {showSuivi && <span>Reçu le</span>}
               {tab==='budget' && <span>Statut</span>}
+              {showSuivi && <span>Statut</span>}
+              {showSuivi && <span>Payée le</span>}
               <span style={{textAlign:'right'}}>Montant</span>
               <span/>
             </div>
             {!rows.length && <p className={styles.empty}>Aucune ligne trouvée</p>}
             {rows.map(r => (
-              <div key={r.id} className={`${styles.row} ${tab==='budget'?styles.rowBudget:''}`}>
+              <div key={r.id} className={`${styles.row} ${tab==='budget'?styles.rowBudget:''} ${tab==='factures'?styles.rowFactures:''}`}>
                 <span className={styles.rowDate}>{fmt(dateField(r))}</span>
                 {r.filename
                   ? <a href={fileUrl(r.id,tab)} target="_blank" rel="noreferrer" className={styles.rowFile}>
@@ -344,12 +386,38 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                 }
                 <span className={styles.rowCat} style={{background:'none',border:'none',padding:0,fontSize:'12px',color:'var(--gris)'}}>{r.entite||'—'}</span>
                 <span className={styles.rowCat}>{r.categorie||'—'}</span>
+                {showMoyen && (
+                  <span className={styles.rowCat}>{r.source==='carte_credit' ? 'Carte de crédit' : 'Facture'}</span>
+                )}
                 <span className={styles.rowDesc}>{r.description||'—'}</span>
+                {showSuivi && (
+                  <input type="date" className={styles.rowDateInput} value={r.recu_le?.slice(0,10)||''}
+                    onChange={e=>updateInlineField(r.id,'recu_le',e.target.value)}/>
+                )}
                 {tab==='budget' && <span className={styles.rowStatut} data-s={r.statut}>{r.statut||'—'}</span>}
+                {showSuivi && (
+                  <select className={styles.rowSelect} data-s={r.statut||'non_payee'} value={r.statut||'non_payee'}
+                    onChange={e=>updateInlineField(r.id,'statut',e.target.value)}>
+                    {Object.entries(STATUT_PAIEMENT_LABELS).map(([v,l])=><option key={v} value={v}>{l}</option>)}
+                  </select>
+                )}
+                {showSuivi && (
+                  <input type="date" className={styles.rowDateInput} value={r.payee_le?.slice(0,10)||''}
+                    onChange={e=>updateInlineField(r.id,'payee_le',e.target.value)}/>
+                )}
                 <span className={styles.rowMontant} style={{color:r.montant?'var(--rouge)':'var(--gris-lt)'}}>
                   {r.montant?`${parseFloat(r.montant).toFixed(2)} CHF`:'—'}
                 </span>
-                <div style={{display:'flex',gap:'4px',justifyContent:'flex-end'}}>
+                <div style={{display:'flex',gap:'4px',justifyContent:'flex-end',alignItems:'center'}}>
+                  {showSuivi && r.envoye_le && (
+                    <span className={styles.vuBadge} title={`Envoyée le ${fmt(r.envoye_le)}`}>✓ Vu</span>
+                  )}
+                  {showSuivi && (
+                    <button className={styles.btnEnvoyer} disabled={envoyingId===r.id}
+                      onClick={e=>{e.stopPropagation();doEnvoyer(r.id);}}>
+                      {envoyingId===r.id ? '…' : 'Envoyer'}
+                    </button>
+                  )}
                   <button className={styles.btnView} onClick={e=>{e.stopPropagation();openEdit(r);}}
                     style={{fontSize:'11px',padding:'4px 8px'}}>✎</button>
                   <button className={styles.rowDel} onClick={e=>{e.stopPropagation();doDelRow(r.id);}}>×</button>
@@ -370,7 +438,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
             </div>
             <div className={styles.modalBody}>
               {/* Drop zone — pour factures (création et édition) */}
-              {tab==='factures' && (
+              {tab!=='budget' && (
                 <div className={styles.dropZone}
                   style={{borderColor:dragOver?'var(--rose)':file?'var(--vert)':'var(--border)',background:dragOver?'#fdf0f1':file?'#f3f8f0':'#fff'}}
                   onDragOver={e=>{e.preventDefault();setDragOver(true);}}
@@ -395,14 +463,27 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
                   )}
                 </div>
               )}
-              {tab==='factures'
-                ? <div className={styles.mf}><label>Date de facture</label>
-                    <input type="date" value={form.date_facture} onChange={e=>setForm(p=>({...p,date_facture:e.target.value}))}/>
-                  </div>
-                : <div className={styles.mf}><label>Date prévue</label>
+              {tab==='budget'
+                ? <div className={styles.mf}><label>Date prévue</label>
                     <input type="date" value={form.date_prevue} onChange={e=>setForm(p=>({...p,date_prevue:e.target.value}))}/>
                   </div>
+                : <div className={styles.mf}><label>Date de facture</label>
+                    <input type="date" value={form.date_facture} onChange={e=>setForm(p=>({...p,date_facture:e.target.value}))}/>
+                  </div>
               }
+              {showSuivi && (
+                <div className={styles.mf}><label>Reçu le</label>
+                  <input type="date" value={form.recu_le} onChange={e=>setForm(p=>({...p,recu_le:e.target.value}))}/>
+                </div>
+              )}
+              {showMoyen && (
+                <div className={styles.mf}><label>Facture / Carte de crédit</label>
+                  <select value={form.moyen} onChange={e=>setForm(p=>({...p,moyen:e.target.value}))}>
+                    <option value="facture">Facture</option>
+                    <option value="carte_credit">Carte de crédit</option>
+                  </select>
+                </div>
+              )}
               <div className={styles.mf}><label>{"Entité"}</label>
                 <select value={form.entite} onChange={e=>setForm(p=>({...p,entite:e.target.value}))}>
                   <option value="">{"— Non spécifiée —"}</option>

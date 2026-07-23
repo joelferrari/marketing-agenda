@@ -103,3 +103,19 @@
 .rowStatut[data-s="Confirmé"]{background:#e8f4e8;color:var(--vert)}
 .rowStatut[data-s="Payé"]{background:#e8f4e8;color:var(--vert)}
 .rowStatut[data-s="Annulé"]{background:#fde8e8;color:var(--rouge)}
+
+/* Onglet Factures avec suivi de paiement — la liste devient plus large que
+   1100px : on laisse défiler horizontalement plutôt que d'écraser les
+   colonnes. */
+.listScroll{overflow-x:auto}
+
+.listHeaderFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 132px;min-width:1260px}
+.rowFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 132px;min-width:1260px}
+
+.rowDateInput{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;color:var(--gris);width:100%;font-family:'Open Sans',sans-serif}
+.rowSelect{font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--fond);color:var(--gris);width:100%;font-family:'Open Sans',sans-serif;cursor:pointer}
+.rowSelect[data-s="payee"]{background:#e8f4e8;color:var(--vert);border-color:var(--vert)}
+.btnEnvoyer{background:none;border:1px solid var(--rose);color:var(--rose);border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer;white-space:nowrap}
+.btnEnvoyer:hover{background:var(--rose);color:#fff}
+.btnEnvoyer:disabled{opacity:.5;cursor:not-allowed}
+.vuBadge{font-size:10px;font-weight:600;color:var(--vert);background:#e8f4e8;border-radius:4px;padding:3px 7px;white-space:nowrap}
