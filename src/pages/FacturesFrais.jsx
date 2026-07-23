@@ -86,7 +86,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const [showCats,   setShowCats]  = useState(false);
   const [dragOver,   setDragOver]  = useState(false);
   const [file,       setFile]      = useState(null);
-  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:''});
+  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:'',moyen:'facture'});
   const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'});
   const [newCat,     setNewCat]    = useState('');
   const fileRef = useRef();
@@ -143,7 +143,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   };
 
   const ENTITES_FF = ["Mined'or", 'Rubis Spa'];
-  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:''}); };
+  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:'',moyen:'facture'}); };
 
   const upload = async () => {
     setUploading(true);
@@ -184,6 +184,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
       date_prevue:  r.date_prevue?.slice(0,10) || '',
       statut:       r.statut || 'Prévu',
       recu_le:      r.recu_le?.slice(0,10) || '',
+      moyen:        r.source === 'carte_credit' ? 'carte_credit' : 'facture',
     });
     setShowUpload(true);
   };
@@ -206,6 +207,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         fd.append('entite',      form.entite||'');
         fd.append('date_facture',form.date_facture);
         fd.append('recu_le',     form.recu_le||'');
+        if (tab === 'factures') fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
         if (file) fd.append('file', file);
         await (tab === 'celine' ? updateFactureCeline(editing.id, fd) : updateInvoice(editing.id, fd));
       }
@@ -477,6 +479,14 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
               {showSuivi && (
                 <div className={styles.mf}><label>Reçu le</label>
                   <input type="date" value={form.recu_le} onChange={e=>setForm(p=>({...p,recu_le:e.target.value}))}/>
+                </div>
+              )}
+              {showMoyen && (
+                <div className={styles.mf}><label>Facture / Carte de crédit</label>
+                  <select value={form.moyen} onChange={e=>setForm(p=>({...p,moyen:e.target.value}))}>
+                    <option value="facture">Facture</option>
+                    <option value="carte_credit">Carte de crédit</option>
+                  </select>
                 </div>
               )}
               <div className={styles.mf}><label>{"Entité"}</label>
