@@ -411,9 +411,18 @@ export default function RH({ user, onBack, onLogout }) {
     .filter(m => parseInt(m.mois) <= mois)
     .reduce((s,m) => s + parseFloat(m.heures_sup||0), 0);
 
+  // Un jour ne compte comme "travaillé" que s'il tombe sur un jour ouvré du
+  // user (mar-sam Emilie, mar-ven Joël) — sinon un lundi (jour off pour les
+  // deux) était compté dans "X jours"/"X travaillées" alors que heuresSup
+  // l'excluait déjà correctement via entry.delta.
+  const isExtraDay = (dateStr) => {
+    const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
+    return !wd.includes(new Date(dateStr + 'T12:00:00').getDay());
+  };
+
   // Stats mois courant
-  const totalH     = entries.filter(e=>e.type!=='recup').reduce((s,e) => s + (parseFloat(e.heures)||0), 0);
-  const nbJours    = entries.filter(e=>e.type!=='recup' && e.heures).length;
+  const totalH     = entries.filter(e=>e.type!=='recup' && !isExtraDay(e.date_jour?.slice(0,10))).reduce((s,e) => s + (parseFloat(e.heures)||0), 0);
+  const nbJours    = entries.filter(e=>e.type!=='recup' && e.heures && !isExtraDay(e.date_jour?.slice(0,10))).length;
   const nbRecup    = entries.filter(e=>e.type==='recup').length;
   const heuresSup  = entries.reduce((s,e) => s + (e.delta||0), 0);
 
@@ -429,11 +438,6 @@ export default function RH({ user, onBack, onLogout }) {
   // Bilan annuel
   const totalSupAnnee = bilan.reduce((s,m) => s + parseFloat(m.heures_sup||0), 0);
   const maxH = bilan.length ? Math.max(...bilan.map(m=>parseFloat(m.total_heures||0))) : 0;
-
-  const isExtraDay = (dateStr) => {
-    const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
-    return !wd.includes(new Date(dateStr + 'T12:00:00').getDay());
-  };
 
   const dayColor = (entry, dateStr) => {
     if (!entry) return 'var(--fond)';
