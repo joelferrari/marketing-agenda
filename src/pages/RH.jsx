@@ -107,6 +107,22 @@ const getFirstDayOfMonth = (year, month) => {
   return d === 0 ? 7 : d; // 1=lun ... 7=dim
 };
 
+// Nombre de jours ouvrés du user dans une plage date_debut/date_fin (mar-sam
+// Emilie, mar-ven Joël) — un lundi/dimanche dans la plage ne doit pas compter
+// comme un jour de vacances consommé.
+const workDaysCount = (dateDebut, dateFin, userKey) => {
+  if (!dateDebut || !dateFin) return 0;
+  const wd = userKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
+  let n = 0;
+  const cur = new Date(dateDebut + 'T12:00:00');
+  const end = new Date(dateFin + 'T12:00:00');
+  while (cur <= end) {
+    if (wd.includes(cur.getDay())) n++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return n;
+};
+
 export default function RH({ user, onBack, onLogout }) {
   // viewKey = quel utilisateur on consulte : 'emilie' ou 'joel'
   // Pour emilie/joel : fixe. Pour admin : sélectionnable.
@@ -254,7 +270,7 @@ export default function RH({ user, onBack, onLogout }) {
     const rows = vacances.map(v => {
       const debut = new Date(v.date_debut+'T12:00:00');
       const fin   = new Date(v.date_fin+'T12:00:00');
-      const jours = Math.round((fin-debut)/86400000)+1;
+      const jours = workDaysCount(v.date_debut, v.date_fin, viewKey);
       return `<tr>
         <td>${debut.toLocaleDateString('fr-CH')}</td>
         <td>${fin.toLocaleDateString('fr-CH')}</td>
@@ -264,7 +280,7 @@ export default function RH({ user, onBack, onLogout }) {
     }).join('');
     const total = vacances
       .filter(v=>new Date(v.date_debut).getFullYear()===anneeVac||new Date(v.date_fin).getFullYear()===anneeVac)
-      .reduce((s,v)=>{const d=new Date(v.date_debut+'T12:00:00'),f=new Date(v.date_fin+'T12:00:00');return s+Math.round((f-d)/86400000)+1;},0);
+      .reduce((s,v)=>s+workDaysCount(v.date_debut, v.date_fin, viewKey),0);
     openPrint(`Vacances ${prenom}`, `${anneeVac} — ${total} / ${DROIT_VAC} jours pris`,
       `<table><thead><tr><th>Début</th><th>Fin</th><th style="text-align:center">Jours</th><th>Notes</th></tr></thead>
        <tbody>${rows||'<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Aucune vacance</td></tr>'}</tbody></table>`);
@@ -532,11 +548,7 @@ export default function RH({ user, onBack, onLogout }) {
             const anneeVac = now.getFullYear();
             const totalJours = vacances
               .filter(v => new Date(v.date_debut).getFullYear() === anneeVac || new Date(v.date_fin).getFullYear() === anneeVac)
-              .reduce((s,v) => {
-                const debut = new Date(v.date_debut);
-                const fin   = new Date(v.date_fin);
-                return s + Math.round((fin - debut) / 86400000) + 1;
-              }, 0);
+              .reduce((s,v) => s + workDaysCount(v.date_debut, v.date_fin, viewKey), 0);
             const DROIT = DROIT_VAC;
             const restant = DROIT - totalJours;
             return (
@@ -560,12 +572,13 @@ export default function RH({ user, onBack, onLogout }) {
             const moisMax = NOW.getMonth() + 1;
             const CREDIT_MENSUEL = CREDIT_MENS;
             const debitParMois = {};
+            const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
             vacances.forEach(v => {
               const debut = new Date(v.date_debut + 'T12:00:00');
               const fin   = new Date((v.date_fin || v.date_debut) + 'T12:00:00');
               const cur = new Date(debut);
               while (cur <= fin) {
-                if (cur.getFullYear() === anneeVacBilan) {
+                if (cur.getFullYear() === anneeVacBilan && wd.includes(cur.getDay())) {
                   const m = cur.getMonth() + 1;
                   debitParMois[m] = (debitParMois[m] || 0) + 1;
                 }
@@ -630,7 +643,7 @@ export default function RH({ user, onBack, onLogout }) {
             {vacances.map(v => {
               const debut = new Date(v.date_debut);
               const fin   = new Date(v.date_fin);
-              const jours = Math.round((fin - debut) / 86400000) + 1;
+              const jours = workDaysCount(v.date_debut, v.date_fin, viewKey);
               const isPast = fin < new Date();
               return (
                 <div key={v.id} className={`${styles.row} ${rh.vacRow}`}
@@ -656,7 +669,7 @@ export default function RH({ user, onBack, onLogout }) {
                 {demandes.map(dm => {
                   const debut = new Date(dm.date_debut + 'T12:00:00');
                   const fin   = new Date(dm.date_fin   + 'T12:00:00');
-                  const jours = Math.round((fin - debut) / 86400000) + 1;
+                  const jours = workDaysCount(dm.date_debut, dm.date_fin, viewKey);
                   const s     = DEM_STATUT[dm.statut] || DEM_STATUT.en_attente;
                   return (
                     <div key={dm.id} className={styles.row} style={{alignItems:'center',gap:'8px'}}>
@@ -1129,7 +1142,7 @@ export default function RH({ user, onBack, onLogout }) {
             </div>
             {demForm.date_debut && demForm.date_fin && demForm.date_fin >= demForm.date_debut && (
               <div className={rh.preview} style={{background:'#e8eaf6',color:VERT}}>
-                <span>📅 {Math.round((new Date(demForm.date_fin)-new Date(demForm.date_debut))/86400000)+1} jours</span>
+                <span>📅 {workDaysCount(demForm.date_debut, demForm.date_fin, viewKey)} jours</span>
                 <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
               </div>
             )}
@@ -1219,7 +1232,7 @@ export default function RH({ user, onBack, onLogout }) {
             </div>
             {vacForm.date_debut && vacForm.date_fin && vacForm.date_fin >= vacForm.date_debut && (
               <div className={rh.preview} style={{background:'#fff8e1',color:'#b08020'}}>
-                <span>📅 {Math.round((new Date(vacForm.date_fin)-new Date(vacForm.date_debut))/86400000)+1} jours</span>
+                <span>📅 {workDaysCount(vacForm.date_debut, vacForm.date_fin, viewKey)} jours</span>
                 <span style={{fontSize:'12px'}}>{viewKey === 'joel' ? "Agenda personnel + calendrier marketing" : "Agenda spa bloque + calendrier marketing"}</span>
               </div>
             )}
