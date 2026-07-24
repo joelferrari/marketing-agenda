@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances, getDemandesVacances, addDemandeVacances, emailRH, getAttestations, uploadAttestation, deleteAttestation, emailAttestations, getAttestationUrl } from '../api';
+import { getPointage, savePointage, delPointage, getBilan, getVacances, addVacances, deleteVacances, getDemandesVacances, addDemandeVacances, getDemandesRecup, addDemandeRecup, emailRH, getAttestations, uploadAttestation, deleteAttestation, emailAttestations, getAttestationUrl } from '../api';
 import styles from './CreditCard.module.css';
 import rh from './RH.module.css';
 
@@ -133,6 +133,10 @@ export default function RH({ user, onBack, onLogout }) {
   const [demModal,      setDemModal]     = useState(false);
   const [demForm,       setDemForm]      = useState({date_debut:'',date_fin:'',commentaire:''});
   const [demSaving,     setDemSaving]    = useState(false);
+  const [demandesRecup,   setDemandesRecup]   = useState([]);
+  const [demRecupModal,   setDemRecupModal]   = useState(false);
+  const [demRecupForm,    setDemRecupForm]    = useState({date_jour:'',heures_recup:'',commentaire:''});
+  const [demRecupSaving,  setDemRecupSaving]  = useState(false);
   const [attestations,  setAttestations] = useState([]);
   const [attModal,      setAttModal]     = useState(false);
   const [attForm,       setAttForm]      = useState({titre:'',type_doc:'maladie',date_doc:''});
@@ -159,6 +163,10 @@ export default function RH({ user, onBack, onLogout }) {
 
   const loadDemandes = async () => {
     try { const d = await getDemandesVacances(viewKey); setDemandes(Array.isArray(d)?d:[]); } catch{}
+  };
+
+  const loadDemandesRecup = async () => {
+    try { const d = await getDemandesRecup(viewKey); setDemandesRecup(Array.isArray(d)?d:[]); } catch{}
   };
 
   const loadAttestations = async () => {
@@ -299,7 +307,7 @@ export default function RH({ user, onBack, onLogout }) {
   };
 
   useEffect(() => {
-    if (tab==='pointage') { loadPointage(); loadBilan(); }
+    if (tab==='pointage') { loadPointage(); loadBilan(); loadDemandesRecup(); }
     else if (tab==='resume') loadBilan();
     else if (tab==='vacances') { loadVacances(); loadDemandes(); }
     else if (tab==='attestations') loadAttestations();
@@ -320,6 +328,21 @@ export default function RH({ user, onBack, onLogout }) {
       loadDemandes();
     } catch(err) { toast$(err.message, false); }
     finally { setDemSaving(false); }
+  };
+
+  const addDemRecup = async (e) => {
+    e.preventDefault();
+    if (!demRecupForm.date_jour || !demRecupForm.heures_recup) return;
+    setDemRecupSaving(true);
+    try {
+      const d = await addDemandeRecup({ ...demRecupForm, user: viewKey });
+      if (d.erreur) throw new Error(d.erreur);
+      toast$('Demande envoyée à Nathalie pour validation ✓');
+      setDemRecupModal(false);
+      setDemRecupForm({date_jour:'',heures_recup:'',commentaire:''});
+      loadDemandesRecup();
+    } catch(err) { toast$(err.message, false); }
+    finally { setDemRecupSaving(false); }
   };
 
   const addVac = async (e) => {
@@ -677,6 +700,10 @@ export default function RH({ user, onBack, onLogout }) {
             <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}>
               <IcoMail/> {emailing ? '…' : 'Email'}
             </button>
+            <button className={styles.addBtn} style={{background:'#7950f2',borderColor:'#7950f2'}}
+              onClick={()=>setDemRecupModal(true)}>
+              <IcoCal/> Demander une récup.
+            </button>
           </div>
 
           {/* Grille calendrier */}
@@ -721,6 +748,32 @@ export default function RH({ user, onBack, onLogout }) {
             <span className={rh.legendItem} style={{background:'#fff8e1',color:'#b08020'}}>5h–9h</span>
             <span className={rh.legendItem} style={{background:'#fde8e8',color:'var(--rouge)'}}>{'< 5h'}</span>
             <span className={rh.legendItem} style={{background:'var(--fond)',color:'var(--gris-lt)'}}>Pas de pointage</span>
+          </div>
+
+          {/* Demandes de récupération */}
+          <div style={{marginTop:'28px'}}>
+            <p style={{fontSize:'11px',letterSpacing:'.08em',textTransform:'uppercase',color:'var(--gris-lt)',margin:'0 0 8px'}}>
+              Demandes de récupération
+            </p>
+            {demandesRecup.length === 0 && <p className={styles.empty}>Aucune demande envoyée</p>}
+            {demandesRecup.length > 0 && (
+              <div className={styles.list}>
+                {demandesRecup.map(dr => {
+                  const s = DEM_STATUT[dr.statut] || DEM_STATUT.en_attente;
+                  return (
+                    <div key={dr.id} className={styles.row} style={{alignItems:'center',gap:'8px'}}>
+                      <span className={styles.rowDate}>{new Date(dr.date_jour+'T12:00:00').toLocaleDateString('fr-CH')}</span>
+                      <span style={{color:'#7950f2',fontWeight:500}}>{dr.heures_recup} h</span>
+                      {dr.commentaire && <span className={styles.rowAuteur}>{dr.commentaire}</span>}
+                      <div style={{flex:1}}/>
+                      <span style={{fontSize:'11px',fontWeight:600,color:s.color,background:s.bg,padding:'3px 8px',borderRadius:'4px',whiteSpace:'nowrap'}}>
+                        {s.label}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </>)}
 
@@ -1086,6 +1139,53 @@ export default function RH({ user, onBack, onLogout }) {
               <button type="button" className={styles.btnCancel} onClick={()=>setDemModal(false)}>Annuler</button>
               <button type="submit" className={styles.btnSubmit} style={{background:VERT}} disabled={demSaving}>
                 {demSaving ? '…' : 'Envoyer à Nathalie'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    )}
+    {/* Modal demande de récupération */}
+    {demRecupModal && (
+      <div className={styles.overlay} onClick={()=>setDemRecupModal(false)}>
+        <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
+          <div className={styles.modalHeader}>
+            <h2 className={styles.modalTitle}>Demande de récupération</h2>
+            <button className={styles.modalClose} onClick={()=>setDemRecupModal(false)}>✕</button>
+          </div>
+          <form onSubmit={addDemRecup} className={styles.modalBody}>
+            <p style={{fontSize:'13px',color:'var(--gris)',marginTop:0,marginBottom:'16px'}}>
+              La demande sera envoyée à Nathalie par e-mail pour validation.
+            </p>
+            <div className={rh.formRow}>
+              <div className={styles.mf}>
+                <label>Date</label>
+                <input type="date" value={demRecupForm.date_jour} required
+                  onChange={e=>setDemRecupForm(p=>({...p,date_jour:e.target.value}))}/>
+              </div>
+              <div className={styles.mf}>
+                <label>Heures</label>
+                <input value={demRecupForm.heures_recup} required
+                  placeholder="ex: 4:30 ou 4.5"
+                  onChange={e=>setDemRecupForm(p=>({...p,heures_recup:e.target.value}))}/>
+              </div>
+            </div>
+            {demRecupForm.date_jour && demRecupForm.heures_recup && (
+              <div className={rh.preview} style={{background:'#ede9fe',color:'#7950f2'}}>
+                <span>💜 {demRecupForm.heures_recup} h de récupération</span>
+                <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
+              </div>
+            )}
+            <div className={styles.mf}>
+              <label>Commentaire (optionnel)</label>
+              <input value={demRecupForm.commentaire}
+                onChange={e=>setDemRecupForm(p=>({...p,commentaire:e.target.value}))}
+                placeholder="Motif de la récupération…"/>
+            </div>
+            <div className={styles.modalFooter}>
+              <button type="button" className={styles.btnCancel} onClick={()=>setDemRecupModal(false)}>Annuler</button>
+              <button type="submit" className={styles.btnSubmit} style={{background:'#7950f2'}} disabled={demRecupSaving}>
+                {demRecupSaving ? '…' : 'Envoyer à Nathalie'}
               </button>
             </div>
           </form>
