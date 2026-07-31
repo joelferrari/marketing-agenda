@@ -120,13 +120,13 @@ export default function Calendar({ user, onLogout, onBack }) {
             return (
               <div key={ds} className={`${styles.moisCell} ${styles.moisCellActive} ${isToday?styles.moisToday:''}`} onClick={()=>setModal({defaultDate:ds})}>
                 <span className={styles.moisNum}>{i+1}</span>
-                {evs.slice(0,3).map(ev=>(
+                {evs.slice(0,6).map(ev=>(
                   <div key={ev.id} className={styles.moisEvent} style={{background:ev.couleur+'22',borderLeftColor:ev.couleur}} onClick={e=>{e.stopPropagation();setModal({event:ev})}}>
                     {!ev.toute_la_journee&&ev.heure_debut&&<span className={styles.moisTime}>{ev.heure_debut.slice(0,5)} </span>}{ev.titre}
                     {ev.description&&<span className={styles.moisDesc}> — {ev.description}</span>}
                   </div>
                 ))}
-                {evs.length>3&&<span className={styles.moisMore}>+{evs.length-3}</span>}
+                {evs.length>6&&<span className={styles.moisMore}>+{evs.length-6}</span>}
               </div>
             );
           })}
