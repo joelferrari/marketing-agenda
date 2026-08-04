@@ -386,6 +386,11 @@ export default function RH({ user, onBack, onLogout }) {
 
   const openDay = (dateStr) => {
     const e = entriesByDate[dateStr];
+    if (e?.type === 'vacances' && !e.id) {
+      toast$('Jour de vacances — à gérer depuis l\'onglet Vacances');
+      setTab('vacances');
+      return;
+    }
     setForm({
       type:          e?.type || 'travail',
       heures_recup:  e?.heures ? String(Math.abs(parseFloat(e.heures))) : '9',
@@ -457,6 +462,7 @@ export default function RH({ user, onBack, onLogout }) {
 
   const dayColor = (entry, dateStr) => {
     if (!entry) return 'var(--fond)';
+    if (entry.type === 'vacances') return '#fff3d6';
     if (entry.type === 'recup') return '#ede7f6';
     if (!entry.heures) return 'var(--fond)';
     const h = parseFloat(entry.heures);
@@ -470,6 +476,7 @@ export default function RH({ user, onBack, onLogout }) {
 
   const dayTextColor = (entry, dateStr) => {
     if (!entry) return 'var(--gris-lt)';
+    if (entry.type === 'vacances') return '#b08020';
     if (entry.type === 'recup') return '#7950f2';
     if (!entry.heures) return 'var(--gris-lt)';
     const h = parseFloat(entry.heures);
@@ -741,7 +748,9 @@ export default function RH({ user, onBack, onLogout }) {
                     style={{background: isSun||isFuture ? '' : dayColor(entry, dateStr)}}
                     onClick={()=>openDay(dateStr)}>
                     <span className={rh.calDayNum}>{day}</span>
-                    {entry?.type === 'recup' ? (
+                    {entry?.type === 'vacances' ? (
+                      <span className={rh.calHours} style={{color:'#b08020',fontSize:'12px'}}>Vacances</span>
+                    ) : entry?.type === 'recup' ? (
                       <span className={rh.calHours} style={{color:'#7950f2',fontSize:'12px'}}>Récup</span>
                     ) : entry?.heures ? (
                       <span className={rh.calHours} style={{color: dayTextColor(entry, dateStr)}}>
@@ -764,6 +773,7 @@ export default function RH({ user, onBack, onLogout }) {
             <span className={rh.legendItem} style={{background:'#e8f4e8',color:'var(--vert)'}}>≥ 9h</span>
             <span className={rh.legendItem} style={{background:'#fff8e1',color:'#b08020'}}>5h–9h</span>
             <span className={rh.legendItem} style={{background:'#fde8e8',color:'var(--rouge)'}}>{'< 5h'}</span>
+            <span className={rh.legendItem} style={{background:'#fff3d6',color:'#b08020'}}>Vacances</span>
             <span className={rh.legendItem} style={{background:'var(--fond)',color:'var(--gris-lt)'}}>Pas de pointage</span>
           </div>
 
