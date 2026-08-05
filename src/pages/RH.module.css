@@ -90,3 +90,12 @@
 .staffBtn:hover{border-color:var(--acc);color:var(--acc)}
 .staffBtnOn{background:var(--acc);border-color:var(--acc);color:#fff}
 .staffBtnOn:hover{color:#fff}
+
+/* 4 cartes stats (comme la maquette) */
+.statCards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
+.statCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:13px 15px}
+.statLabel{font-size:11px;color:var(--gris);margin-bottom:6px}
+.statVal{font-size:19px;font-weight:700;color:var(--noir)}
+@media(max-width:700px){.statCards{grid-template-columns:1fr 1fr}}
+/* Marqueur du jour courant */
+.calToday{background:var(--acc);color:#fff;border-radius:50%;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
