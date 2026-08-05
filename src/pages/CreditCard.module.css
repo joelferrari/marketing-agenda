@@ -3,14 +3,14 @@
 .toastOk{background:var(--vert);color:#fff}.toastErr{background:var(--rouge);color:#fff}
 .header{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:var(--blanc);border-bottom:1px solid var(--border)}
 .backBtn{background:none;border:none;font-size:13px;color:var(--gris);cursor:pointer;padding:6px 0}
-.backBtn:hover{color:var(--rose)}
+.backBtn:hover{color:var(--acc)}
 .headerCenter{display:flex;align-items:center;gap:12px}
 .logo{height:28px;object-fit:contain}
 .headerTitle{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir)}
-.addBtn{background:var(--rose);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-.addBtn:hover{background:var(--rose-dk)}
+.addBtn{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.addBtn:hover{background:var(--acc-dk)}
 
-.main{flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%}
+.main{flex:1;padding:32px;max-width:860px;margin:0 auto;width:100%;animation:rubUp .4s both}
 .soldeCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:center;margin-bottom:32px;box-shadow:0 2px 12px rgba(42,40,37,0.06)}
 .soldeLabel{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);margin-bottom:8px}
 .soldeVal{font-family:var(--font-disp);font-size:48px;font-weight:normal;margin-bottom:16px}
@@ -21,8 +21,8 @@
 .empty{text-align:center;color:var(--gris-lt);padding:40px;font-size:14px}
 
 .list{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.listHeader{display:grid;grid-template-columns:90px 1fr 90px 120px 70px 110px 72px;gap:12px;padding:12px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
-.row{display:grid;grid-template-columns:90px 1fr 90px 120px 70px 110px 72px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
+.listHeader{display:grid;grid-template-columns:100px 1fr 100px 120px 36px;gap:12px;padding:12px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.row{display:grid;grid-template-columns:100px 1fr 100px 120px 36px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
 .rowDepense:hover{background:var(--rouge-lt)}
 .rowVirement:hover{background:var(--vert-lt)}
 .rowDate{font-size:13px;color:var(--gris)}
@@ -31,8 +31,6 @@
 .rowMontant{font-size:15px;font-weight:600;text-align:right}
 .rowDel{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:18px;text-align:center}
 .rowDel:hover{color:var(--rouge)}
-.btnEdit{background:none;border:1px solid var(--border);border-radius:4px;color:var(--gris);cursor:pointer;font-size:12px;padding:3px 7px}
-.btnEdit:hover{border-color:var(--rose);color:var(--rose)}
 
 .overlay{position:fixed;inset:0;background:rgba(42,40,37,.4);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
 .modalBox{background:#fff;border-radius:12px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(42,40,37,.12);overflow:hidden}
@@ -46,15 +44,15 @@
 .typeBtnVirement{border-color:var(--vert);background:var(--vert-lt);color:var(--vert);font-weight:500}
 .mf{display:flex;flex-direction:column;gap:6px}
 .mf label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
-.mf input,.mf select{border:1.5px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%;background:#fff;color:var(--noir);font-family:inherit}
-.mf input:focus,.mf select:focus{border-color:var(--rose)}
+.mf input{border:1.5px solid var(--border);border-radius:6px;padding:10px 12px;font-size:14px;outline:none;width:100%}
+.mf input:focus{border-color:var(--acc)}
 .modalFooter{display:flex;gap:8px;justify-content:flex-end;padding-top:4px;border-top:1px solid var(--border)}
 .btnCancel{background:var(--fond);border:1px solid var(--border);color:var(--gris);padding:9px 16px;border-radius:6px;font-size:12px;cursor:pointer}
 .btnSubmit{color:#fff;border:none;padding:9px 20px;border-radius:6px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
 @media(max-width:600px){
-  .listHeader,.row{grid-template-columns:80px 1fr 60px 36px}
-  .rowAuteur,.rowEntite,.rowCat{display:none}
-  .listHeader span:nth-child(3),.listHeader span:nth-child(4),.listHeader span:nth-child(5){display:none}
+  .listHeader,.row{grid-template-columns:80px 1fr 80px 36px}
+  .rowAuteur{display:none}
+  .listHeader span:nth-child(3){display:none}
 }
 .headerLeft{display:flex;align-items:center;gap:12px}
 .headerCenter{flex:1}
@@ -62,14 +60,3 @@
 .navSecondary{background:none;border:1px solid var(--border);border-radius:3px;padding:6px 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);cursor:pointer;white-space:nowrap}
 .navSecondary:hover{color:var(--gris)}
 .headerSub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);margin-bottom:2px}
-.catsPanel{background:var(--beige);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:20px}
-.catsTitle{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gris-lt);margin-bottom:12px}
-.catsList{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
-.catItem{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:4px;padding:4px 10px;font-size:12px;color:var(--gris)}
-.catDel{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:14px;padding:0}
-.catDel:hover{color:var(--rouge)}
-.catAdd{display:flex;gap:8px}
-.catInput{flex:1;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;outline:none;font-family:inherit}
-.catInput:focus{border-color:var(--rose)}
-.catAddBtn{background:var(--vert);color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;white-space:nowrap;font-family:inherit}
-.catsEmpty{font-size:12px;color:var(--gris-lt)}

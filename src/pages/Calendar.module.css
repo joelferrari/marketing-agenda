@@ -1,6 +1,6 @@
 .app{height:100vh;display:flex;flex-direction:column;background:var(--fond)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;font-size:13px;border-radius:8px;z-index:200;white-space:nowrap}
-.toastOk{background:var(--teal);color:#fff}.toastErr{background:#e03131;color:#fff}
+.toastOk{background:var(--vert);color:#fff}.toastErr{background:#e03131;color:#fff}
 .header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:#fff;border-bottom:1px solid var(--border);flex-shrink:0;gap:16px;flex-wrap:wrap}
 .headerLeft{display:flex;align-items:center;gap:12px}
 .headerLogo{font-size:28px}
@@ -8,67 +8,54 @@
 .headerTitle{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir)}
 .headerCenter{display:flex;align-items:center;gap:8px;flex:1;justify-content:center}
 .todayBtn{padding:6px 14px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:12px;cursor:pointer;color:var(--gris)}
-.todayBtn:hover{border-color:var(--indigo);color:var(--indigo)}
+.todayBtn:hover{border-color:var(--acc);color:var(--acc)}
 .navBtn{background:none;border:none;font-size:22px;color:var(--gris);cursor:pointer;padding:0 6px}
-.navBtn:hover{color:var(--indigo)}
+.navBtn:hover{color:var(--acc)}
 .dateTitle{font-size:15px;font-weight:500;color:var(--noir);min-width:200px;text-align:center}
 .headerRight{display:flex;align-items:center;gap:10px}
-.vueTabs{display:flex;background:var(--indigo-lt);border-radius:6px;padding:3px}
+.vueTabs{display:flex;background:var(--acc-lt);border-radius:6px;padding:3px}
 .vueTab{padding:5px 12px;border:none;background:none;border-radius:4px;font-size:12px;cursor:pointer;color:var(--gris)}
-.vueTabOn{background:var(--indigo);color:#fff}
-.newBtn{background:var(--indigo);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
-.newBtn:hover{background:var(--indigo-dk)}
+.vueTabOn{background:var(--acc);color:#fff}
+.newBtn{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;white-space:nowrap}
+.newBtn:hover{background:var(--acc-dk)}
 .userMenu{display:flex;align-items:center;gap:8px}
 .userName{font-size:13px;color:var(--gris);font-weight:500}
 .logoutBtn{background:none;border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--gris-lt);cursor:pointer}
-.main{flex:1;overflow:hidden}
+.main{flex:1;overflow:auto;animation:rubUp .4s both}
 .loading{padding:40px;text-align:center;color:var(--gris-lt);font-size:14px}
-.moisOuter{display:flex;height:100%;overflow:hidden}
-.moisWrap{flex:1;min-width:0;height:100%;display:flex;flex-direction:column}
-.moisHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--indigo-lt);border-bottom:1px solid var(--border);flex-shrink:0}
-.moisDayName{padding:10px;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);font-weight:500}
-.moisGrid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:minmax(140px,1fr);flex:1;overflow:auto}
-.sidePanel{width:240px;height:100%;overflow-y:auto;border-left:1px solid var(--border);background:#fff;padding:16px 12px;flex-shrink:0}
-.sidePanelTitle{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);margin:0 0 14px}
-.sidePanelEmpty{font-size:12px;color:var(--gris-lt);text-align:center;padding:12px 0}
-.sidePanelGroup{margin-bottom:14px}
-.sidePanelCatRow{display:flex;align-items:center;gap:6px;margin-bottom:6px}
-.sidePanelCatDot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
-.sidePanelCat{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gris);flex:1}
-.sidePanelCatCount{font-size:10px;color:var(--gris-lt);background:var(--fond);padding:1px 5px;border-radius:8px}
-.sidePanelEvent{border-left:3px solid #ccc;padding:4px 8px;margin-bottom:3px;cursor:pointer;border-radius:0 3px 3px 0;background:var(--fond)}
-.sidePanelEvent:hover{opacity:.75}
-.sidePanelDate{display:block;font-size:10px;color:var(--gris-lt);margin-bottom:1px}
-.sidePanelEvTitle{display:block;font-size:11px;font-weight:500;color:var(--noir);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.semaineWrap{display:grid;grid-template-columns:repeat(7,1fr);height:100%;overflow-y:auto}
+.moisWrap{height:100%;display:flex;flex-direction:column}
+.moisHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--acc-lt);border-bottom:1px solid var(--border)}
+.moisDayName{padding:10px;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);font-weight:500}
+.moisGrid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;flex:1}
 .moisCell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;cursor:pointer;overflow:hidden;display:flex;flex-direction:column}
-.moisCellActive:hover{background:var(--indigo-lt)}
+.moisCellActive:hover{background:var(--acc-lt)}
 .moisToday{background:var(--violet-lt)}
 .moisNum{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;font-size:13px;font-weight:500;color:var(--gris);margin-bottom:4px}
-.moisToday .moisNum{background:var(--indigo);color:#fff}
+.moisToday .moisNum{background:var(--acc);color:#fff}
 .moisEvent{font-size:11px;padding:2px 6px;border-radius:4px;border-left:3px solid;margin-bottom:2px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
 .moisEvent:hover{opacity:.8}
 .moisTime{font-size:10px;opacity:.7}
 .moisMore{font-size:10px;color:var(--gris-lt);padding-left:4px}
+.semaineWrap{display:grid;grid-template-columns:repeat(7,1fr);height:100%}
 .semaineCol{border-right:1px solid var(--border);padding:12px 8px;cursor:pointer;min-height:200px}
 .semaineCol:last-child{border-right:none}
-.semaineCol:hover{background:var(--indigo-lt)}
+.semaineCol:hover{background:var(--acc-lt)}
 .semaineToday{background:var(--violet-lt)}
 .semaineDayHeader{display:flex;flex-direction:column;align-items:center;margin-bottom:12px;gap:4px}
 .semaineDayName{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
 .semaineDayNum{font-size:20px;font-weight:300;color:var(--gris)}
-.semaineTodayNum{background:var(--indigo);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.semaineTodayNum{background:var(--acc);color:#fff;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;font-size:16px}
 .semaineEvents{display:flex;flex-direction:column;gap:6px}
 .semaineEvent{padding:8px 10px;border-radius:6px;border-left:3px solid;cursor:pointer}
 .semaineEvent:hover{opacity:.8}
 .semaineEvTitle{font-size:13px;font-weight:500;color:var(--noir);margin-bottom:2px}
 .semaineEvTime{font-size:11px;color:var(--gris)}
 .rappelBadge{font-size:11px;color:var(--gris);margin-top:4px;display:inline-block}
-.jourWrap{padding:24px;max-width:700px;margin:0 auto;height:100%;overflow-y:auto;box-sizing:border-box}
-.addBtn{background:var(--indigo);color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:12px;cursor:pointer;margin-bottom:20px;letter-spacing:.06em;text-transform:uppercase}
+.jourWrap{padding:24px;max-width:700px;margin:0 auto}
+.addBtn{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:12px;cursor:pointer;margin-bottom:20px;letter-spacing:.06em;text-transform:uppercase}
 .empty{color:var(--gris-lt);font-size:14px;text-align:center;padding:40px 0}
 .jourEvent{display:flex;border-radius:8px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border);border-left:4px solid;cursor:pointer}
-.jourEvent:hover{box-shadow:0 2px 12px rgba(59,91,219,.1)}
+.jourEvent:hover{box-shadow:0 2px 12px rgba(197,110,110,.12)}
 .jourEvLeft{padding:16px;min-width:90px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0}
 .jourEvTime{font-size:14px;font-weight:500;color:var(--noir)}
 .jourEvTimeTo{font-size:12px;color:var(--gris)}

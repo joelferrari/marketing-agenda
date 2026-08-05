@@ -6,12 +6,12 @@
 .headerSub{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);margin-bottom:2px}
 .headerTitle{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir);margin:0}
 .headerRight{display:flex;align-items:center;gap:8px}
-.addBtn{background:var(--rose);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
-.addBtn:hover{background:var(--rose-dk)}
+.addBtn{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:8px 18px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.addBtn:hover{background:var(--acc-dk)}
 .navSecondary{background:none;border:1px solid var(--border);border-radius:3px;padding:6px 12px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);cursor:pointer;white-space:nowrap}
 .navSecondary:hover{color:var(--gris)}
 
-.main{flex:1;padding:32px;max-width:1100px;margin:0 auto;width:100%}
+.main{flex:1;padding:32px;max-width:900px;margin:0 auto;width:100%;animation:rubUp .4s both}
 
 /* Carte résumé */
 .soldeCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:center;margin-bottom:24px;box-shadow:0 2px 12px rgba(42,40,37,.06)}
@@ -20,7 +20,7 @@
 .soldeMeta{display:flex;justify-content:center;align-items:center;gap:24px}
 .soldeDebit{font-size:13px;color:var(--gris)}
 .catLink{background:none;border:none;font-size:12px;color:var(--gris-lt);cursor:pointer;letter-spacing:.06em}
-.catLink:hover{color:var(--rose)}
+.catLink:hover{color:var(--acc)}
 
 /* Catégories */
 .catsCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:24px}
@@ -32,8 +32,8 @@
 .catsEmpty{font-size:13px;color:var(--gris-lt)}
 .catAdd{display:flex;gap:8px}
 .catInput{flex:1;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;outline:none}
-.catInput:focus{border-color:var(--rose)}
-.catAddBtn{background:var(--rose);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap}
+.catInput:focus{border-color:var(--acc)}
+.catAddBtn{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap}
 
 /* Filtres */
 .filtersCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:16px 20px;margin-bottom:20px}
@@ -45,17 +45,17 @@
 .mf{display:flex;flex-direction:column;gap:5px}
 .mf label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris)}
 .mf input,.mf select{border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;outline:none;background:#fff;color:var(--noir);font-family:inherit}
-.mf input:focus,.mf select:focus{border-color:var(--rose)}
+.mf input:focus,.mf select:focus{border-color:var(--acc)}
 
 /* Liste */
 .loading{text-align:center;color:var(--gris-lt);padding:40px}
 .empty{text-align:center;color:var(--gris-lt);padding:32px;font-size:14px;margin:0}
 .list{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-.listHeader{display:grid;grid-template-columns:90px 1fr 90px 110px 1fr 100px 72px;gap:12px;padding:12px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
-.row{display:grid;grid-template-columns:90px 1fr 90px 110px 1fr 100px 72px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
-.row:hover{background:#fdf7f6}
+.listHeader{display:grid;grid-template-columns:90px 1fr 110px 1fr 100px 72px;gap:12px;padding:12px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.row{display:grid;grid-template-columns:90px 1fr 110px 1fr 100px 72px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
+.row:hover{background:var(--acc-lt)}
 .rowDate{font-size:12px;color:var(--gris)}
-.rowFile{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--rose);text-decoration:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.rowFile{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--acc);text-decoration:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .rowFile:hover{text-decoration:underline}
 .rowCat{font-size:12px;color:var(--gris);background:var(--fond);border:1px solid var(--border);border-radius:4px;padding:2px 6px;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .rowDesc{font-size:13px;color:var(--noir);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
@@ -78,7 +78,7 @@
 /* Drop zone */
 .dropZone{border:1.5px dashed var(--border);border-radius:8px;padding:24px;text-align:center;cursor:pointer;transition:all .15s}
 .dropHint{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--gris-lt);font-size:13px}
-.dropHint strong{color:var(--rose)}
+.dropHint strong{color:var(--acc)}
 .dropSub{font-size:11px;color:var(--gris-lt)}
 .filePreview{display:flex;align-items:center;gap:8px;justify-content:center}
 .fileName{font-size:13px;color:var(--noir);font-weight:500}
@@ -86,7 +86,7 @@
 
 @media(max-width:700px){
   .listHeader,.row{grid-template-columns:80px 1fr 80px 36px}
-  .listHeader span:nth-child(3),.listHeader span:nth-child(4),.listHeader span:nth-child(5),.rowCat,.rowDesc{display:none}
+  .listHeader span:nth-child(3),.rowCat,.listHeader span:nth-child(4),.rowDesc{display:none}
   .header{padding:12px 16px}.main{padding:16px}
 }
 
@@ -94,28 +94,12 @@
 .filterTotal strong{font-size:15px}
 
 .tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)}
-.tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:'Open Sans',sans-serif;color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:var(--font-ui);color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
 .tab:hover{color:var(--gris)}
-.tabOn{color:var(--rose);border-bottom-color:var(--rose);font-weight:600}
-.listHeaderBudget{grid-template-columns:90px 1fr 90px 110px 1fr 90px 100px 72px}
-.rowBudget{grid-template-columns:90px 1fr 90px 110px 1fr 90px 100px 36px}
+.tabOn{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.listHeaderBudget{grid-template-columns:90px 1fr 110px 1fr 90px 100px 72px}
+.rowBudget{grid-template-columns:90px 1fr 110px 1fr 90px 100px 36px}
 .rowStatut{font-size:11px;padding:2px 6px;border-radius:4px;background:var(--fond);color:var(--gris);white-space:nowrap;align-self:center}
-.rowStatut[data-s="Confirmé"]{background:#e8f4e8;color:var(--vert)}
-.rowStatut[data-s="Payé"]{background:#e8f4e8;color:var(--vert)}
-.rowStatut[data-s="Annulé"]{background:#fde8e8;color:var(--rouge)}
-
-/* Onglet Factures avec suivi de paiement — la liste devient plus large que
-   1100px : on laisse défiler horizontalement plutôt que d'écraser les
-   colonnes. */
-.listScroll{overflow-x:auto}
-
-.listHeaderFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 132px;min-width:1260px}
-.rowFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 132px;min-width:1260px}
-
-.rowDateInput{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;color:var(--gris);width:100%;font-family:'Open Sans',sans-serif}
-.rowSelect{font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--fond);color:var(--gris);width:100%;font-family:'Open Sans',sans-serif;cursor:pointer}
-.rowSelect[data-s="payee"]{background:#e8f4e8;color:var(--vert);border-color:var(--vert)}
-.btnEnvoyer{background:none;border:1px solid var(--rose);color:var(--rose);border-radius:5px;padding:4px 9px;font-size:11px;cursor:pointer;white-space:nowrap}
-.btnEnvoyer:hover{background:var(--rose);color:#fff}
-.btnEnvoyer:disabled{opacity:.5;cursor:not-allowed}
-.vuBadge{font-size:10px;font-weight:600;color:var(--vert);background:#e8f4e8;border-radius:4px;padding:3px 7px;white-space:nowrap}
+.rowStatut[data-s="Confirmé"]{background:var(--vert-lt);color:var(--vert)}
+.rowStatut[data-s="Payé"]{background:var(--vert-lt);color:var(--vert)}
+.rowStatut[data-s="Annulé"]{background:var(--rouge-lt);color:var(--rouge)}

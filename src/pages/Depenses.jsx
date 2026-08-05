@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Skeleton from '../components/Skeleton';
 import styles from './CreditCard.module.css';
 import dep from './Depenses.module.css';
 
@@ -6,9 +7,9 @@ const BASE = '/mkt';
 const h = () => ({ 'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}` });
 
 const STATUT = {
-  en_attente: { label:'En attente', color:'#b08020', bg:'#fff8e1' },
-  validee:    { label:'Validée ✅',  color:'#2e7d32', bg:'#e8f5e9' },
-  refusee:    { label:'Refusée ❌',  color:'#c62828', bg:'#fde8e8' },
+  en_attente: { label:'En attente', color:'var(--orange)', bg:'var(--orange-lt)' },
+  validee:    { label:'Validée ✅',  color:'var(--vert)',   bg:'var(--vert-lt)' },
+  refusee:    { label:'Refusée ❌',  color:'var(--rouge)',  bg:'var(--rouge-lt)' },
 };
 
 export default function Depenses({ user, onBack, onLogout }) {
@@ -47,7 +48,7 @@ export default function Depenses({ user, onBack, onLogout }) {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-module="depenses">
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
 
       <header className={styles.header}>
@@ -101,7 +102,7 @@ export default function Depenses({ user, onBack, onLogout }) {
         {/* Liste des demandes */}
         <div className={dep.card} style={{marginTop:'20px'}}>
           <h2 className={dep.cardTitle}>Historique des demandes</h2>
-          {loading && <p className={styles.empty}>Chargement…</p>}
+          {loading && <Skeleton rows={3}/>}
           {!loading && list.length === 0 && <p className={styles.empty}>Aucune demande pour le moment</p>}
           {list.map(d => {
             const st = STATUT[d.statut] || STATUT.en_attente;

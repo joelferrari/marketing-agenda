@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getTransactions, addTransaction, updateTransaction, deleteTransaction, addInvoiceJSON,
          getAbonnements, addAbonnement, toggleAbonnement, deleteAbonnement,
          getInvCats, addInvCat, delInvCat } from '../api';
+import Skeleton from '../components/Skeleton';
 import styles from './CreditCard.module.css';
 
 const fmt = (n) => new Intl.NumberFormat('fr-CH',{style:'currency',currency:'CHF'}).format(n);
@@ -156,7 +157,7 @@ export default function CreditCard({ user, onBack, onLogout }) {
   const catTag = (t) => [t.categorie_principale, t.sous_categorie].filter(Boolean).join(' › ');
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-module="carte">
       {toast&&<div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
@@ -253,7 +254,7 @@ export default function CreditCard({ user, onBack, onLogout }) {
           </div>
         )}
 
-        {loading && <p className={styles.loading}>{"Chargement…"}</p>}
+        {loading && <Skeleton rows={4}/>}
         {!loading && transactions.length===0 && <p className={styles.empty}>{"Aucune transaction pour l'instant."}</p>}
         {!loading && transactions.length>0 && (
           <div className={styles.list}>

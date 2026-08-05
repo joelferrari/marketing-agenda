@@ -8,13 +8,18 @@ import FacturesFrais from './pages/FacturesFrais';
 import Caisse from './pages/Caisse';
 import RH from './pages/RH';
 import Depenses from './pages/Depenses';
-import FeuilleTemps from './pages/FeuilleTemps';
 import './index.css';
 
 export default function App() {
   const [user, setUser]         = useState(null);
   const [checking, setChecking] = useState(true);
   const [page, setPage]         = useState('home');
+  const [theme, setTheme]       = useState(() => localStorage.getItem('mkt_theme') || 'light');
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('mkt_theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     const token = localStorage.getItem('mkt_token');
@@ -27,16 +32,27 @@ export default function App() {
   }, []);
 
   const logout = () => { localStorage.removeItem('mkt_token'); setUser(null); setPage('home'); };
+  const toggleTheme = () => setTheme(t => t === 'dark' ? 'light' : 'dark');
 
-  if (checking) return <div style={{height:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'#6b6560',fontFamily:'system-ui'}}>Chargement…</div>;
-  if (!user) return <Login onLogin={u => { setUser(u); setPage('home'); }}/>;
+  const ThemeToggle = () => (
+    <button className="themeToggle" onClick={toggleTheme}
+      title={theme === 'dark' ? 'Passer en clair' : 'Passer en sombre'}
+      aria-label="Basculer le thème">
+      {theme === 'dark' ? '☀' : '☾'}
+    </button>
+  );
 
-  if (page === 'agenda')  return <Calendar user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
-  if (page === 'carte')   return <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>
-  if (page === 'factures-frais') return <FacturesFrais user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  if (page === 'caisse') return <Caisse user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  if (page === 'rh') return <RH user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  if (page === 'depenses') return <Depenses user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  if (page === 'timesheet' && user.prenom === 'Joël') return <FeuilleTemps user={user} viewKey="joel" onBack={()=>setPage('home')} onLogout={logout}/>;
-  return <Home user={user} onNavigate={setPage} onLogout={logout}/>;
+  if (checking) return <div style={{height:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--gris)',fontFamily:'var(--font-ui)'}}>Chargement…</div>;
+  if (!user) return <><Login onLogin={u => { setUser(u); setPage('home'); }}/><ThemeToggle/></>;
+
+  let pageEl;
+  if (page === 'agenda')              pageEl = <Calendar user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
+  else if (page === 'carte')          pageEl = <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
+  else if (page === 'factures-frais') pageEl = <FacturesFrais user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
+  else if (page === 'caisse')         pageEl = <Caisse user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
+  else if (page === 'rh')             pageEl = <RH user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
+  else if (page === 'depenses')       pageEl = <Depenses user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
+  else                                pageEl = <Home user={user} onNavigate={setPage} onLogout={logout}/>;
+
+  return <>{pageEl}<ThemeToggle/></>;
 }

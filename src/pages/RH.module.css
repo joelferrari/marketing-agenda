@@ -1,12 +1,12 @@
 /* Onglets */
 .tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border)}
-.tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:'Open Sans',sans-serif;color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
-.tab:hover{color:var(--gris)}.tabOn{color:var(--rose);border-bottom-color:var(--rose);font-weight:600}
+.tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:var(--font-ui);color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab:hover{color:var(--gris)}.tabOn{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
 
 /* Navigation mois */
 .moisNav{display:flex;align-items:center;gap:12px;margin-bottom:16px}
 .moisBtn{background:none;border:1px solid var(--border);border-radius:6px;width:32px;height:32px;font-size:18px;cursor:pointer;color:var(--gris);display:flex;align-items:center;justify-content:center}
-.moisBtn:hover{border-color:var(--rose);color:var(--rose)}
+.moisBtn:hover{border-color:var(--acc);color:var(--acc)}
 .moisTitle{font-family:var(--font-disp);font-size:20px;font-weight:normal;color:var(--noir);min-width:180px}
 .statsPills{display:flex;gap:8px;flex-wrap:wrap}
 .pill{background:var(--fond);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--gris)}
@@ -32,7 +32,7 @@
 /* Année */
 .anneeBar{display:flex;gap:8px;margin-bottom:16px}
 .anneeBtn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 16px;font-size:13px;cursor:pointer;color:var(--gris)}
-.anneeBtnOn{background:var(--rose);border-color:var(--rose);color:#fff;font-weight:500}
+.anneeBtnOn{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:500}
 
 /* Graphique barres */
 .chartCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:20px}
@@ -47,7 +47,7 @@
 /* Tableau bilan */
 .bilanHeader{display:grid;grid-template-columns:1fr 80px 100px 120px;gap:12px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
 .bilanRow{grid-template-columns:1fr 80px 100px 120px!important;cursor:pointer}
-.bilanRow:hover{background:#fdf7f6}
+.bilanRow:hover{background:var(--acc-lt)}
 
 /* Modal */
 .timeRow{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:flex-end}
@@ -69,21 +69,8 @@
 .joursLbl{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 .typeToggle{display:flex;gap:8px;margin-bottom:4px}
 .typeBtn{flex:1;padding:8px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
-.typeBtn:hover{border-color:var(--rose)}
+.typeBtn:hover{border-color:var(--acc)}
 
 .bilanHeaderCumul{display:grid;grid-template-columns:1fr 70px 90px 110px 140px;gap:10px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-lt)}
 .bilanRowCumul{grid-template-columns:1fr 70px 90px 110px 140px!important;gap:10px;cursor:pointer}
-.bilanRowCumul:hover{background:#fdf7f6}
-.formRow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.exportBtn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--gris);display:inline-flex;align-items:center;gap:4px;font-family:inherit}
-.exportBtn:hover{border-color:#4a7c5f;color:#4a7c5f}
-.exportBtn:disabled{opacity:.5;cursor:default}
-.attHeader{display:grid;grid-template-columns:90px 80px 1fr 110px;gap:12px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
-.attRow{grid-template-columns:90px 80px 1fr 110px!important}
-
-/* Sélecteur utilisateur admin */
-.staffSwitch{display:flex;gap:8px;margin-bottom:20px}
-.staffBtn{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 18px;font-size:12px;cursor:pointer;color:var(--gris);font-family:inherit;letter-spacing:.04em}
-.staffBtn:hover{border-color:#4a7c5f;color:#4a7c5f}
-.staffBtnOn{background:#4a7c5f;border-color:#4a7c5f;color:#fff}
-.staffBtnOn:hover{color:#fff}
+.bilanRowCumul:hover{background:var(--acc-lt)}
