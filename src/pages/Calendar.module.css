@@ -24,8 +24,23 @@
 .main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;animation:rubUp .4s both}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 20px;flex-shrink:0}
 .toolbarGroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.calBody{flex:1;min-height:0;overflow:auto}
+.calBody{flex:1;min-height:0;display:flex;overflow:hidden}
+.calMain{flex:1;min-width:0;overflow:auto}
+.summary{width:300px;flex-shrink:0;border-left:1px solid var(--border);overflow:auto;padding:18px 16px;background:var(--blanc)}
+.sumHead{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:6px}
+.sumTitle{font-family:var(--font-disp);font-size:16px;color:var(--noir);text-transform:capitalize}
+.sumCount{font-size:11.5px;color:var(--acc-dk);font-weight:600;background:var(--acc-lt);padding:2px 9px;border-radius:20px;white-space:nowrap}
+.sumSub{font-size:11.5px;color:var(--gris-lt);margin-bottom:8px}
+.sumDay{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt);font-weight:600;margin:14px 0 6px}
+.sumItem{display:flex;gap:10px;padding:9px 10px;border-radius:9px;cursor:pointer;transition:background .15s}
+.sumItem:hover{background:var(--acc-lt)}
+.sumBar{width:3px;border-radius:3px;flex-shrink:0}
+.sumBody{min-width:0;flex:1}
+.sumEvTitle{font-size:12.5px;font-weight:600;color:var(--noir);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sumEvMeta{font-size:11px;color:var(--gris);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sumEmpty{font-size:12.5px;color:var(--gris-lt);text-align:center;padding:32px 12px}
 .loading{padding:40px;text-align:center;color:var(--gris-lt);font-size:14px}
+@media(max-width:1024px){.summary{display:none}}
 .moisWrap{height:100%;display:flex;flex-direction:column}
 .moisHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--acc-lt);border-bottom:1px solid var(--border)}
 .moisDayName{padding:10px;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);font-weight:500}
