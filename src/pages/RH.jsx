@@ -525,7 +525,6 @@ export default function RH({ user }) {
               <button className={rh.exportBtn} onClick={printVacances} title="Télécharger PDF"><IcoPdf/> PDF</button>
               <button className={rh.exportBtn} onClick={()=>openEmailModal('vacances')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
               <button className={styles.addBtn}
-                style={{background:VERT,borderColor:VERT}}
                 onClick={()=>setDemModal(true)}>
                 <IcoCal/> Demander
               </button>
@@ -710,7 +709,7 @@ export default function RH({ user }) {
             <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}>
               <IcoMail/> {emailing ? '…' : 'Email'}
             </button>
-            <button className={styles.addBtn} style={{background:'var(--violet)',borderColor:'var(--violet)'}}
+            <button className={styles.addBtn}
               onClick={()=>setDemRecupModal(true)}>
               <IcoCal/> Demander une récup.
             </button>
