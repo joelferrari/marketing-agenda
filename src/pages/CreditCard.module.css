@@ -13,6 +13,45 @@
 .main{flex:1;padding:32px;max-width:860px;margin:0 auto;width:100%;animation:rubUp .4s both}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px}
 .toolbarGroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ==== Contenu « Retro Spring » (maquette) — résumé + table stylée ==== */
+.dcSummary{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.dcPill{flex:1;min-width:200px;background:var(--acc-lt);border-radius:14px;padding:16px 18px}
+.dcPillLabel{font-size:11.5px;color:var(--acc-dk);font-weight:600;margin-bottom:6px}
+.dcPillVal{font-size:28px;font-weight:700;color:var(--noir);font-variant-numeric:tabular-nums}
+.dcPillUnit{font-size:15px;font-weight:500;color:var(--gris)}
+.dcPillMeta{display:flex;gap:16px;margin-top:8px;font-size:12px}
+.dcInfo{flex:2;min-width:230px;background:var(--blanc);border:1px solid var(--border);border-radius:14px;padding:16px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.dcInfoText{font-size:12.5px;color:var(--gris);line-height:1.5}
+.dcInfoText strong{color:var(--noir)}
+.dcSectionLabel{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris-lt);margin:0 0 8px}
+.dcTable{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--blanc)}
+.dcHead{display:grid;gap:10px;padding:10px 16px;background:var(--acc-lt);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc-dk);font-weight:600}
+.dcRow{display:grid;gap:10px;padding:12px 16px;border-top:1px solid var(--border);align-items:center;transition:background .1s}
+.dcRow:hover{background:var(--acc-lt)}
+.dcDate{font-size:12px;color:var(--gris)}
+.dcName{font-size:13px;color:var(--noir);font-weight:500}
+.dcCat{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--acc-lt);color:var(--acc-dk);font-weight:500;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.dcAmount{font-size:12.5px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+.dcActions{display:flex;gap:4px;justify-content:flex-end;align-items:center}
+.dcActionBtn{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:14px;padding:2px 4px;line-height:1}
+.dcActionBtn:hover{color:var(--acc)}
+.dcActionBtnDel:hover{color:var(--rouge)}
+.dcBtn{background:var(--acc);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;transition:.15s}
+.dcBtn:hover{background:var(--acc-dk)}
+
+.catsPanel{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:16px}
+.catsTitle{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--gris-lt);margin:0 0 14px}
+.catsList{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.catItem{display:flex;align-items:center;gap:8px;background:var(--fond);border:1px solid var(--border);border-radius:6px;padding:5px 10px;font-size:13px;color:var(--noir)}
+.catDel{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:13px;padding:0;line-height:1}
+.catDel:hover{color:var(--rouge)}
+.catsEmpty{font-size:13px;color:var(--gris-lt)}
+.catAdd{display:flex;gap:8px}
+.catInput{flex:1;border:1.5px solid var(--border);border-radius:6px;padding:8px 12px;font-size:13px;outline:none}
+.catInput:focus{border-color:var(--acc)}
+.catAddBtn{background:var(--acc);color:#fff;border:none;border-radius:6px;padding:8px 16px;font-size:12px;cursor:pointer;white-space:nowrap}
+
 .soldeCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:32px;text-align:center;margin-bottom:32px;box-shadow:0 2px 12px rgba(42,40,37,0.06)}
 .soldeLabel{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);margin-bottom:8px}
 .soldeVal{font-family:var(--font-disp);font-size:48px;font-weight:normal;margin-bottom:16px}

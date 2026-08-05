@@ -15,6 +15,7 @@
   --beige:  #f2ede3;  --beige-dk: #efe7db;
   --noir:   #3a322c;  --gris: #9a8c7c;  --gris-lt: #b3a794;
   --fond:   #f6efe4;  --blanc: #fffdf9;  --border: #efe7db;
+  --side:   #fbf5ec;  --sideb: #ece2d4;   /* barre latérale crème chaud */
 
   /* Statuts */
   --vert:  #2f7d4f;  --vert-lt:  #e7f3e7;
@@ -51,6 +52,7 @@
   --beige:#201b14; --beige-dk:rgba(255,255,255,.10);
   --noir:#f0e8dc;  --gris:#a79a89;  --gris-lt:#8a7d6d;
   --fond:#1a1611;  --blanc:#241f18; --border:rgba(255,255,255,.10);
+  --side:#1e1a13;  --sideb:rgba(255,255,255,.09);
 
   --vert:#7fc99b;  --vert-lt:rgba(47,125,79,.22);
   --rouge:#e2938a; --rouge-lt:rgba(189,85,75,.22);

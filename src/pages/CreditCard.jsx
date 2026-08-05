@@ -190,53 +190,56 @@ export default function CreditCard({ user }) {
           </div>
         )}
 
-        <div className={styles.soldeCard}>
-          <p className={styles.soldeLabel}>{"Solde actuel"}</p>
-          <p className={styles.soldeVal} style={{color:soldeColor}}>{fmt(solde)}</p>
-          <div className={styles.soldeMeta}>
-            <span className={styles.soldeDebit}>
-              {"↓ "}{fmt(transactions.filter(t=>t.type==='depense').reduce((a,t)=>a+parseFloat(t.montant),0))}{" dépenses"}
-            </span>
-            <span className={styles.soldeCredit}>
-              {"↑ "}{fmt(transactions.filter(t=>t.type==='virement').reduce((a,t)=>a+parseFloat(t.montant),0))}{" virements"}
-            </span>
+        <div className={styles.dcSummary}>
+          <div className={styles.dcPill}>
+            <div className={styles.dcPillLabel}>{"Solde actuel"}</div>
+            <div className={styles.dcPillVal} style={{color:soldeColor}}>{fmt(solde)}</div>
+            <div className={styles.dcPillMeta}>
+              <span style={{color:'var(--rouge)'}}>
+                {"↓ "}{fmt(transactions.filter(t=>t.type==='depense').reduce((a,t)=>a+parseFloat(t.montant),0))}{" dépenses"}
+              </span>
+              <span style={{color:'var(--vert)'}}>
+                {"↑ "}{fmt(transactions.filter(t=>t.type==='virement').reduce((a,t)=>a+parseFloat(t.montant),0))}{" virements"}
+              </span>
+            </div>
+          </div>
+          <div className={styles.dcInfo}>
+            <div className={styles.dcInfoText}>{"Chaque dépense crée automatiquement une facture dans "}<strong>{"Factures frais"}</strong>{" (catégorie « Carte de crédit »)."}</div>
+            <button className={styles.dcBtn} onClick={()=>{ setEditing(null); setForm(makeForm()); setModal(true); }}>{"+ Ajouter"}</button>
           </div>
         </div>
 
         {abonnements.length > 0 && (
           <div style={{marginBottom:'24px'}}>
-            <p className={styles.soldeLabel} style={{textAlign:'left',marginBottom:'8px',fontSize:'11px'}}>
-              {"Abonnements récurrents"}
-            </p>
-            <div className={styles.list}>
-              <div className={styles.listHeader} style={{gridTemplateColumns:'110px 1fr 70px 150px 72px'}}>
+            <p className={styles.dcSectionLabel}>{"Abonnements récurrents"}</p>
+            <div className={styles.dcTable}>
+              <div className={styles.dcHead} style={{gridTemplateColumns:'95px 1fr 90px 110px 70px'}}>
                 <span>{"Depuis"}</span><span>{"Description"}</span>
                 <span style={{textAlign:'center'}}>{"Statut"}</span>
                 <span style={{textAlign:'right'}}>{"Mensuel"}</span>
                 <span/>
               </div>
               {abonnements.map(a => (
-                <div key={a.id} className={styles.row}
-                  style={{gridTemplateColumns:'110px 1fr 70px 150px 72px',opacity:a.actif?1:.55}}>
-                  <span className={styles.rowDate}>
+                <div key={a.id} className={styles.dcRow}
+                  style={{gridTemplateColumns:'95px 1fr 90px 110px 70px',opacity:a.actif?1:.55}}>
+                  <span className={styles.dcDate}>
                     {new Date(a.date_debut+'T12:00').toLocaleDateString('fr-CH',{month:'short',year:'numeric'})}
                   </span>
                   <div>
-                    <p className={styles.rowDesc} style={{margin:0}}>{a.description}</p>
-                    {catTag(a) && <p style={{fontSize:'10px',color:'var(--gris-lt)',margin:0}}>{catTag(a)}</p>}
+                    <p className={styles.dcName} style={{margin:0}}>{a.description}</p>
+                    {catTag(a) && <span className={styles.dcCat} style={{marginTop:'4px'}}>{catTag(a)}</span>}
                   </div>
                   <span style={{fontSize:'11px',fontWeight:600,color:a.actif?'var(--vert)':'var(--gris-lt)',textAlign:'center'}}>
                     {a.actif ? '● Actif' : '○ Pausé'}
                   </span>
-                  <span className={styles.rowMontant} style={{color:'var(--rouge)'}}>
+                  <span className={styles.dcAmount} style={{color:'var(--rouge)'}}>
                     {"-"}{fmt(a.montant)}{"/mois"}
                   </span>
-                  <div style={{display:'flex',gap:'4px',justifyContent:'flex-end',alignItems:'center'}}>
-                    <button className={styles.rowDel} title={a.actif?'Pause':'Reprendre'}
-                      style={{fontSize:'13px'}} onClick={()=>toggleAbo(a.id)}>
+                  <div className={styles.dcActions}>
+                    <button className={styles.dcActionBtn} title={a.actif?'Pause':'Reprendre'} onClick={()=>toggleAbo(a.id)}>
                       {a.actif ? '⏸' : '▶'}
                     </button>
-                    <button className={styles.rowDel} onClick={()=>delAbo(a.id)}>{"×"}</button>
+                    <button className={`${styles.dcActionBtn} ${styles.dcActionBtnDel}`} onClick={()=>delAbo(a.id)}>{"×"}</button>
                   </div>
                 </div>
               ))}
@@ -247,26 +250,26 @@ export default function CreditCard({ user }) {
         {loading && <Skeleton rows={4}/>}
         {!loading && transactions.length===0 && <p className={styles.empty}>{"Aucune transaction pour l'instant."}</p>}
         {!loading && transactions.length>0 && (
-          <div className={styles.list}>
-            <div className={styles.listHeader}>
+          <div className={styles.dcTable}>
+            <div className={styles.dcHead} style={{gridTemplateColumns:'85px 1fr 85px 100px 90px 90px 60px'}}>
               <span>{"Date"}</span><span>{"Description"}</span>
               <span>{"Entité"}</span><span>{"Catégorie"}</span>
               <span>{"Ajouté par"}</span>
               <span style={{textAlign:'right'}}>{"Montant"}</span><span/>
             </div>
             {transactions.map(t=>(
-              <div key={t.id} className={`${styles.row} ${t.type==='virement'?styles.rowVirement:styles.rowDepense}`}>
-                <span className={styles.rowDate}>{new Date(t.date_transaction).toLocaleDateString('fr-CH')}</span>
-                <span className={styles.rowDesc}>{t.description}</span>
-                <span className={styles.rowEntite} style={{fontSize:'12px',color:'var(--gris)'}}>{t.entite||'—'}</span>
-                <span className={styles.rowCat} style={{fontSize:'12px',color:'var(--gris)'}}>{catTag(t)||'—'}</span>
-                <span className={styles.rowAuteur}>{t.auteur_prenom||'—'}</span>
-                <span className={styles.rowMontant} style={{color:t.type==='virement'?'var(--vert)':'var(--rouge)'}}>
+              <div key={t.id} className={styles.dcRow} style={{gridTemplateColumns:'85px 1fr 85px 100px 90px 90px 60px'}}>
+                <span className={styles.dcDate}>{new Date(t.date_transaction).toLocaleDateString('fr-CH')}</span>
+                <span className={styles.dcName}>{t.description}</span>
+                <span style={{fontSize:'12px',color:'var(--gris)'}}>{t.entite||'—'}</span>
+                <span>{catTag(t) ? <span className={styles.dcCat}>{catTag(t)}</span> : <span style={{fontSize:'12px',color:'var(--gris-lt)'}}>{"—"}</span>}</span>
+                <span style={{fontSize:'12px',color:'var(--gris-lt)'}}>{t.auteur_prenom||'—'}</span>
+                <span className={styles.dcAmount} style={{color:t.type==='virement'?'var(--vert)':'var(--rouge)'}}>
                   {t.type==='virement'?'+':'-'}{fmt(t.montant)}
                 </span>
-                <div style={{display:'flex',gap:'4px',justifyContent:'flex-end',alignItems:'center'}}>
-                  <button className={styles.btnEdit} onClick={()=>openEdit(t)}>{"✎"}</button>
-                  <button className={styles.rowDel} onClick={()=>remove(t.id)}>{"×"}</button>
+                <div className={styles.dcActions}>
+                  <button className={styles.dcActionBtn} onClick={()=>openEdit(t)}>{"✎"}</button>
+                  <button className={`${styles.dcActionBtn} ${styles.dcActionBtnDel}`} onClick={()=>remove(t.id)}>{"×"}</button>
                 </div>
               </div>
             ))}

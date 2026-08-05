@@ -13,11 +13,11 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
     <div className={styles.shell} data-module={mod}>
       <aside className={styles.side}>
         <div className={styles.brand}>
-          <img src="https://booking.rubisspa.ch/logo.png" alt="" className={styles.brandLogo}
+          <img src={`${import.meta.env.BASE_URL}rubis-pilot.png`} alt="Rubis Pilot" className={styles.brandLogo}
             onError={e => { e.target.style.display = 'none'; }}/>
           <div>
             <div className={styles.brandSub}>Rubis SPA</div>
-            <div className={styles.brandName}>Espace Staff</div>
+            <div className={styles.brandName}>Rubis Pilot</div>
           </div>
         </div>
 

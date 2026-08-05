@@ -58,14 +58,17 @@ export default function Caisse({ user }) {
           </div>
         </div>
 
-        <div className={styles.soldeCard}>
-          <p className={styles.soldeLabel}>Solde en caisse</p>
-          <p className={styles.soldeVal} style={{color: solde >= 0 ? 'var(--vert)' : 'var(--rouge)'}}>
-            {fmt(solde)}
-          </p>
-          <div className={styles.soldeMeta}>
-            <span className={styles.soldeCredit}>↑ {fmt(entrees)} entrées</span>
-            <span className={styles.soldeDebit}>↓ {fmt(sorties)} sorties</span>
+        <div className={styles.dcSummary}>
+          <div className={styles.dcPill}>
+            <div className={styles.dcPillLabel}>Solde en caisse</div>
+            <div className={styles.dcPillVal} style={{color: solde >= 0 ? 'var(--vert)' : 'var(--rouge)'}}>{fmt(solde)}</div>
+            <div className={styles.dcPillMeta}>
+              <span style={{color:'var(--vert)'}}>↑ {fmt(entrees)} entrées</span>
+              <span style={{color:'var(--rouge)'}}>↓ {fmt(sorties)} sorties</span>
+            </div>
+          </div>
+          <div className={styles.dcInfo}>
+            <div className={styles.dcInfoText}>Les encaissements <strong>POS</strong> (part espèces des RDV) sont importés automatiquement et non modifiables.</div>
           </div>
         </div>
 
@@ -74,32 +77,35 @@ export default function Caisse({ user }) {
           <p className={styles.empty}>Aucune transaction. Les paiements cash du POS apparaîtront ici automatiquement.</p>
         )}
 
-        {!loading && transactions.length > 0 && (
-          <div className={styles.list}>
-            <div className={styles.listHeader}>
-              <span>Date</span><span>Description</span><span>Source</span><span style={{textAlign:'right'}}>Montant</span><span/>
+        {!loading && transactions.length > 0 && (() => {
+          const cols = '110px 1fr 130px 130px 40px';
+          return (
+          <div className={styles.dcTable}>
+            <div className={styles.dcHead} style={{gridTemplateColumns:cols}}>
+              <span>Date</span><span>Libellé</span><span>Source</span><span style={{textAlign:'right'}}>Montant</span><span/>
             </div>
             {transactions.map(t => (
-              <div key={t.id} className={`${styles.row} ${t.type === 'entree' ? styles.rowVirement : styles.rowDepense}`}>
-                <span className={styles.rowDate}>{fmtDate(t.date_transaction)}</span>
-                <span className={styles.rowDesc}>{t.description}</span>
-                <span className={styles.rowAuteur}>
+              <div key={t.id} className={styles.dcRow} style={{gridTemplateColumns:cols}}>
+                <span className={styles.dcDate}>{fmtDate(t.date_transaction)}</span>
+                <span className={styles.dcName}>{t.description}</span>
+                <span>
                   {t.source === 'pos'
-                    ? <span style={{fontSize:'11px',background:'var(--vert-lt)',color:'var(--vert)',padding:'2px 6px',borderRadius:'4px',fontWeight:500}}>POS</span>
-                    : t.auteur_prenom || '—'
+                    ? <span className={styles.dcCat} style={{background:'var(--vert-lt)',color:'var(--vert)'}}>POS · auto</span>
+                    : <span className={styles.dcCat}>{t.auteur_prenom || 'Manuel'}</span>
                   }
                 </span>
-                <span className={styles.rowMontant} style={{color: t.type === 'entree' ? 'var(--vert)' : 'var(--rouge)'}}>
+                <span className={styles.dcAmount} style={{color: t.type === 'entree' ? 'var(--vert)' : 'var(--rouge)'}}>
                   {t.type === 'entree' ? '+' : '-'}{fmt(t.montant)}
                 </span>
                 <button className={styles.rowDel} onClick={()=>remove(t.id)}
-                  style={{opacity: t.source === 'pos' ? 0.25 : 1, cursor: t.source === 'pos' ? 'default' : 'pointer'}}>
+                  style={{opacity: t.source === 'pos' ? 0.25 : 1, cursor: t.source === 'pos' ? 'default' : 'pointer', textAlign:'right'}}>
                   ×
                 </button>
               </div>
             ))}
           </div>
-        )}
+          );
+        })()}
       </main>
 
       {modal && (
