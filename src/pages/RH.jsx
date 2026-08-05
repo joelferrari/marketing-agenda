@@ -462,12 +462,12 @@ export default function RH({ user }) {
 
   const dayColor = (entry, dateStr) => {
     if (!entry) return 'var(--fond)';
-    if (entry.type === 'vacances') return '#fff3d6';
+    if (entry.type === 'vacances') return 'var(--orange-lt)';
     if (entry.type === 'recup') return 'var(--violet-lt)';
     if (!entry.heures) return 'var(--fond)';
     const h = parseFloat(entry.heures);
     const extra = isExtraDay(dateStr);
-    if (extra && viewKey !== 'joel') return '#f0f0ee'; // Emilie jour hors planning = neutre
+    if (extra && viewKey !== 'joel') return 'var(--beige)'; // Emilie jour hors planning = neutre
     const c = extra ? 0 : CIBLE; // Joel jour extra : cible 0 → tout vert
     if (h >= c)       return 'var(--vert-lt)';
     if (h >= c * 0.6) return 'var(--orange-lt)';
@@ -689,18 +689,12 @@ export default function RH({ user }) {
             <button className={rh.moisBtn} onClick={prevMois}>‹</button>
             <span className={rh.moisTitle}>{MOIS_FR[mois-1]} {annee}</span>
             <button className={rh.moisBtn} onClick={nextMois}>›</button>
-            <div style={{flex:1}}/>
-            <div className={rh.statsPills}>
-              <span className={rh.pill}>{nbJours} jour{nbJours!==1?'s':''}</span>
-              <span className={rh.pill}>{fmtH(totalH)} travaillées</span>
-              {nbRecup>0 && <span className={rh.pill} style={{color:'var(--violet)'}}>{nbRecup} récup.</span>}
-              <span className={rh.pill} style={{color:heuresSup>=0?'var(--vert)':'var(--rouge)',fontWeight:600}}>
-                {fmtH(heuresSup,true)} ce mois
-              </span>
-              <span className={rh.pill} style={{color:cumulYTD>=0?'var(--vert)':'var(--rouge)',fontWeight:700,border:'1.5px solid '+(cumulYTD>=0?'var(--vert)':'var(--rouge)')}}>
-                Cumul {annee} : {fmtH(cumulYTD,true)}
-              </span>
-            </div>
+          </div>
+          <div className={rh.statCards}>
+            <div className={rh.statCard}><div className={rh.statLabel}>Jours pointés</div><div className={rh.statVal}>{nbJours}</div></div>
+            <div className={rh.statCard}><div className={rh.statLabel}>Heures travaillées</div><div className={rh.statVal}>{fmtH(totalH)}</div></div>
+            <div className={rh.statCard}><div className={rh.statLabel}>Heures sup. (mois)</div><div className={rh.statVal} style={{color:heuresSup>=0?'var(--vert)':'var(--rouge)'}}>{fmtH(heuresSup,true)}</div></div>
+            <div className={rh.statCard}><div className={rh.statLabel}>Cumul {annee}</div><div className={rh.statVal} style={{color:cumulYTD>=0?'var(--vert)':'var(--rouge)'}}>{fmtH(cumulYTD,true)}</div></div>
           </div>
 
           {/* Barre export */}
@@ -732,7 +726,7 @@ export default function RH({ user }) {
                     className={`${rh.calCell} ${isSun?rh.calSun:''} ${isFuture?rh.calFuture:''}`}
                     style={{background: isSun||isFuture ? '' : dayColor(entry, dateStr)}}
                     onClick={()=>openDay(dateStr)}>
-                    <span className={rh.calDayNum}>{day}</span>
+                    <span className={dateStr === new Date().toISOString().slice(0,10) ? rh.calToday : rh.calDayNum}>{day}</span>
                     {entry?.type === 'vacances' ? (
                       <span className={rh.calHours} style={{color:'var(--orange)',fontSize:'12px'}}>Vacances</span>
                     ) : entry?.type === 'recup' ? (
