@@ -12,12 +12,6 @@ dayjs.locale('fr');
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
-const CAT_COLORS = {
-  'Vacances':'#fab005','Maladie':'#e03131','Récup. heures sup.':'#7950f2',
-  'Marketing':'#3b5bdb','Autre':'#868e96',
-};
-const CAT_ORDER = ['Vacances','Maladie','Récup. heures sup.','Marketing','Autre'];
-
 export default function Calendar({ user }) {
   const [date, setDate] = useState(dayjs());
   const [vue, setVue] = useState('mois');
@@ -63,47 +57,6 @@ export default function Calendar({ user }) {
     if(vue==='jour') return date.format('dddd D MMMM YYYY');
     if(vue==='semaine') return `${date.isoWeekday(1).format('D MMM')} — ${date.isoWeekday(7).format('D MMM YYYY')}`;
     return `${MONTHS[date.month()]} ${date.year()}`;
-  };
-
-  const renderMoisSidePanel = () => {
-    const monthStart = date.startOf('month').format('YYYY-MM-DD');
-    const monthEnd   = date.endOf('month').format('YYYY-MM-DD');
-    const moisEvs = events
-      .filter(e => e.date_debut?.slice(0,10) <= monthEnd && (e.date_fin?.slice(0,10)||e.date_debut?.slice(0,10)) >= monthStart)
-      .sort((a,b) => a.date_debut < b.date_debut ? -1 : 1);
-    const byCat = {};
-    moisEvs.forEach(ev => {
-      const cat = ev.categorie || 'Autre';
-      if (!byCat[cat]) byCat[cat] = [];
-      byCat[cat].push(ev);
-    });
-    const present = CAT_ORDER.filter(c => byCat[c]);
-    return (
-      <div className={styles.sidePanel}>
-        <p className={styles.sidePanelTitle}>{MONTHS[date.month()]}</p>
-        {present.length === 0 && <p className={styles.sidePanelEmpty}>Aucun événement ce mois</p>}
-        {present.map(cat => (
-          <div key={cat} className={styles.sidePanelGroup}>
-            <div className={styles.sidePanelCatRow}>
-              <span className={styles.sidePanelCatDot} style={{background:CAT_COLORS[cat]||'#868e96'}}/>
-              <span className={styles.sidePanelCat}>{cat}</span>
-              <span className={styles.sidePanelCatCount}>{byCat[cat].length}</span>
-            </div>
-            {byCat[cat].map(ev => (
-              <div key={ev.id} className={styles.sidePanelEvent}
-                style={{borderLeftColor:CAT_COLORS[cat]||'#868e96'}}
-                onClick={()=>setModal({event:ev})}>
-                <span className={styles.sidePanelDate}>
-                  {ev.date_debut?.slice(5,10).replace('-','/')}
-                  {ev.date_fin && ev.date_fin !== ev.date_debut ? ' → ' + ev.date_fin.slice(5,10).replace('-','/') : ''}
-                </span>
-                <span className={styles.sidePanelEvTitle}>{ev.titre}</span>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    );
   };
 
   const renderMois = () => {
@@ -186,13 +139,59 @@ export default function Calendar({ user }) {
     );
   };
 
+  const periodEvents = () => {
+    let start, end;
+    if (vue==='jour') { start=date; end=date; }
+    else if (vue==='semaine') { start=date.isoWeekday(1); end=date.isoWeekday(7); }
+    else { start=date.startOf('month'); end=date.endOf('month'); }
+    const s=start.format('YYYY-MM-DD'), f=end.format('YYYY-MM-DD');
+    return events
+      .filter(e => { const es=e.date_debut?.slice(0,10); const ef=(e.date_fin?.slice(0,10)||es); return es && ef>=s && es<=f; })
+      .sort((a,b)=>(a.date_debut||'').localeCompare(b.date_debut||'') || (a.heure_debut||'').localeCompare(b.heure_debut||''));
+  };
+
+  const renderSummary = () => {
+    const evs = periodEvents();
+    const label = vue==='jour' ? 'Ce jour' : vue==='semaine' ? 'Cette semaine' : 'Ce mois';
+    const grouped = {};
+    evs.forEach(e => { const k=e.date_debut?.slice(0,10)||'?'; (grouped[k]=grouped[k]||[]).push(e); });
+    const days = Object.keys(grouped).sort();
+    return (
+      <aside className={styles.summary}>
+        <div className={styles.sumHead}>
+          <span className={styles.sumTitle}>{label}</span>
+          <span className={styles.sumCount}>{evs.length} événement{evs.length>1?'s':''}</span>
+        </div>
+        <div className={styles.sumSub}>{dateTitle()}</div>
+        {evs.length===0 && <div className={styles.sumEmpty}>Aucun événement sur la période.</div>}
+        {days.map(k => (
+          <div key={k}>
+            <div className={styles.sumDay}>{dayjs(k).format('dddd D MMM')}</div>
+            {grouped[k].map(ev => (
+              <div key={ev.id} className={styles.sumItem} onClick={()=>setModal({event:ev})}>
+                <span className={styles.sumBar} style={{background:ev.couleur}}/>
+                <div className={styles.sumBody}>
+                  <div className={styles.sumEvTitle}>{ev.titre}</div>
+                  <div className={styles.sumEvMeta}>
+                    {ev.toute_la_journee ? 'Toute la journée' : (ev.heure_debut ? ev.heure_debut.slice(0,5) + (ev.heure_fin?` – ${ev.heure_fin.slice(0,5)}`:'') : '—')}
+                    {ev.description ? ` · ${ev.description}` : ''}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </aside>
+    );
+  };
+
   return (
     <>
       {toast&&<div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
       <main className={styles.main}>
         <div className={styles.toolbar}>
           <div className={styles.toolbarGroup}>
-            <button className={styles.todayBtn} onClick={()=>setDate(dayjs())}>Aujourd'hui</button>
+            <button className={styles.todayBtn} onClick={()=>setDate(dayjs())}>Aujourd&apos;hui</button>
             <button className={styles.navBtn} onClick={()=>nav(-1)}>‹</button>
             <span className={styles.dateTitle} style={{textTransform:'capitalize'}}>{dateTitle()}</span>
             <button className={styles.navBtn} onClick={()=>nav(1)}>›</button>
@@ -207,15 +206,13 @@ export default function Calendar({ user }) {
           </div>
         </div>
         <div className={styles.calBody}>
-          {loading&&<div className={styles.loading}>Chargement…</div>}
-          {!loading&&vue==='mois'&&(
-            <div className={styles.moisOuter}>
-              {renderMois()}
-              {renderMoisSidePanel()}
-            </div>
-          )}
-          {!loading&&vue==='semaine'&&renderSemaine()}
-          {!loading&&vue==='jour'&&renderJour()}
+          <div className={styles.calMain}>
+            {loading&&<div className={styles.loading}>Chargement…</div>}
+            {!loading&&vue==='mois'&&renderMois()}
+            {!loading&&vue==='semaine'&&renderSemaine()}
+            {!loading&&vue==='jour'&&renderJour()}
+          </div>
+          {!loading && renderSummary()}
         </div>
       </main>
       {modal&&<EventModal event={modal.event} defaultDate={modal.defaultDate||date.format('YYYY-MM-DD')} onSave={save} onDelete={remove} onClose={()=>setModal(null)}/>}
