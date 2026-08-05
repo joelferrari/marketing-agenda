@@ -3,6 +3,7 @@ import {
   getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat, envoyerInvoice,
   getBudget, addBudget, deleteBudget, updateBudget,
 } from '../api';
+import Skeleton from '../components/Skeleton';
 import styles from './FacturesFrais.module.css';
 
 const BASE     = import.meta.env.VITE_API_URL || '/mkt';
@@ -257,7 +258,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const showMoyen = tab === 'factures'; // colonne + filtre Facture / Carte de crédit
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-module="factures">
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
 
       {/* Header */}
@@ -354,7 +355,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
         </div>
 
         {/* Liste */}
-        {loading ? <p className={styles.loading}>Chargement…</p> : (
+        {loading ? <Skeleton rows={4}/> : (
           <div className={`${styles.list} ${showSuivi?styles.listScroll:''}`}>
             <div className={`${styles.listHeader} ${tab==='budget'?styles.listHeaderBudget:''} ${tab==='factures'?styles.listHeaderFactures:''}`}>
               <span>Date</span>
@@ -440,7 +441,7 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
               {/* Drop zone — pour factures (création et édition) */}
               {tab!=='budget' && (
                 <div className={styles.dropZone}
-                  style={{borderColor:dragOver?'var(--rose)':file?'var(--vert)':'var(--border)',background:dragOver?'#fdf0f1':file?'#f3f8f0':'#fff'}}
+                  style={{borderColor:dragOver?'var(--acc)':file?'var(--vert)':'var(--border)',background:dragOver?'var(--acc-lt)':file?'var(--vert-lt)':'var(--blanc)'}}
                   onDragOver={e=>{e.preventDefault();setDragOver(true);}}
                   onDragLeave={()=>setDragOver(false)}
                   onDrop={e=>{e.preventDefault();setDragOver(false);handleFile(e.dataTransfer.files[0]);}}

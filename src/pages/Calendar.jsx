@@ -187,7 +187,7 @@ export default function Calendar({ user, onLogout, onBack }) {
   };
 
   return (
-    <div className={styles.app}>
+    <div className={styles.app} data-module="agenda">
       {toast&&<div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
       <header className={styles.header}>
         <div className={styles.headerLeft}>

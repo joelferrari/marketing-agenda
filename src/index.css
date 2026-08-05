@@ -1,29 +1,94 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ======================================================================
+   Retro Spring — tokens
+   Accent par module : chaque page pose data-module="agenda|carte|…" sur son
+   élément racine. Les couleurs (claires ET sombres) sont définies ici.
+   Mode sombre : <html data-theme="dark">.
+   ====================================================================== */
 :root {
-  --rose:      #c4737c;
-  --rose-lt:   #fdf6f7;
-  --rose-dk:   #9e5a62;
-  --rose-soft: #e8a0a8;
-  --beige:     #f5ede8;
-  --beige-dk:  #e8d5cc;
-  --noir:      #2a2825;
-  --gris:      #6b6560;
-  --gris-lt:   #b0aaa7;
-  --fond:      #faf8f6;
-  --blanc:     #ffffff;
-  --border:    #eeddd8;
-  --vert:      #4a7c5f;
-  --vert-lt:   #edf5f0;
-  --rouge:     #b56b65;
-  --rouge-lt:  #fdf0ef;
-  --indigo:    #3b5bdb;
-  --indigo-lt: #edf2ff;
-  --indigo-dk: #2c44b0;
-  --violet-lt: #f3f0ff;
-  --font-ui:   'Open Sans', system-ui, sans-serif;
-  --font-disp: 'Open Sans', Georgia, serif;
+  /* Accent principal (rose) + défaut --acc */
+  --rose:      #c56e6e;  --rose-lt: #fbeeec;  --rose-dk: #af5b5b;  --rose-soft: #eba5a5;
+  --acc:       #c56e6e;  --acc-dk: #af5b5b;   --acc-lt: #f7ebe8;
+
+  /* Surfaces crème */
+  --beige:  #f2ede3;  --beige-dk: #efe7db;
+  --noir:   #3a322c;  --gris: #9a8c7c;  --gris-lt: #b3a794;
+  --fond:   #f6efe4;  --blanc: #fffdf9;  --border: #efe7db;
+
+  /* Statuts */
+  --vert:  #2f7d4f;  --vert-lt:  #e7f3e7;
+  --rouge: #bd554b;  --rouge-lt: #fbe6e4;
+  --orange:#a9791d;  --orange-lt:#fbf1da;
+  --violet:#7950f2;  --violet-fg:#7950f2;
+  --teal:  #2f7d4f;             /* alias legacy (toast Calendar) */
+
+  /* Agenda / Calendrier (famille --indigo conservée) */
+  --indigo: #c56e6e;  --indigo-lt: #f7ebe8;  --indigo-dk: #af5b5b;
+  --violet-lt: #ece7f6;
+
+  /* Skeletons */
+  --skel1: #ece3d6;  --skel2: #f7f0e6;
+
+  /* Typographie */
+  --font-ui:   'Hanken Grotesk', 'Open Sans', system-ui, sans-serif;
+  --font-disp: 'Swear Text', 'Newsreader', Georgia, serif;
 }
+
+/* --- Accent par module (clair) --- */
+[data-module="agenda"]   { --acc:#c56e6e; --acc-dk:#af5b5b; --acc-lt:#f7ebe8; }
+[data-module="carte"]    { --acc:#e39b45; --acc-dk:#c9842f; --acc-lt:#fbf1e0; }
+[data-module="factures"] { --acc:#6f9179; --acc-dk:#5a7a64; --acc-lt:#eef3ef; }
+[data-module="depenses"] { --acc:#e28a56; --acc-dk:#c9743f; --acc-lt:#fbeee2; }
+[data-module="rh"]       { --acc:#8d8858; --acc-dk:#787245; --acc-lt:#f2f1e6; }
+[data-module="caisse"]   { --acc:#cf8078; --acc-dk:#b8675f; --acc-lt:#fbeeec; }
+
+/* ======================= MODE SOMBRE ======================= */
+[data-theme="dark"] {
+  --rose:#e79a9a; --rose-lt:rgba(197,110,110,.18); --rose-dk:#c56e6e; --rose-soft:#c56e6e;
+  --acc:#e79a9a;  --acc-dk:#c56e6e; --acc-lt:rgba(197,110,110,.18);
+
+  --beige:#201b14; --beige-dk:rgba(255,255,255,.10);
+  --noir:#f0e8dc;  --gris:#a79a89;  --gris-lt:#8a7d6d;
+  --fond:#1a1611;  --blanc:#241f18; --border:rgba(255,255,255,.10);
+
+  --vert:#7fc99b;  --vert-lt:rgba(47,125,79,.22);
+  --rouge:#e2938a; --rouge-lt:rgba(189,85,75,.22);
+  --orange:#d9b25a;--orange-lt:rgba(169,121,29,.22);
+  --teal:#7fc99b;
+
+  --indigo:#e79a9a; --indigo-lt:rgba(197,110,110,.18); --indigo-dk:#c56e6e;
+  --violet:#b39ddb; --violet-fg:#b39ddb; --violet-lt:rgba(123,82,214,.26);
+
+  --skel1:rgba(255,255,255,.05); --skel2:rgba(255,255,255,.11);
+}
+[data-theme="dark"] [data-module="agenda"]   { --acc:#e79a9a; --acc-dk:#c56e6e; --acc-lt:rgba(197,110,110,.18); }
+[data-theme="dark"] [data-module="carte"]    { --acc:#ffc078; --acc-dk:#e39b45; --acc-lt:rgba(227,155,69,.18); }
+[data-theme="dark"] [data-module="factures"] { --acc:#a7c6ae; --acc-dk:#6f9179; --acc-lt:rgba(111,145,121,.20); }
+[data-theme="dark"] [data-module="depenses"] { --acc:#f7ad7c; --acc-dk:#e28a56; --acc-lt:rgba(226,138,86,.18); }
+[data-theme="dark"] [data-module="rh"]       { --acc:#cbc48c; --acc-dk:#8d8858; --acc-lt:rgba(141,136,88,.20); }
+[data-theme="dark"] [data-module="caisse"]   { --acc:#f0b3ab; --acc-dk:#cf8078; --acc-lt:rgba(207,128,120,.18); }
+
+/* Police d'affichage du site (confirmer le chemin absolu). */
+@font-face {
+  font-family: 'Swear Text';
+  src: url('https://booking.rubisspa.ch/fonts/SwearText.woff2') format('woff2');
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+/* Animations Retro Spring */
+@keyframes rubUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+@keyframes rubShimmer { 0% { background-position:400px 0; } 100% { background-position:-400px 0; } }
+
+/* Skeleton réutilisable (global) */
+.skel { border-radius:6px; height:12px; background:linear-gradient(90deg,var(--skel1) 25%,var(--skel2) 37%,var(--skel1) 63%); background-size:400px 100%; animation:rubShimmer 1.4s linear infinite; }
+
+/* Toggle thème (flottant, injecté par App.jsx) */
+.themeToggle { position:fixed; right:18px; bottom:18px; z-index:300; width:40px; height:40px; border-radius:50%; border:1px solid var(--border); background:var(--blanc); color:var(--gris); font-size:17px; cursor:pointer; box-shadow:0 6px 20px rgba(0,0,0,.14); display:flex; align-items:center; justify-content:center; transition:transform .15s, color .15s; }
+.themeToggle:hover { transform:translateY(-2px); color:var(--acc); }
+
 html, body, #root { height: 100%; }
-body { font-family: var(--font-ui); background: var(--fond); color: var(--noir); font-weight: 300; }
+body { font-family: var(--font-ui); background: var(--fond); color: var(--noir); font-weight: 400; transition: background .25s, color .25s; }
 * { -webkit-font-smoothing: antialiased; }
 input, select, textarea, button { font-family: var(--font-ui); }

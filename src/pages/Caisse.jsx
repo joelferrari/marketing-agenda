@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCaisse, addCaisse, deleteCaisse } from '../api';
+import Skeleton from '../components/Skeleton';
 import styles from './CreditCard.module.css';
 
 const fmt  = (n) => new Intl.NumberFormat('fr-CH',{style:'currency',currency:'CHF'}).format(n);
@@ -47,7 +48,7 @@ export default function Caisse({ user, onBack, onLogout }) {
   };
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-module="caisse">
       {toast && <div className={`${styles.toast} ${toast.ok ? styles.toastOk : styles.toastErr}`}>{toast.txt}</div>}
 
       {/* Header */}
@@ -85,7 +86,7 @@ export default function Caisse({ user, onBack, onLogout }) {
           </div>
         </div>
 
-        {loading && <p className={styles.loading}>Chargement…</p>}
+        {loading && <Skeleton rows={4}/>}
         {!loading && transactions.length === 0 && (
           <p className={styles.empty}>Aucune transaction. Les paiements cash du POS apparaîtront ici automatiquement.</p>
         )}
@@ -105,7 +106,7 @@ export default function Caisse({ user, onBack, onLogout }) {
                 <span className={styles.rowDesc}>{t.description}</span>
                 <span className={styles.rowAuteur}>
                   {t.source === 'pos'
-                    ? <span style={{fontSize:'11px',background:'#e8f4e8',color:'var(--vert)',padding:'2px 6px',borderRadius:'4px',fontWeight:500}}>POS</span>
+                    ? <span style={{fontSize:'11px',background:'var(--vert-lt)',color:'var(--vert)',padding:'2px 6px',borderRadius:'4px',fontWeight:500}}>POS</span>
                     : t.auteur_prenom || '—'
                   }
                 </span>

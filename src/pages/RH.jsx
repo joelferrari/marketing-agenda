@@ -14,13 +14,13 @@ const JOURS_QUOTA_2025_EMILIE = { 1: 2.96 }; // jan 2026 : 2.96j (→ balance -1
 const PRENOMS = { emilie: 'Emilie', joel: 'Joël' };
 
 const DEM_STATUT = {
-  en_attente: { label: 'En attente', color: '#b08020', bg: '#fff8e1' },
-  validee:    { label: "Validée",    color: '#2d7a4f', bg: '#e8f4e8' },
-  refusee:    { label: "Refusée",    color: '#c62828', bg: '#fde8e8' },
+  en_attente: { label: 'En attente', color: 'var(--orange)', bg: 'var(--orange-lt)' },
+  validee:    { label: "Validée",    color: 'var(--vert)',   bg: 'var(--vert-lt)' },
+  refusee:    { label: "Refusée",    color: 'var(--rouge)',  bg: 'var(--rouge-lt)' },
 };
 
 const ATT_TYPES  = { maladie: 'Maladie', accident: 'Accident', autre: 'Autre' };
-const ATT_COLORS = { maladie: 'var(--rouge)', accident: '#b08020', autre: 'var(--gris)' };
+const ATT_COLORS = { maladie: 'var(--rouge)', accident: 'var(--orange)', autre: 'var(--gris)' };
 
 const VERT = '#4a7c5f';
 
@@ -219,7 +219,7 @@ export default function RH({ user, onBack, onLogout }) {
     const rows = entries.map(e => {
       const h   = parseFloat(e.heures) || 0;
       const sup = e.type === 'recup' ? h : (e.heures ? h - CIBLE : null);
-      const hCol = e.type==='recup'?'#7950f2':h>=CIBLE?VERT:h>=CIBLE*0.6?'#b08020':'var(--rouge)';
+      const hCol = e.type==='recup'?'var(--violet)':h>=CIBLE?VERT:h>=CIBLE*0.6?'var(--orange)':'var(--rouge)';
       const dStr = new Date(e.date_jour+'T12:00:00').toLocaleDateString('fr-CH',{weekday:'long',day:'numeric',month:'long'});
       return `<tr>
         <td>${dStr}</td>
@@ -463,33 +463,33 @@ export default function RH({ user, onBack, onLogout }) {
   const dayColor = (entry, dateStr) => {
     if (!entry) return 'var(--fond)';
     if (entry.type === 'vacances') return '#fff3d6';
-    if (entry.type === 'recup') return '#ede7f6';
+    if (entry.type === 'recup') return 'var(--violet-lt)';
     if (!entry.heures) return 'var(--fond)';
     const h = parseFloat(entry.heures);
     const extra = isExtraDay(dateStr);
     if (extra && viewKey !== 'joel') return '#f0f0ee'; // Emilie jour hors planning = neutre
     const c = extra ? 0 : CIBLE; // Joel jour extra : cible 0 → tout vert
-    if (h >= c)       return '#e8f4e8';
-    if (h >= c * 0.6) return '#fff8e1';
-    return '#fde8e8';
+    if (h >= c)       return 'var(--vert-lt)';
+    if (h >= c * 0.6) return 'var(--orange-lt)';
+    return 'var(--rouge-lt)';
   };
 
   const dayTextColor = (entry, dateStr) => {
     if (!entry) return 'var(--gris-lt)';
-    if (entry.type === 'vacances') return '#b08020';
-    if (entry.type === 'recup') return '#7950f2';
+    if (entry.type === 'vacances') return 'var(--orange)';
+    if (entry.type === 'recup') return 'var(--violet)';
     if (!entry.heures) return 'var(--gris-lt)';
     const h = parseFloat(entry.heures);
     const extra = isExtraDay(dateStr);
     if (extra && viewKey !== 'joel') return 'var(--gris)'; // Emilie jour hors planning = neutre
     const c = extra ? 0 : CIBLE;
     if (h >= c) return 'var(--vert)';
-    if (h >= c * 0.6) return '#b08020';
+    if (h >= c * 0.6) return 'var(--orange)';
     return 'var(--rouge)';
   };
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-module="rh">
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
 
       {/* Header */}
@@ -708,7 +708,7 @@ export default function RH({ user, onBack, onLogout }) {
             <div className={rh.statsPills}>
               <span className={rh.pill}>{nbJours} jour{nbJours!==1?'s':''}</span>
               <span className={rh.pill}>{fmtH(totalH)} travaillées</span>
-              {nbRecup>0 && <span className={rh.pill} style={{color:'#7950f2'}}>{nbRecup} récup.</span>}
+              {nbRecup>0 && <span className={rh.pill} style={{color:'var(--violet)'}}>{nbRecup} récup.</span>}
               <span className={rh.pill} style={{color:heuresSup>=0?'var(--vert)':'var(--rouge)',fontWeight:600}}>
                 {fmtH(heuresSup,true)} ce mois
               </span>
@@ -724,7 +724,7 @@ export default function RH({ user, onBack, onLogout }) {
             <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}>
               <IcoMail/> {emailing ? '…' : 'Email'}
             </button>
-            <button className={styles.addBtn} style={{background:'#7950f2',borderColor:'#7950f2'}}
+            <button className={styles.addBtn} style={{background:'var(--violet)',borderColor:'var(--violet)'}}
               onClick={()=>setDemRecupModal(true)}>
               <IcoCal/> Demander une récup.
             </button>
@@ -749,9 +749,9 @@ export default function RH({ user, onBack, onLogout }) {
                     onClick={()=>openDay(dateStr)}>
                     <span className={rh.calDayNum}>{day}</span>
                     {entry?.type === 'vacances' ? (
-                      <span className={rh.calHours} style={{color:'#b08020',fontSize:'12px'}}>Vacances</span>
+                      <span className={rh.calHours} style={{color:'var(--orange)',fontSize:'12px'}}>Vacances</span>
                     ) : entry?.type === 'recup' ? (
-                      <span className={rh.calHours} style={{color:'#7950f2',fontSize:'12px'}}>Récup</span>
+                      <span className={rh.calHours} style={{color:'var(--violet)',fontSize:'12px'}}>Récup</span>
                     ) : entry?.heures ? (
                       <span className={rh.calHours} style={{color: dayTextColor(entry, dateStr)}}>
                         {fmtH(parseFloat(entry.heures))}
@@ -770,10 +770,10 @@ export default function RH({ user, onBack, onLogout }) {
 
           {/* Légende */}
           <div className={rh.legend}>
-            <span className={rh.legendItem} style={{background:'#e8f4e8',color:'var(--vert)'}}>≥ 9h</span>
-            <span className={rh.legendItem} style={{background:'#fff8e1',color:'#b08020'}}>5h–9h</span>
-            <span className={rh.legendItem} style={{background:'#fde8e8',color:'var(--rouge)'}}>{'< 5h'}</span>
-            <span className={rh.legendItem} style={{background:'#fff3d6',color:'#b08020'}}>Vacances</span>
+            <span className={rh.legendItem} style={{background:'var(--vert-lt)',color:'var(--vert)'}}>≥ 9h</span>
+            <span className={rh.legendItem} style={{background:'var(--orange-lt)',color:'var(--orange)'}}>5h–9h</span>
+            <span className={rh.legendItem} style={{background:'var(--rouge-lt)',color:'var(--rouge)'}}>{'< 5h'}</span>
+            <span className={rh.legendItem} style={{background:'var(--orange-lt)',color:'var(--orange)'}}>Vacances</span>
             <span className={rh.legendItem} style={{background:'var(--fond)',color:'var(--gris-lt)'}}>Pas de pointage</span>
           </div>
 
@@ -790,7 +790,7 @@ export default function RH({ user, onBack, onLogout }) {
                   return (
                     <div key={dr.id} className={styles.row} style={{alignItems:'center',gap:'8px'}}>
                       <span className={styles.rowDate}>{new Date(dr.date_jour+'T12:00:00').toLocaleDateString('fr-CH')}</span>
-                      <span style={{color:'#7950f2',fontWeight:500}}>{dr.heures_recup} h</span>
+                      <span style={{color:'var(--violet)',fontWeight:500}}>{dr.heures_recup} h</span>
                       {dr.commentaire && <span className={styles.rowAuteur}>{dr.commentaire}</span>}
                       <div style={{flex:1}}/>
                       <span style={{fontSize:'11px',fontWeight:600,color:s.color,background:s.bg,padding:'3px 8px',borderRadius:'4px',whiteSpace:'nowrap'}}>
@@ -959,7 +959,7 @@ export default function RH({ user, onBack, onLogout }) {
             <form onSubmit={submit} className={styles.modalBody}>
               {/* Toggle Travail / Récupération */}
               <div className={rh.typeToggle}>
-                {[{id:'travail',label:'🕐 Travail',color:'var(--rose)'},{id:'recup',label:'💜 Récupération',color:'#7950f2'}].map(t=>(
+                {[{id:'travail',label:'🕐 Travail',color:'var(--acc)'},{id:'recup',label:'💜 Récupération',color:'var(--violet)'}].map(t=>(
                   <button key={t.id} type="button"
                     className={rh.typeBtn}
                     style={form.type===t.id?{background:t.color,borderColor:t.color,color:'#fff'}:{}}
@@ -984,7 +984,7 @@ export default function RH({ user, onBack, onLogout }) {
                   if (!isNaN(h) && h > 0) {
                     const hh=Math.floor(h), mm=Math.round((h-hh)*60);
                     return (
-                      <div className={rh.preview} style={{background:'#ede7f6',color:'#7950f2'}}>
+                      <div className={rh.preview} style={{background:'var(--violet-lt)',color:'var(--violet)'}}>
                         <span>Récupération</span>
                         <span style={{fontWeight:600}}>-{hh}h{String(mm).padStart(2,'0')} du solde</span>
                       </div>
@@ -1016,7 +1016,7 @@ export default function RH({ user, onBack, onLogout }) {
                   const delta = extra && viewKey !== 'joel' ? 0 : total - cibleEff;
                   const isNeutre = extra && viewKey !== 'joel';
                   if(total>0) return (
-                    <div className={rh.preview} style={{background:isNeutre?'#f0f0ee':delta>=0?'#e8f4e8':'#fde8e8',color:isNeutre?'var(--gris)':delta>=0?'var(--vert)':'var(--rouge)'}}>
+                    <div className={rh.preview} style={{background:isNeutre?'var(--fond)':delta>=0?'var(--vert-lt)':'var(--rouge-lt)',color:isNeutre?'var(--gris)':delta>=0?'var(--vert)':'var(--rouge)'}}>
                       <span>{fmtH(total)} travaillées</span>
                       <span style={{fontWeight:600}}>{isNeutre ? 'Jour hors planning — non comptabilisé' : `${fmtH(delta,true)} vs cible ${cibleEff}h`}</span>
                     </div>
@@ -1038,7 +1038,7 @@ export default function RH({ user, onBack, onLogout }) {
                 <div style={{flex:1}}/>
                 <button type="button" className={styles.btnCancel} onClick={()=>setModal(null)}>Annuler</button>
                 <button type="submit" className={styles.btnSubmit}
-                  style={{background:form.type==='recup'?'#7950f2':'var(--rose)'}}>Enregistrer</button>
+                  style={{background:form.type==='recup'?'var(--violet)':'var(--acc)'}}>Enregistrer</button>
               </div>
             </form>
           </div>
@@ -1198,7 +1198,7 @@ export default function RH({ user, onBack, onLogout }) {
               </div>
             </div>
             {demRecupForm.date_jour && demRecupForm.heures_recup && (
-              <div className={rh.preview} style={{background:'#ede9fe',color:'#7950f2'}}>
+              <div className={rh.preview} style={{background:'var(--violet-lt)',color:'var(--violet)'}}>
                 <span>💜 {demRecupForm.heures_recup} h de récupération</span>
                 <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
               </div>
@@ -1211,7 +1211,7 @@ export default function RH({ user, onBack, onLogout }) {
             </div>
             <div className={styles.modalFooter}>
               <button type="button" className={styles.btnCancel} onClick={()=>setDemRecupModal(false)}>Annuler</button>
-              <button type="submit" className={styles.btnSubmit} style={{background:'#7950f2'}} disabled={demRecupSaving}>
+              <button type="submit" className={styles.btnSubmit} style={{background:'var(--violet)'}} disabled={demRecupSaving}>
                 {demRecupSaving ? '…' : 'Envoyer à Nathalie'}
               </button>
             </div>
@@ -1241,7 +1241,7 @@ export default function RH({ user, onBack, onLogout }) {
               </div>
             </div>
             {vacForm.date_debut && vacForm.date_fin && vacForm.date_fin >= vacForm.date_debut && (
-              <div className={rh.preview} style={{background:'#fff8e1',color:'#b08020'}}>
+              <div className={rh.preview} style={{background:'var(--orange-lt)',color:'var(--orange)'}}>
                 <span>📅 {workDaysCount(vacForm.date_debut, vacForm.date_fin, viewKey)} jours</span>
                 <span style={{fontSize:'12px'}}>{viewKey === 'joel' ? "Agenda personnel + calendrier marketing" : "Agenda spa bloque + calendrier marketing"}</span>
               </div>
@@ -1254,7 +1254,7 @@ export default function RH({ user, onBack, onLogout }) {
             </div>
             <div className={styles.modalFooter}>
               <button type="button" className={styles.btnCancel} onClick={()=>setVacModal(false)}>Annuler</button>
-              <button type="submit" className={styles.btnSubmit} style={{background:'#fab005'}} disabled={vacSaving}>
+              <button type="submit" className={styles.btnSubmit} style={{background:'var(--orange)'}} disabled={vacSaving}>
                 {vacSaving ? '…' : "✓ Enregistrer et bloquer l'agenda"}
               </button>
             </div>
