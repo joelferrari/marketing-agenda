@@ -12,7 +12,7 @@ const STATUT = {
   refusee:    { label:'Refusée ❌',  color:'var(--rouge)',  bg:'var(--rouge-lt)' },
 };
 
-export default function Depenses({ user, onBack, onLogout }) {
+export default function Depenses({ user }) {
   const [list,    setList]    = useState([]);
   const [loading, setLoading] = useState(true);
   const [form,    setForm]    = useState({ titre:'', prix:'', magasin:'', lien:'' });
@@ -48,26 +48,9 @@ export default function Depenses({ user, onBack, onLogout }) {
   };
 
   return (
-    <div className={styles.page} data-module="depenses">
+    <>
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
-
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink:0}}>
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <polyline points="9 15 11 17 15 13" strokeWidth="1.6"/>
-          </svg>
-          <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>Demandes de dépense</h1></div>
-        </div>
-        <div className={styles.headerRight}>
-          <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
-          <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
-        </div>
-      </header>
-
       <main className={styles.main}>
-        {/* Formulaire */}
         <div className={dep.card}>
           <h2 className={dep.cardTitle}>Nouvelle demande</h2>
           <form onSubmit={submit} className={dep.form}>
@@ -99,10 +82,9 @@ export default function Depenses({ user, onBack, onLogout }) {
           </form>
         </div>
 
-        {/* Liste des demandes */}
         <div className={dep.card} style={{marginTop:'20px'}}>
           <h2 className={dep.cardTitle}>Historique des demandes</h2>
-          {loading && <Skeleton rows={3}/>}
+          {loading && <Skeleton rows={3} card={false}/>}
           {!loading && list.length === 0 && <p className={styles.empty}>Aucune demande pour le moment</p>}
           {list.map(d => {
             const st = STATUT[d.statut] || STATUT.en_attente;
@@ -123,6 +105,6 @@ export default function Depenses({ user, onBack, onLogout }) {
           })}
         </div>
       </main>
-    </div>
+    </>
   );
 }

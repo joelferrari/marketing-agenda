@@ -7,7 +7,7 @@ const fmt  = (n) => new Intl.NumberFormat('fr-CH',{style:'currency',currency:'CH
 const fmtDate = (d) => new Date(d).toLocaleDateString('fr-CH');
 const today = () => new Date().toISOString().slice(0,10);
 
-export default function Caisse({ user, onBack, onLogout }) {
+export default function Caisse({ user }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal,   setModal]   = useState(false);
@@ -25,7 +25,6 @@ export default function Caisse({ user, onBack, onLogout }) {
 
   useEffect(() => { load(); }, []);
 
-  // Solde = entrées (POS cash + dépôts manuels) - sorties manuelles
   const entrees = transactions.filter(t => t.type === 'entree').reduce((a,t) => a + parseFloat(t.montant), 0);
   const sorties = transactions.filter(t => t.type === 'sortie').reduce((a,t) => a + parseFloat(t.montant), 0);
   const solde   = entrees - sorties;
@@ -48,33 +47,17 @@ export default function Caisse({ user, onBack, onLogout }) {
   };
 
   return (
-    <div className={styles.page} data-module="caisse">
+    <>
       {toast && <div className={`${styles.toast} ${toast.ok ? styles.toastOk : styles.toastErr}`}>{toast.txt}</div>}
-
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <rect x="2" y="7" width="20" height="15" rx="2"/>
-            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
-            <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
-          </svg>
-          <div>
-            <p className={styles.headerSub}>Rubis SPA</p>
-            <h1 className={styles.headerTitle}>Caisse cash</h1>
+      <main className={styles.main}>
+        <div className={styles.toolbar}>
+          <div/>
+          <div className={styles.toolbarGroup}>
+            <button className={styles.addBtn} onClick={()=>setModal(true)}>+ Ajouter</button>
+            <button className={styles.navSecondary} onClick={load} title="Actualiser">↻ Actualiser</button>
           </div>
         </div>
-        <div className={styles.headerCenter}/>
-        <div className={styles.headerRight}>
-          <button className={styles.addBtn} onClick={()=>setModal(true)}>+ Ajouter</button>
-          <button className={styles.navSecondary} onClick={load} title="Actualiser">↻</button>
-          <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
-          <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
-        </div>
-      </header>
 
-      <main className={styles.main}>
-        {/* Solde */}
         <div className={styles.soldeCard}>
           <p className={styles.soldeLabel}>Solde en caisse</p>
           <p className={styles.soldeVal} style={{color: solde >= 0 ? 'var(--vert)' : 'var(--rouge)'}}>
@@ -94,11 +77,7 @@ export default function Caisse({ user, onBack, onLogout }) {
         {!loading && transactions.length > 0 && (
           <div className={styles.list}>
             <div className={styles.listHeader}>
-              <span>Date</span>
-              <span>Description</span>
-              <span>Source</span>
-              <span style={{textAlign:'right'}}>Montant</span>
-              <span/>
+              <span>Date</span><span>Description</span><span>Source</span><span style={{textAlign:'right'}}>Montant</span><span/>
             </div>
             {transactions.map(t => (
               <div key={t.id} className={`${styles.row} ${t.type === 'entree' ? styles.rowVirement : styles.rowDepense}`}>
@@ -123,7 +102,6 @@ export default function Caisse({ user, onBack, onLogout }) {
         )}
       </main>
 
-      {/* Modal */}
       {modal && (
         <div className={styles.overlay} onClick={()=>setModal(false)}>
           <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
@@ -173,6 +151,6 @@ export default function Caisse({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -15,7 +15,7 @@ const makeForm = () => ({
   categorie_principale: '', sous_categorie: '', entite: '', est_abonnement: false, date_debut_abo: '',
 });
 
-export default function CreditCard({ user, onBack, onLogout }) {
+export default function CreditCard({ user }) {
   const [transactions, setTransactions] = useState([]);
   const [abonnements,  setAbonnements]  = useState([]);
   const [cats,         setCats]         = useState([]);
@@ -157,28 +157,18 @@ export default function CreditCard({ user, onBack, onLogout }) {
   const catTag = (t) => [t.categorie_principale, t.sous_categorie].filter(Boolean).join(' › ');
 
   return (
-    <div className={styles.page} data-module="carte">
+    <>
       {toast&&<div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <rect x="2" y="6" width="20" height="14" rx="2"/><path d="M2 10h20M6 14h4"/>
-          </svg>
-          <div>
-            <p className={styles.headerSub}>Rubis SPA</p>
-            <h1 className={styles.headerTitle}>Carte de crédit</h1>
-          </div>
-        </div>
-        <div className={styles.headerCenter}/>
-        <div className={styles.headerRight}>
-          <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>{"⚙ Catégories"}</button>
-          <button className={styles.addBtn} onClick={()=>{ setEditing(null); setForm(makeForm()); setModal(true); }}>{"+ Ajouter"}</button>
-          <button className={styles.navSecondary} onClick={onBack}>{"← Accueil"}</button>
-          <button className={styles.navSecondary} onClick={onLogout}>{"Déconnexion"}</button>
-        </div>
-      </header>
 
       <main className={styles.main}>
+
+        <div className={styles.toolbar}>
+          <div/>
+          <div className={styles.toolbarGroup}>
+            <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>{"⚙ Catégories"}</button>
+            <button className={styles.addBtn} onClick={()=>{ setEditing(null); setForm(makeForm()); setModal(true); }}>{"+ Ajouter"}</button>
+          </div>
+        </div>
 
         {showCats && (
           <div className={styles.catsPanel}>
@@ -390,6 +380,6 @@ export default function CreditCard({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

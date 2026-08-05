@@ -18,7 +18,7 @@ const CAT_COLORS = {
 };
 const CAT_ORDER = ['Vacances','Maladie','Récup. heures sup.','Marketing','Autre'];
 
-export default function Calendar({ user, onLogout, onBack }) {
+export default function Calendar({ user }) {
   const [date, setDate] = useState(dayjs());
   const [vue, setVue] = useState('mois');
   const [events, setEvents] = useState([]);
@@ -187,46 +187,38 @@ export default function Calendar({ user, onLogout, onBack }) {
   };
 
   return (
-    <div className={styles.app} data-module="agenda">
+    <>
       {toast&&<div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--indigo)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 9h18M8 4v2M16 4v2"/>
-          </svg>
-          <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>Agenda Marketing</h1></div>
-        </div>
-        <div className={styles.headerCenter}>
-          <button className={styles.todayBtn} onClick={()=>setDate(dayjs())}>Aujourd'hui</button>
-          <button className={styles.navBtn} onClick={()=>nav(-1)}>‹</button>
-          <span className={styles.dateTitle} style={{textTransform:'capitalize'}}>{dateTitle()}</span>
-          <button className={styles.navBtn} onClick={()=>nav(1)}>›</button>
-        </div>
-        <div className={styles.headerRight}>
-          <div className={styles.vueTabs}>
-            {['jour','semaine','mois'].map(v=>(
-              <button key={v} className={`${styles.vueTab} ${vue===v?styles.vueTabOn:''}`} onClick={()=>setVue(v)}>{v[0].toUpperCase()+v.slice(1)}</button>
-            ))}
-          </div>
-          <button className={styles.newBtn} onClick={()=>setModal({defaultDate:date.format('YYYY-MM-DD')})}>+ Événement</button>
-          <div className={styles.userMenu}>
-            <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
-          <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
-          </div>
-        </div>
-      </header>
       <main className={styles.main}>
-        {loading&&<div className={styles.loading}>Chargement…</div>}
-        {!loading&&vue==='mois'&&(
-          <div className={styles.moisOuter}>
-            {renderMois()}
-            {renderMoisSidePanel()}
+        <div className={styles.toolbar}>
+          <div className={styles.toolbarGroup}>
+            <button className={styles.todayBtn} onClick={()=>setDate(dayjs())}>Aujourd'hui</button>
+            <button className={styles.navBtn} onClick={()=>nav(-1)}>‹</button>
+            <span className={styles.dateTitle} style={{textTransform:'capitalize'}}>{dateTitle()}</span>
+            <button className={styles.navBtn} onClick={()=>nav(1)}>›</button>
           </div>
-        )}
-        {!loading&&vue==='semaine'&&renderSemaine()}
-        {!loading&&vue==='jour'&&renderJour()}
+          <div className={styles.toolbarGroup}>
+            <div className={styles.vueTabs}>
+              {['jour','semaine','mois'].map(v=>(
+                <button key={v} className={`${styles.vueTab} ${vue===v?styles.vueTabOn:''}`} onClick={()=>setVue(v)}>{v[0].toUpperCase()+v.slice(1)}</button>
+              ))}
+            </div>
+            <button className={styles.newBtn} onClick={()=>setModal({defaultDate:date.format('YYYY-MM-DD')})}>+ Événement</button>
+          </div>
+        </div>
+        <div className={styles.calBody}>
+          {loading&&<div className={styles.loading}>Chargement…</div>}
+          {!loading&&vue==='mois'&&(
+            <div className={styles.moisOuter}>
+              {renderMois()}
+              {renderMoisSidePanel()}
+            </div>
+          )}
+          {!loading&&vue==='semaine'&&renderSemaine()}
+          {!loading&&vue==='jour'&&renderJour()}
+        </div>
       </main>
       {modal&&<EventModal event={modal.event} defaultDate={modal.defaultDate||date.format('YYYY-MM-DD')} onSave={save} onDelete={remove} onClose={()=>setModal(null)}/>}
-    </div>
+    </>
   );
 }

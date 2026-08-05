@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getMe } from './api';
+import AppShell from './components/AppShell';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import Calendar from './pages/Calendar';
@@ -36,8 +37,7 @@ export default function App() {
 
   const ThemeToggle = () => (
     <button className="themeToggle" onClick={toggleTheme}
-      title={theme === 'dark' ? 'Passer en clair' : 'Passer en sombre'}
-      aria-label="Basculer le thème">
+      title={theme === 'dark' ? 'Passer en clair' : 'Passer en sombre'} aria-label="Basculer le thème">
       {theme === 'dark' ? '☀' : '☾'}
     </button>
   );
@@ -45,14 +45,22 @@ export default function App() {
   if (checking) return <div style={{height:'100vh',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--gris)',fontFamily:'var(--font-ui)'}}>Chargement…</div>;
   if (!user) return <><Login onLogin={u => { setUser(u); setPage('home'); }}/><ThemeToggle/></>;
 
-  let pageEl;
-  if (page === 'agenda')              pageEl = <Calendar user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
-  else if (page === 'carte')          pageEl = <CreditCard user={user} onLogout={logout} onBack={()=>setPage('home')}/>;
-  else if (page === 'factures-frais') pageEl = <FacturesFrais user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  else if (page === 'caisse')         pageEl = <Caisse user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  else if (page === 'rh')             pageEl = <RH user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  else if (page === 'depenses')       pageEl = <Depenses user={user} onBack={()=>setPage('home')} onLogout={logout}/>;
-  else                                pageEl = <Home user={user} onNavigate={setPage} onLogout={logout}/>;
+  // Chaque module rend UNIQUEMENT son contenu ; la coquille fournit nav + header.
+  let content;
+  if (page === 'agenda')              content = <Calendar user={user}/>;
+  else if (page === 'carte')          content = <CreditCard user={user}/>;
+  else if (page === 'factures-frais') content = <FacturesFrais user={user}/>;
+  else if (page === 'caisse')         content = <Caisse user={user}/>;
+  else if (page === 'rh')             content = <RH user={user}/>;
+  else if (page === 'depenses')       content = <Depenses user={user}/>;
+  else                                content = <Home user={user} onNavigate={setPage}/>;
 
-  return <>{pageEl}<ThemeToggle/></>;
+  return (
+    <>
+      <AppShell user={user} page={page} onNavigate={setPage} onLogout={logout}>
+        {content}
+      </AppShell>
+      <ThemeToggle/>
+    </>
+  );
 }
