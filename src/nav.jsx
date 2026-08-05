@@ -17,13 +17,17 @@ export const IconBell = () => (<svg {...s(1.5)} width="18" height="18"><path d="
 export const IconLogout = () => (<svg {...s(1.5)} width="17" height="17"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg>);
 export const Arrow = () => (<svg {...s(1.6)} width="18" height="18"><path d="M5 12h14M13 6l6 6-6 6"/></svg>);
 
+/* Accent neutre (Accueil / coquille) — famille Meadow, comme la maquette. */
+export const HOME_ACCENT = { soft:'#a4bda8', deep:'#6f9179', ink:'#213328' };
+
+/* color = teinte moyenne (icône) · soft = pastel opaque (fond pastille/tuile) · ink = texte foncé sur pastel */
 export const MODULES = [
-  { id:'agenda',         mod:'agenda',   label:'Agenda Marketing',    desc:'Campagnes, newsletters et événements',   color:'#c56e6e', deep:'#af5b5b', Icon:IconCalendar },
-  { id:'carte',          mod:'carte',    label:'Carte de crédit',     desc:'Dépenses et virements de la carte',       color:'#e39b45', deep:'#c9842f', Icon:IconCard },
-  { id:'factures-frais', mod:'factures', label:'Factures frais',      desc:'Upload et gestion des factures',          color:'#6f9179', deep:'#5a7a64', Icon:IconReceipt },
-  { id:'depenses',       mod:'depenses', label:'Demandes de dépense', desc:'À valider par Nathalie',                  color:'#e28a56', deep:'#c9743f', Icon:IconDepenses },
-  { id:'rh',             mod:'rh',       label:'RH — Emilie',         desc:'Heures, heures sup. et vacances',         color:'#8d8858', deep:'#787245', Icon:IconRH },
-  { id:'caisse',         mod:'caisse',   label:'Caisse cash',         desc:'Suivi espèces, import POS auto',          color:'#cf8078', deep:'#b8675f', Icon:IconCaisse },
+  { id:'agenda',         mod:'agenda',   label:'Agenda Marketing',    desc:'Campagnes, newsletters et événements',   color:'#c56e6e', deep:'#af5b5b', soft:'#eba5a5', ink:'#571f1f', Icon:IconCalendar },
+  { id:'carte',          mod:'carte',    label:'Carte de crédit',     desc:'Dépenses et virements de la carte',       color:'#e39b45', deep:'#c9842f', soft:'#ffca8c', ink:'#553611', Icon:IconCard },
+  { id:'factures-frais', mod:'factures', label:'Factures frais',      desc:'Upload et gestion des factures',          color:'#6f9179', deep:'#5a7a64', soft:'#a4bda8', ink:'#213328', Icon:IconReceipt },
+  { id:'depenses',       mod:'depenses', label:'Demandes de dépense', desc:'À valider par Nathalie',                  color:'#e28a56', deep:'#c9743f', soft:'#fabb92', ink:'#552c12', Icon:IconDepenses },
+  { id:'rh',             mod:'rh',       label:'RH — Emilie',         desc:'Heures, heures sup. et vacances',         color:'#8d8858', deep:'#787245', soft:'#c7c19d', ink:'#302f19', Icon:IconRH },
+  { id:'caisse',         mod:'caisse',   label:'Caisse cash',         desc:'Suivi espèces, import POS auto',          color:'#cf8078', deep:'#b8675f', soft:'#f5cec7', ink:'#592923', Icon:IconCaisse },
 ];
 
 export const EXTERNAL = [

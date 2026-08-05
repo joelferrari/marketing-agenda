@@ -35,7 +35,7 @@ export default function Home({ user, onNavigate }) {
       <div className={styles.grid}>
         {MODULES.map(m => (
           <button key={m.id} className={styles.card} onClick={() => onNavigate(m.id)}>
-            <span className={styles.cardIcon} style={{ background: m.color + '22', color: m.deep }}><m.Icon/></span>
+            <span className={styles.cardIcon} style={{ background: m.soft, color: m.color }}><m.Icon/></span>
             <span className={styles.cardBody}>
               <span className={styles.cardTitle}>{m.label}</span>
               <span className={styles.cardDesc}>{m.desc}</span>

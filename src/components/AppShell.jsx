@@ -1,4 +1,4 @@
-import { MODULES, EXTERNAL, TITLES, IconHome, IconSearch, IconBell, IconLogout } from '../nav';
+import { MODULES, HOME_ACCENT, EXTERNAL, TITLES, IconHome, IconSearch, IconBell, IconLogout } from '../nav';
 import styles from './AppShell.module.css';
 
 /* Coquille persistante : barre latérale + header unifié + panneau de contenu.
@@ -22,15 +22,16 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         </div>
 
         <nav className={styles.nav}>
-          <button className={styles.navItem} data-on={page === 'home'} onClick={() => onNavigate('home')}>
+          <button className={styles.navItem} data-on={page === 'home'} onClick={() => onNavigate('home')}
+            style={page === 'home' ? { background: HOME_ACCENT.soft, color: HOME_ACCENT.ink, fontWeight: 600 } : undefined}>
             <span className={styles.navIcon}><IconHome/></span><span>Accueil</span>
           </button>
           {MODULES.map(m => {
             const on = page === m.id;
             return (
               <button key={m.id} className={styles.navItem} data-on={on} onClick={() => onNavigate(m.id)}
-                style={on ? { background: m.color + '22', color: m.deep, fontWeight: 600 } : undefined}>
-                <span className={styles.navIcon} style={on ? { color: m.deep } : undefined}><m.Icon/></span>
+                style={on ? { background: m.soft, color: m.ink, fontWeight: 600 } : undefined}>
+                <span className={styles.navIcon}><m.Icon/></span>
                 <span className={styles.navLabel}>{m.label}</span>
               </button>
             );

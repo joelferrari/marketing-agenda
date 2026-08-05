@@ -2,8 +2,8 @@
 .cardTitle{font-family:var(--font-disp);font-size:18px;font-weight:normal;color:var(--noir);margin:0 0 20px}
 .form{display:flex;flex-direction:column;gap:14px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.submitBtn{background:var(--acc);color:#fff;border:none;border-radius:8px;padding:13px 20px;font-size:14px;font-family:inherit;cursor:pointer;font-weight:500;margin-top:4px;transition:.15s}
-.submitBtn:hover:not(:disabled){opacity:.9}
+.submitBtn{background:var(--acc-soft);color:var(--acc-ink);border:none;border-radius:9px;padding:13px 20px;font-size:14px;font-family:inherit;cursor:pointer;font-weight:600;margin-top:4px;transition:.15s}
+.submitBtn:hover:not(:disabled){background:var(--acc-dk);color:#fff}
 .submitBtn:disabled{opacity:.5;cursor:default}
 .depRow{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid var(--border)}
 .depRow:last-child{border-bottom:none}

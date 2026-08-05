@@ -7,9 +7,10 @@
    Mode sombre : <html data-theme="dark">.
    ====================================================================== */
 :root {
-  /* Accent principal (rose) + défaut --acc */
+  /* Accent principal (rose conservé) + défaut --acc neutre = Meadow (comme la maquette) */
   --rose:      #c56e6e;  --rose-lt: #fbeeec;  --rose-dk: #af5b5b;  --rose-soft: #eba5a5;
-  --acc:       #c56e6e;  --acc-dk: #af5b5b;   --acc-lt: #f7ebe8;
+  --acc:       #6f9179;  --acc-dk: #5a7a64;   --acc-lt: #eef3ef;
+  --acc-soft:  #a4bda8;  --acc-ink: #213328;   /* pastel opaque + texte foncé (boutons/pastilles maquette) */
 
   /* Surfaces crème */
   --beige:  #f2ede3;  --beige-dk: #efe7db;
@@ -37,17 +38,17 @@
 }
 
 /* --- Accent par module (clair) --- */
-[data-module="agenda"]   { --acc:#c56e6e; --acc-dk:#af5b5b; --acc-lt:#f7ebe8; }
-[data-module="carte"]    { --acc:#e39b45; --acc-dk:#c9842f; --acc-lt:#fbf1e0; }
-[data-module="factures"] { --acc:#6f9179; --acc-dk:#5a7a64; --acc-lt:#eef3ef; }
-[data-module="depenses"] { --acc:#e28a56; --acc-dk:#c9743f; --acc-lt:#fbeee2; }
-[data-module="rh"]       { --acc:#8d8858; --acc-dk:#787245; --acc-lt:#f2f1e6; }
-[data-module="caisse"]   { --acc:#cf8078; --acc-dk:#b8675f; --acc-lt:#fbeeec; }
+[data-module="agenda"]   { --acc:#c56e6e; --acc-dk:#af5b5b; --acc-lt:#f7ebe8; --acc-soft:#eba5a5; --acc-ink:#571f1f; }
+[data-module="carte"]    { --acc:#e39b45; --acc-dk:#c9842f; --acc-lt:#fbf1e0; --acc-soft:#ffca8c; --acc-ink:#553611; }
+[data-module="factures"] { --acc:#6f9179; --acc-dk:#5a7a64; --acc-lt:#eef3ef; --acc-soft:#a4bda8; --acc-ink:#213328; }
+[data-module="depenses"] { --acc:#e28a56; --acc-dk:#c9743f; --acc-lt:#fbeee2; --acc-soft:#fabb92; --acc-ink:#552c12; }
+[data-module="rh"]       { --acc:#8d8858; --acc-dk:#787245; --acc-lt:#f2f1e6; --acc-soft:#c7c19d; --acc-ink:#302f19; }
+[data-module="caisse"]   { --acc:#cf8078; --acc-dk:#b8675f; --acc-lt:#fbeeec; --acc-soft:#f5cec7; --acc-ink:#592923; }
 
 /* ======================= MODE SOMBRE ======================= */
 [data-theme="dark"] {
   --rose:#e79a9a; --rose-lt:rgba(197,110,110,.18); --rose-dk:#c56e6e; --rose-soft:#c56e6e;
-  --acc:#e79a9a;  --acc-dk:#c56e6e; --acc-lt:rgba(197,110,110,.18);
+  --acc:#a7c6ae;  --acc-dk:#6f9179; --acc-lt:rgba(111,145,121,.20); --acc-soft:#a7c6ae; --acc-ink:#213328;
 
   --beige:#201b14; --beige-dk:rgba(255,255,255,.10);
   --noir:#f0e8dc;  --gris:#a79a89;  --gris-lt:#8a7d6d;
@@ -64,12 +65,12 @@
 
   --skel1:rgba(255,255,255,.05); --skel2:rgba(255,255,255,.11);
 }
-[data-theme="dark"] [data-module="agenda"]   { --acc:#e79a9a; --acc-dk:#c56e6e; --acc-lt:rgba(197,110,110,.18); }
-[data-theme="dark"] [data-module="carte"]    { --acc:#ffc078; --acc-dk:#e39b45; --acc-lt:rgba(227,155,69,.18); }
-[data-theme="dark"] [data-module="factures"] { --acc:#a7c6ae; --acc-dk:#6f9179; --acc-lt:rgba(111,145,121,.20); }
-[data-theme="dark"] [data-module="depenses"] { --acc:#f7ad7c; --acc-dk:#e28a56; --acc-lt:rgba(226,138,86,.18); }
-[data-theme="dark"] [data-module="rh"]       { --acc:#cbc48c; --acc-dk:#8d8858; --acc-lt:rgba(141,136,88,.20); }
-[data-theme="dark"] [data-module="caisse"]   { --acc:#f0b3ab; --acc-dk:#cf8078; --acc-lt:rgba(207,128,120,.18); }
+[data-theme="dark"] [data-module="agenda"]   { --acc:#e79a9a; --acc-dk:#c56e6e; --acc-lt:rgba(197,110,110,.18); --acc-soft:#e79a9a; --acc-ink:#2a1210; }
+[data-theme="dark"] [data-module="carte"]    { --acc:#ffc078; --acc-dk:#e39b45; --acc-lt:rgba(227,155,69,.18); --acc-soft:#ffc078; --acc-ink:#3a2408; }
+[data-theme="dark"] [data-module="factures"] { --acc:#a7c6ae; --acc-dk:#6f9179; --acc-lt:rgba(111,145,121,.20); --acc-soft:#a7c6ae; --acc-ink:#16241b; }
+[data-theme="dark"] [data-module="depenses"] { --acc:#f7ad7c; --acc-dk:#e28a56; --acc-lt:rgba(226,138,86,.18); --acc-soft:#f7ad7c; --acc-ink:#3a1d0c; }
+[data-theme="dark"] [data-module="rh"]       { --acc:#cbc48c; --acc-dk:#8d8858; --acc-lt:rgba(141,136,88,.20); --acc-soft:#cbc48c; --acc-ink:#22210f; }
+[data-theme="dark"] [data-module="caisse"]   { --acc:#f0b3ab; --acc-dk:#cf8078; --acc-lt:rgba(207,128,120,.18); --acc-soft:#f0b3ab; --acc-ink:#3a1815; }
 
 /* Police d'affichage du site — mêmes fichiers .otf que le tunnel de réservation
    (rubis-spa-git/src/styles/global.css), servis à la racine de booking.rubisspa.ch. */
