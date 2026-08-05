@@ -1,3 +1,6 @@
+/* RH.module.css — thémé Retro Spring (accent = module RH, var(--acc)).
+   Basé sur la version de la branche feat/portail-feuille-temps-entites-rh. */
+
 /* Onglets */
 .tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border)}
 .tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:var(--font-ui);color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
@@ -74,3 +77,16 @@
 .bilanHeaderCumul{display:grid;grid-template-columns:1fr 70px 90px 110px 140px;gap:10px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-lt)}
 .bilanRowCumul{grid-template-columns:1fr 70px 90px 110px 140px!important;gap:10px;cursor:pointer}
 .bilanRowCumul:hover{background:var(--acc-lt)}
+.formRow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.exportBtn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--gris);display:inline-flex;align-items:center;gap:4px;font-family:inherit}
+.exportBtn:hover{border-color:var(--acc);color:var(--acc)}
+.exportBtn:disabled{opacity:.5;cursor:default}
+.attHeader{display:grid;grid-template-columns:90px 80px 1fr 110px;gap:12px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.attRow{grid-template-columns:90px 80px 1fr 110px!important}
+
+/* Sélecteur utilisateur admin */
+.staffSwitch{display:flex;gap:8px;margin-bottom:20px}
+.staffBtn{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 18px;font-size:12px;cursor:pointer;color:var(--gris);font-family:inherit;letter-spacing:.04em}
+.staffBtn:hover{border-color:var(--acc);color:var(--acc)}
+.staffBtnOn{background:var(--acc);border-color:var(--acc);color:#fff}
+.staffBtnOn:hover{color:#fff}
