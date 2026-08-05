@@ -69,13 +69,11 @@
 [data-theme="dark"] [data-module="rh"]       { --acc:#cbc48c; --acc-dk:#8d8858; --acc-lt:rgba(141,136,88,.20); }
 [data-theme="dark"] [data-module="caisse"]   { --acc:#f0b3ab; --acc-dk:#cf8078; --acc-lt:rgba(207,128,120,.18); }
 
-/* Police d'affichage du site (confirmer le chemin absolu). */
-@font-face {
-  font-family: 'Swear Text';
-  src: url('https://booking.rubisspa.ch/fonts/SwearText.woff2') format('woff2');
-  font-weight: 400 600;
-  font-display: swap;
-}
+/* Police d'affichage du site — mêmes fichiers .otf que le tunnel de réservation
+   (rubis-spa-git/src/styles/global.css), servis à la racine de booking.rubisspa.ch. */
+@font-face { font-family: 'Swear Text'; src: url('https://booking.rubisspa.ch/SwearText-Regular.otf') format('opentype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Swear Text'; src: url('https://booking.rubisspa.ch/SwearText-Medium.otf')  format('opentype'); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Swear Text'; src: url('https://booking.rubisspa.ch/SwearText-Bold.otf')    format('opentype'); font-weight: 700; font-style: normal; font-display: swap; }
 
 /* Animations Retro Spring */
 @keyframes rubUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
