@@ -123,7 +123,7 @@ const workDaysCount = (dateDebut, dateFin, userKey) => {
   return n;
 };
 
-export default function RH({ user, onBack, onLogout }) {
+export default function RH({ user }) {
   // viewKey = quel utilisateur on consulte : 'emilie' ou 'joel'
   // Pour emilie/joel : fixe. Pour admin : sélectionnable.
   const myKey = (user?.role === 'emilie' || user?.role === 'joel') ? user.role : 'emilie';
@@ -489,22 +489,8 @@ export default function RH({ user, onBack, onLogout }) {
   };
 
   return (
-    <div className={styles.page} data-module="rh">
+    <>
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
-
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <circle cx="12" cy="7" r="4"/><path d="M5.5 21a8.38 8.38 0 0113 0"/>
-          </svg>
-          <div><p className={styles.headerSub}>Rubis SPA</p><h1 className={styles.headerTitle}>RH — {prenom}</h1></div>
-        </div>
-        <div className={styles.headerRight}>
-          <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
-          <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
-        </div>
-      </header>
 
       <main className={styles.main}>
         {/* Sélecteur utilisateur (admin uniquement) */}
@@ -1262,6 +1248,6 @@ export default function RH({ user, onBack, onLogout }) {
         </div>
       </div>
     )}
-    </div>
+    </>
   );
 }

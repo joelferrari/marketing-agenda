@@ -71,7 +71,7 @@ const exportPDF = (rows, filters, tab, cats) => {
 };
 
 // ── Composant principal ───────────────────────────────────────
-export default function FacturesFrais({ user, onBack, onLogout }) {
+export default function FacturesFrais({ user }) {
   const [tab,        setTab]       = useState('factures');
   const [invoices,   setInvoices]  = useState([]);
   const [budget,     setBudget]    = useState([]);
@@ -258,31 +258,19 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
   const showMoyen = tab === 'factures'; // colonne + filtre Facture / Carte de crédit
 
   return (
-    <div className={styles.page} data-module="factures">
+    <>
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
 
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
-          </svg>
-          <div>
-            <p className={styles.headerSub}>Rubis SPA</p>
-            <h1 className={styles.headerTitle}>Factures frais</h1>
+      <main className={styles.main} style={tab==='factures'?{maxWidth:'1400px'}:undefined}>
+
+        <div className={styles.toolbar}>
+          <div/>
+          <div className={styles.toolbarGroup}>
+            <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>⚙ Catégories</button>
+            <button className={styles.addBtn} onClick={()=>setShowUpload(true)}>+ Ajouter</button>
+            <button className={styles.navSecondary} onClick={()=>exportPDF(rows, filters, tab, cats)}>↓ PDF</button>
           </div>
         </div>
-        <div className={styles.headerRight}>
-          <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>⚙ Catégories</button>
-          <button className={styles.addBtn} onClick={()=>setShowUpload(true)}>+ Ajouter</button>
-          <button className={styles.navSecondary} onClick={()=>exportPDF(rows, filters, tab, cats)}>↓ PDF</button>
-          <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
-          <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
-        </div>
-      </header>
-
-      <main className={styles.main} style={tab==='factures'?{maxWidth:'1400px'}:undefined}>
 
         {/* Onglets */}
         <div className={styles.tabs}>
@@ -520,6 +508,6 @@ export default function FacturesFrais({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

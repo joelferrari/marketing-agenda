@@ -1,0 +1,48 @@
+.shell{height:100vh;display:flex;background:var(--fond)}
+
+/* ---- Barre latérale ---- */
+.side{width:250px;flex-shrink:0;background:var(--side);border-right:1px solid var(--sideb);display:flex;flex-direction:column;padding:18px 14px;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 18px}
+.brandLogo{width:34px;height:34px;border-radius:9px;object-fit:contain;flex-shrink:0}
+.brandSub{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--gris-lt);font-weight:600}
+.brandName{font-size:15px;font-weight:600;color:var(--noir);font-family:var(--font-disp)}
+
+.nav{display:flex;flex-direction:column;gap:1px}
+.navItem{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;font-size:13px;color:var(--gris);cursor:pointer;transition:background .15s,color .15s;white-space:nowrap}
+.navItem:hover{background:var(--acc-lt)}
+.navItem[data-on="true"]{color:var(--noir)}
+.navIcon{display:flex;color:inherit;flex-shrink:0}
+.navLabel{overflow:hidden;text-overflow:ellipsis}
+
+.navDivider{height:1px;background:var(--sideb);margin:12px 6px}
+.navHeading{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gris-lt);font-weight:600;padding:0 8px 6px}
+
+.userCard{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px 8px 4px;border-top:1px solid var(--sideb)}
+.avatar{display:flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:50%;background:var(--acc-lt);color:var(--acc-dk);font-size:12px;font-weight:700;flex-shrink:0}
+.userMeta{flex:1;min-width:0}
+.userName{font-size:12.5px;font-weight:600;color:var(--noir)}
+.userRole{font-size:11px;color:var(--gris-lt)}
+.logoutBtn{width:30px;height:30px;border-radius:8px;border:none;background:none;color:var(--gris-lt);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.logoutBtn:hover{background:var(--rouge-lt);color:var(--rouge)}
+
+/* ---- Corps ---- */
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.topbar{height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:0 24px;border-bottom:1px solid var(--border);background:var(--blanc)}
+.pageTitle{font-size:17px;font-weight:600;color:var(--noir);font-family:var(--font-disp)}
+.topbarRight{display:flex;align-items:center;gap:8px}
+.search{display:flex;align-items:center;gap:8px;background:var(--beige);border-radius:10px;padding:8px 12px;color:var(--gris-lt);font-size:12.5px;min-width:190px}
+.bell{width:37px;height:37px;border-radius:10px;border:1px solid var(--border);background:var(--blanc);color:var(--gris);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
+.bell:hover{color:var(--acc);border-color:var(--acc)}
+
+.content{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;background:var(--fond)}
+
+/* Barre d'outils en haut du contenu (actions propres à chaque page) */
+:global(.pageToolbar){display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 24px 0}
+:global(.pageToolbarGroup){display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+@media(max-width:820px){
+  .side{width:64px;padding:18px 8px}
+  .brandName,.brandSub,.navLabel,.navHeading,.userMeta{display:none}
+  .navItem{justify-content:center;padding:10px}
+  .userCard{justify-content:center}
+}

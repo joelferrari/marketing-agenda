@@ -7,7 +7,7 @@ const fmt  = (n) => new Intl.NumberFormat('fr-CH',{style:'currency',currency:'CH
 const fmtDate = (d) => new Date(d).toLocaleDateString('fr-CH');
 const today = () => new Date().toISOString().slice(0,10);
 
-export default function Caisse({ user, onBack, onLogout }) {
+export default function Caisse({ user }) {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modal,   setModal]   = useState(false);
@@ -25,7 +25,6 @@ export default function Caisse({ user, onBack, onLogout }) {
 
   useEffect(() => { load(); }, []);
 
-  // Solde = entrées (POS cash + dépôts manuels) - sorties manuelles
   const entrees = transactions.filter(t => t.type === 'entree').reduce((a,t) => a + parseFloat(t.montant), 0);
   const sorties = transactions.filter(t => t.type === 'sortie').reduce((a,t) => a + parseFloat(t.montant), 0);
   const solde   = entrees - sorties;
@@ -48,41 +47,28 @@ export default function Caisse({ user, onBack, onLogout }) {
   };
 
   return (
-    <div className={styles.page} data-module="caisse">
+    <>
       {toast && <div className={`${styles.toast} ${toast.ok ? styles.toastOk : styles.toastErr}`}>{toast.txt}</div>}
-
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{flexShrink:0}}>
-            <rect x="2" y="7" width="20" height="15" rx="2"/>
-            <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/>
-            <line x1="12" y1="12" x2="12" y2="16"/><line x1="10" y1="14" x2="14" y2="14"/>
-          </svg>
-          <div>
-            <p className={styles.headerSub}>Rubis SPA</p>
-            <h1 className={styles.headerTitle}>Caisse cash</h1>
+      <main className={styles.main}>
+        <div className={styles.toolbar}>
+          <div/>
+          <div className={styles.toolbarGroup}>
+            <button className={styles.addBtn} onClick={()=>setModal(true)}>+ Ajouter</button>
+            <button className={styles.navSecondary} onClick={load} title="Actualiser">↻ Actualiser</button>
           </div>
         </div>
-        <div className={styles.headerCenter}/>
-        <div className={styles.headerRight}>
-          <button className={styles.addBtn} onClick={()=>setModal(true)}>+ Ajouter</button>
-          <button className={styles.navSecondary} onClick={load} title="Actualiser">↻</button>
-          <button className={styles.navSecondary} onClick={onBack}>← Accueil</button>
-          <button className={styles.navSecondary} onClick={onLogout}>Déconnexion</button>
-        </div>
-      </header>
 
-      <main className={styles.main}>
-        {/* Solde */}
-        <div className={styles.soldeCard}>
-          <p className={styles.soldeLabel}>Solde en caisse</p>
-          <p className={styles.soldeVal} style={{color: solde >= 0 ? 'var(--vert)' : 'var(--rouge)'}}>
-            {fmt(solde)}
-          </p>
-          <div className={styles.soldeMeta}>
-            <span className={styles.soldeCredit}>↑ {fmt(entrees)} entrées</span>
-            <span className={styles.soldeDebit}>↓ {fmt(sorties)} sorties</span>
+        <div className={styles.dcSummary}>
+          <div className={styles.dcPill}>
+            <div className={styles.dcPillLabel}>Solde en caisse</div>
+            <div className={styles.dcPillVal} style={{color: solde >= 0 ? 'var(--vert)' : 'var(--rouge)'}}>{fmt(solde)}</div>
+            <div className={styles.dcPillMeta}>
+              <span style={{color:'var(--vert)'}}>↑ {fmt(entrees)} entrées</span>
+              <span style={{color:'var(--rouge)'}}>↓ {fmt(sorties)} sorties</span>
+            </div>
+          </div>
+          <div className={styles.dcInfo}>
+            <div className={styles.dcInfoText}>Les encaissements <strong>POS</strong> (part espèces des RDV) sont importés automatiquement et non modifiables.</div>
           </div>
         </div>
 
@@ -91,39 +77,37 @@ export default function Caisse({ user, onBack, onLogout }) {
           <p className={styles.empty}>Aucune transaction. Les paiements cash du POS apparaîtront ici automatiquement.</p>
         )}
 
-        {!loading && transactions.length > 0 && (
-          <div className={styles.list}>
-            <div className={styles.listHeader}>
-              <span>Date</span>
-              <span>Description</span>
-              <span>Source</span>
-              <span style={{textAlign:'right'}}>Montant</span>
-              <span/>
+        {!loading && transactions.length > 0 && (() => {
+          const cols = '110px 1fr 130px 130px 40px';
+          return (
+          <div className={styles.dcTable}>
+            <div className={styles.dcHead} style={{gridTemplateColumns:cols}}>
+              <span>Date</span><span>Libellé</span><span>Source</span><span style={{textAlign:'right'}}>Montant</span><span/>
             </div>
             {transactions.map(t => (
-              <div key={t.id} className={`${styles.row} ${t.type === 'entree' ? styles.rowVirement : styles.rowDepense}`}>
-                <span className={styles.rowDate}>{fmtDate(t.date_transaction)}</span>
-                <span className={styles.rowDesc}>{t.description}</span>
-                <span className={styles.rowAuteur}>
+              <div key={t.id} className={styles.dcRow} style={{gridTemplateColumns:cols}}>
+                <span className={styles.dcDate}>{fmtDate(t.date_transaction)}</span>
+                <span className={styles.dcName}>{t.description}</span>
+                <span>
                   {t.source === 'pos'
-                    ? <span style={{fontSize:'11px',background:'var(--vert-lt)',color:'var(--vert)',padding:'2px 6px',borderRadius:'4px',fontWeight:500}}>POS</span>
-                    : t.auteur_prenom || '—'
+                    ? <span className={styles.dcCat} style={{background:'var(--vert-lt)',color:'var(--vert)'}}>POS · auto</span>
+                    : <span className={styles.dcCat}>{t.auteur_prenom || 'Manuel'}</span>
                   }
                 </span>
-                <span className={styles.rowMontant} style={{color: t.type === 'entree' ? 'var(--vert)' : 'var(--rouge)'}}>
+                <span className={styles.dcAmount} style={{color: t.type === 'entree' ? 'var(--vert)' : 'var(--rouge)'}}>
                   {t.type === 'entree' ? '+' : '-'}{fmt(t.montant)}
                 </span>
                 <button className={styles.rowDel} onClick={()=>remove(t.id)}
-                  style={{opacity: t.source === 'pos' ? 0.25 : 1, cursor: t.source === 'pos' ? 'default' : 'pointer'}}>
+                  style={{opacity: t.source === 'pos' ? 0.25 : 1, cursor: t.source === 'pos' ? 'default' : 'pointer', textAlign:'right'}}>
                   ×
                 </button>
               </div>
             ))}
           </div>
-        )}
+          );
+        })()}
       </main>
 
-      {/* Modal */}
       {modal && (
         <div className={styles.overlay} onClick={()=>setModal(false)}>
           <div className={styles.modalBox} onClick={e=>e.stopPropagation()}>
@@ -173,6 +157,6 @@ export default function Caisse({ user, onBack, onLogout }) {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -21,7 +21,10 @@
 .userMenu{display:flex;align-items:center;gap:8px}
 .userName{font-size:13px;color:var(--gris);font-weight:500}
 .logoutBtn{background:none;border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--gris-lt);cursor:pointer}
-.main{flex:1;overflow:auto;animation:rubUp .4s both}
+.main{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;animation:rubUp .4s both}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:16px 20px;flex-shrink:0}
+.toolbarGroup{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.calBody{flex:1;min-height:0;overflow:auto}
 .loading{padding:40px;text-align:center;color:var(--gris-lt);font-size:14px}
 .moisWrap{height:100%;display:flex;flex-direction:column}
 .moisHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--acc-lt);border-bottom:1px solid var(--border)}
