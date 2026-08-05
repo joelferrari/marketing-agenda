@@ -261,7 +261,7 @@ export default function FacturesFrais({ user }) {
     <>
       {toast && <div className={`${styles.toast} ${toast.ok?styles.toastOk:styles.toastErr}`}>{toast.txt}</div>}
 
-      <main className={styles.main} style={tab==='factures'?{maxWidth:'1400px'}:undefined}>
+      <main className={styles.main}>
 
         <div className={styles.toolbar}>
           <div/>

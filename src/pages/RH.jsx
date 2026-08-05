@@ -461,13 +461,13 @@ export default function RH({ user }) {
   const maxH = bilan.length ? Math.max(...bilan.map(m=>parseFloat(m.total_heures||0))) : 0;
 
   const dayColor = (entry, dateStr) => {
-    if (!entry) return 'var(--fond)';
+    if (!entry) return 'var(--blanc)';
     if (entry.type === 'vacances') return 'var(--orange-lt)';
     if (entry.type === 'recup') return 'var(--violet-lt)';
-    if (!entry.heures) return 'var(--fond)';
+    if (!entry.heures) return 'var(--blanc)';
     const h = parseFloat(entry.heures);
     const extra = isExtraDay(dateStr);
-    if (extra && viewKey !== 'joel') return 'var(--beige)'; // Emilie jour hors planning = neutre
+    if (extra && viewKey !== 'joel') return 'var(--blanc)'; // Emilie jour hors planning = neutre
     const c = extra ? 0 : CIBLE; // Joel jour extra : cible 0 → tout vert
     if (h >= c)       return 'var(--vert-lt)';
     if (h >= c * 0.6) return 'var(--orange-lt)';
@@ -506,33 +506,44 @@ export default function RH({ user }) {
           </div>
         )}
 
-        {/* Onglets */}
-        <div className={rh.tabs}>
-          {['pointage','resume','vacances','attestations'].map(t => (
-            <button key={t} className={`${rh.tab} ${tab===t?rh.tabOn:''}`} onClick={()=>setTab(t)}>
-              {t==='pointage'?'Pointage':t==='resume'?'Résumé annuel':t==='vacances'?'Vacances':'Attestations'}
-            </button>
-          ))}
+        {/* Onglets + actions de l'onglet actif, alignées en haut à droite */}
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'10px',marginBottom:'4px'}}>
+          <div className={rh.tabs}>
+            {['pointage','resume','vacances','attestations'].map(t => (
+              <button key={t} className={`${rh.tab} ${tab===t?rh.tabOn:''}`} onClick={()=>setTab(t)}>
+                {t==='pointage'?'Pointage':t==='resume'?'Résumé annuel':t==='vacances'?'Vacances':'Attestations'}
+              </button>
+            ))}
+          </div>
+          <div style={{display:'flex',gap:'8px',flexShrink:0}}>
+            {tab==='pointage' && (<>
+              <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF"><IcoPdf/> PDF</button>
+              <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
+              <button className={styles.addBtn} onClick={()=>setDemRecupModal(true)}><IcoCal/> Demander une récup.</button>
+            </>)}
+            {tab==='resume' && (<>
+              <button className={rh.exportBtn} onClick={printResume} title="Télécharger PDF"><IcoPdf/> PDF</button>
+              <button className={rh.exportBtn} onClick={()=>openEmailModal('resume')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
+            </>)}
+            {tab==='vacances' && (<>
+              <button className={rh.exportBtn} onClick={printVacances} title="Télécharger PDF"><IcoPdf/> PDF</button>
+              <button className={rh.exportBtn} onClick={()=>openEmailModal('vacances')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
+              <button className={styles.addBtn} onClick={()=>setDemModal(true)}><IcoCal/> Demander</button>
+              <button className={styles.addBtn} onClick={()=>setVacModal(true)}><IcoPlus/> Ajouter</button>
+            </>)}
+            {tab==='attestations' && (<>
+              <button className={rh.exportBtn} onClick={printAttestations}><IcoPdf/> PDF</button>
+              <button className={rh.exportBtn} onClick={()=>openEmailModal('attestations')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
+              <button className={styles.addBtn} onClick={()=>setAttModal(true)}><IcoPlus/> Ajouter</button>
+            </>)}
+          </div>
         </div>
 
         {/* ── VACANCES ── */}
         {tab==='vacances' && (<>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
-            <p style={{fontSize:'13px',color:'var(--gris)',margin:0}}>
-              Les vacances bloquent automatiquement l'agenda du spa et apparaissent dans le calendrier marketing.
-            </p>
-            <div style={{display:'flex',gap:'8px',flexShrink:0,marginLeft:'16px'}}>
-              <button className={rh.exportBtn} onClick={printVacances} title="Télécharger PDF"><IcoPdf/> PDF</button>
-              <button className={rh.exportBtn} onClick={()=>openEmailModal('vacances')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
-              <button className={styles.addBtn}
-                onClick={()=>setDemModal(true)}>
-                <IcoCal/> Demander
-              </button>
-              <button className={styles.addBtn} onClick={()=>setVacModal(true)}>
-                <IcoPlus/> Ajouter
-              </button>
-            </div>
-          </div>
+          <p style={{fontSize:'13px',color:'var(--gris)',margin:'0 0 20px'}}>
+            Les vacances bloquent automatiquement l'agenda du spa et apparaissent dans le calendrier marketing.
+          </p>
 
           {/* Carte solde total */}
           {(() => {
@@ -697,18 +708,6 @@ export default function RH({ user }) {
             <div className={rh.statCard}><div className={rh.statLabel}>Cumul {annee}</div><div className={rh.statVal} style={{color:cumulYTD>=0?'var(--vert)':'var(--rouge)'}}>{fmtH(cumulYTD,true)}</div></div>
           </div>
 
-          {/* Barre export */}
-          <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'12px'}}>
-            <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF"><IcoPdf/> PDF</button>
-            <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}>
-              <IcoMail/> {emailing ? '…' : 'Email'}
-            </button>
-            <button className={styles.addBtn}
-              onClick={()=>setDemRecupModal(true)}>
-              <IcoCal/> Demander une récup.
-            </button>
-          </div>
-
           {/* Grille calendrier */}
           <div className={rh.calCard}>
             <div className={rh.calHeader}>
@@ -793,14 +792,6 @@ export default function RH({ user }) {
             ))}
           </div>
 
-          {/* Barre export */}
-          <div style={{display:'flex',justifyContent:'flex-end',gap:'6px',marginBottom:'16px'}}>
-            <button className={rh.exportBtn} onClick={printResume} title="Télécharger PDF"><IcoPdf/> PDF</button>
-            <button className={rh.exportBtn} onClick={()=>openEmailModal('resume')} disabled={emailing}>
-              <IcoMail/> {emailing ? '…' : 'Email'}
-            </button>
-          </div>
-
           {/* Solde global */}
           <div className={styles.soldeCard}>
             <p className={styles.soldeLabel}>Solde heures supplémentaires {annee}</p>
@@ -877,18 +868,9 @@ export default function RH({ user }) {
 
         {/* ── ATTESTATIONS ── */}
         {tab==='attestations' && (<>
-          <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'20px'}}>
-            <p style={{fontSize:'13px',color:'var(--gris)',margin:0}}>
-              Certificats médicaux, attestations maladie et accident.
-            </p>
-            <div style={{display:'flex',gap:'6px',flexShrink:0,marginLeft:'16px'}}>
-              <button className={rh.exportBtn} onClick={printAttestations}><IcoPdf/> PDF</button>
-              <button className={rh.exportBtn} onClick={()=>openEmailModal('attestations')} disabled={emailing}>
-                <IcoMail/> {emailing?'…':'Email'}
-              </button>
-              <button className={styles.addBtn} onClick={()=>setAttModal(true)}><IcoPlus/> Ajouter</button>
-            </div>
-          </div>
+          <p style={{fontSize:'13px',color:'var(--gris)',margin:'0 0 20px'}}>
+            Certificats médicaux, attestations maladie et accident.
+          </p>
 
           {attestations.length === 0 && <p className={styles.empty}>Aucune attestation enregistrée</p>}
 
