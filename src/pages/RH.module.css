@@ -2,9 +2,9 @@
    Basé sur la version de la branche feat/portail-feuille-temps-entites-rh. */
 
 /* Onglets */
-.tabs{display:flex;gap:0;margin-bottom:20px;border-bottom:2px solid var(--border)}
-.tab{background:none;border:none;padding:10px 20px;font-size:13px;font-family:var(--font-ui);color:var(--gris-lt);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
-.tab:hover{color:var(--gris)}.tabOn{color:var(--acc);border-bottom-color:var(--acc);font-weight:600}
+.tabs{display:inline-flex;gap:3px;margin-bottom:20px;background:var(--beige);border-radius:9px;padding:3px}
+.tab{background:none;border:none;padding:6px 16px;border-radius:6px;font-size:12.5px;font-family:var(--font-ui);color:var(--gris);cursor:pointer;transition:.15s}
+.tab:hover{color:var(--gris)}.tabOn{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}
 
 /* Navigation mois */
 .moisNav{display:flex;align-items:center;gap:12px;margin-bottom:16px}
@@ -16,8 +16,8 @@
 
 /* Calendrier */
 .calCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
-.calHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--beige);border-bottom:1px solid var(--border)}
-.calHeaderCell{text-align:center;padding:8px 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.calHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--acc-lt);border-bottom:1px solid var(--border)}
+.calHeaderCell{text-align:center;padding:8px 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-dk)}
 .calGrid{display:grid;grid-template-columns:repeat(7,1fr)}
 .calCell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 6px;min-height:80px;cursor:pointer;transition:opacity .15s;display:flex;flex-direction:column;gap:2px}
 .calCell:hover{opacity:.85}
@@ -35,7 +35,7 @@
 /* Année */
 .anneeBar{display:flex;gap:8px;margin-bottom:16px}
 .anneeBtn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 16px;font-size:13px;cursor:pointer;color:var(--gris)}
-.anneeBtnOn{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:500}
+.anneeBtnOn{background:var(--acc-soft);border-color:var(--acc-soft);color:var(--acc-ink);font-weight:600}
 
 /* Graphique barres */
 .chartCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;padding:20px 24px;margin-bottom:20px}
@@ -48,7 +48,7 @@
 .barMois{font-size:11px;font-weight:600;color:var(--gris-lt);margin-top:2px}
 
 /* Tableau bilan */
-.bilanHeader{display:grid;grid-template-columns:1fr 80px 100px 120px;gap:12px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.bilanHeader{display:grid;grid-template-columns:1fr 80px 100px 120px;gap:12px;padding:10px 20px;background:var(--acc-lt);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-dk)}
 .bilanRow{grid-template-columns:1fr 80px 100px 120px!important;cursor:pointer}
 .bilanRow:hover{background:var(--acc-lt)}
 
@@ -65,7 +65,7 @@
   .barChart{height:120px}
 }
 
-.vacHeader{display:grid;grid-template-columns:100px 100px 80px 1fr 36px;gap:12px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.vacHeader{display:grid;grid-template-columns:100px 100px 80px 1fr 36px;gap:12px;padding:10px 20px;background:var(--acc-lt);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-dk)}
 .vacRow{grid-template-columns:100px 100px 80px 1fr 36px!important}
 .joursBadge{display:flex;flex-direction:column;align-items:center;line-height:1.2}
 .joursNum{font-size:16px;font-weight:700}
@@ -74,22 +74,22 @@
 .typeBtn{flex:1;padding:8px;border:1.5px solid var(--border);border-radius:6px;background:#fff;font-size:13px;cursor:pointer;font-family:inherit;transition:.15s}
 .typeBtn:hover{border-color:var(--acc)}
 
-.bilanHeaderCumul{display:grid;grid-template-columns:1fr 70px 90px 110px 140px;gap:10px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--gris-lt)}
+.bilanHeaderCumul{display:grid;grid-template-columns:1fr 70px 90px 110px 140px;gap:10px;padding:10px 20px;background:var(--acc-lt);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--acc-dk)}
 .bilanRowCumul{grid-template-columns:1fr 70px 90px 110px 140px!important;gap:10px;cursor:pointer}
 .bilanRowCumul:hover{background:var(--acc-lt)}
 .formRow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .exportBtn{background:none;border:1px solid var(--border);border-radius:6px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--gris);display:inline-flex;align-items:center;gap:4px;font-family:inherit}
 .exportBtn:hover{border-color:var(--acc);color:var(--acc)}
 .exportBtn:disabled{opacity:.5;cursor:default}
-.attHeader{display:grid;grid-template-columns:90px 80px 1fr 110px;gap:12px;padding:10px 20px;background:var(--beige);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--gris-lt)}
+.attHeader{display:grid;grid-template-columns:90px 80px 1fr 110px;gap:12px;padding:10px 20px;background:var(--acc-lt);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-dk)}
 .attRow{grid-template-columns:90px 80px 1fr 110px!important}
 
 /* Sélecteur utilisateur admin */
 .staffSwitch{display:flex;gap:8px;margin-bottom:20px}
 .staffBtn{background:none;border:1px solid var(--border);border-radius:20px;padding:5px 18px;font-size:12px;cursor:pointer;color:var(--gris);font-family:inherit;letter-spacing:.04em}
 .staffBtn:hover{border-color:var(--acc);color:var(--acc)}
-.staffBtnOn{background:var(--acc);border-color:var(--acc);color:#fff}
-.staffBtnOn:hover{color:#fff}
+.staffBtnOn{background:var(--acc-soft);border-color:var(--acc-soft);color:var(--acc-ink);font-weight:600}
+.staffBtnOn:hover{color:var(--acc-ink)}
 
 /* 4 cartes stats (comme la maquette) */
 .statCards{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-bottom:16px}
