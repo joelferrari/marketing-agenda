@@ -264,22 +264,20 @@ export default function FacturesFrais({ user }) {
       <main className={styles.main}>
 
         <div className={styles.toolbar}>
-          <div/>
+          {/* Onglets */}
+          <div className={styles.tabs}>
+            <button className={`${styles.tab} ${tab==='factures'?styles.tabOn:''}`} onClick={()=>switchTab('factures')}>
+              Factures
+            </button>
+            <button className={`${styles.tab} ${tab==='budget'?styles.tabOn:''}`} onClick={()=>switchTab('budget')}>
+              Budget
+            </button>
+          </div>
           <div className={styles.toolbarGroup}>
             <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>⚙ Catégories</button>
             <button className={styles.addBtn} onClick={()=>setShowUpload(true)}>+ Ajouter</button>
             <button className={styles.navSecondary} onClick={()=>exportPDF(rows, filters, tab, cats)}>↓ PDF</button>
           </div>
-        </div>
-
-        {/* Onglets */}
-        <div className={styles.tabs}>
-          <button className={`${styles.tab} ${tab==='factures'?styles.tabOn:''}`} onClick={()=>switchTab('factures')}>
-            Factures
-          </button>
-          <button className={`${styles.tab} ${tab==='budget'?styles.tabOn:''}`} onClick={()=>switchTab('budget')}>
-            Budget
-          </button>
         </div>
 
         {/* Catégories */}

@@ -95,7 +95,7 @@
 .filterTotal{display:flex;flex-direction:column;align-items:flex-end;gap:2px;font-size:12px;color:var(--gris);white-space:nowrap}
 .filterTotal strong{font-size:15px}
 
-.tabs{display:inline-flex;gap:3px;margin-bottom:16px;background:var(--beige);border-radius:9px;padding:3px}
+.tabs{display:inline-flex;gap:3px;background:var(--beige);border-radius:9px;padding:3px}
 .tab{background:none;border:none;padding:6px 16px;border-radius:6px;font-size:12.5px;font-family:var(--font-ui);color:var(--gris);cursor:pointer;transition:.15s}
 .tab:hover{color:var(--gris)}
 .tabOn{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}

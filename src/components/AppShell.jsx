@@ -24,7 +24,7 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         <nav className={styles.nav}>
           <button className={styles.navItem} data-on={page === 'home'} onClick={() => onNavigate('home')}
             style={page === 'home' ? { background: HOME_ACCENT.soft, color: HOME_ACCENT.ink, fontWeight: 600 } : undefined}>
-            <span className={styles.navIcon}><IconHome/></span><span>Accueil</span>
+            <span className={styles.navIcon}><IconHome/></span><span className={styles.navLabel}>Accueil</span>
           </button>
           {MODULES.map(m => {
             const on = page === m.id;
@@ -42,7 +42,7 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         <div className={styles.navHeading}>Externe</div>
         {EXTERNAL.map(e => (
           <a key={e.href} className={styles.navItem} href={e.href} target="_blank" rel="noreferrer">
-            <span className={styles.navIcon}><e.Icon/></span><span>{e.label}</span>
+            <span className={styles.navIcon}><e.Icon/></span><span className={styles.navLabel}>{e.label}</span>
           </a>
         ))}
 

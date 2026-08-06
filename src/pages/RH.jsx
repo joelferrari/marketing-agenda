@@ -508,14 +508,14 @@ export default function RH({ user }) {
 
         {/* Onglets + actions de l'onglet actif, alignées en haut à droite */}
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'10px',marginBottom:'4px'}}>
-          <div className={rh.tabs}>
+          <div className={rh.tabs} style={{flexWrap:'wrap'}}>
             {['pointage','resume','vacances','attestations'].map(t => (
               <button key={t} className={`${rh.tab} ${tab===t?rh.tabOn:''}`} onClick={()=>setTab(t)}>
                 {t==='pointage'?'Pointage':t==='resume'?'Résumé annuel':t==='vacances'?'Vacances':'Attestations'}
               </button>
             ))}
           </div>
-          <div style={{display:'flex',gap:'8px',flexShrink:0}}>
+          <div style={{display:'flex',gap:'8px',flexWrap:'wrap'}}>
             {tab==='pointage' && (<>
               <button className={rh.exportBtn} onClick={printPointage} title="Télécharger PDF"><IcoPdf/> PDF</button>
               <button className={rh.exportBtn} onClick={()=>openEmailModal('pointage')} disabled={emailing}><IcoMail/> {emailing?'…':'Email'}</button>
