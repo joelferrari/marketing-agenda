@@ -21,12 +21,26 @@
 .userMenu{display:flex;align-items:center;gap:8px}
 .userName{font-size:13px;color:var(--gris);font-weight:500}
 .logoutBtn{background:none;border:1px solid var(--border);border-radius:4px;padding:5px 10px;font-size:11px;color:var(--gris-lt);cursor:pointer}
-.main{flex:1;overflow:auto}
+.main{flex:1;overflow:hidden}
 .loading{padding:40px;text-align:center;color:var(--gris-lt);font-size:14px}
-.moisWrap{height:100%;display:flex;flex-direction:column}
-.moisHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--indigo-lt);border-bottom:1px solid var(--border)}
+.moisOuter{display:flex;height:100%;overflow:hidden}
+.moisWrap{flex:1;min-width:0;height:100%;display:flex;flex-direction:column}
+.moisHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--indigo-lt);border-bottom:1px solid var(--border);flex-shrink:0}
 .moisDayName{padding:10px;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);font-weight:500}
-.moisGrid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;flex:1}
+.moisGrid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:minmax(140px,1fr);flex:1;overflow:auto}
+.sidePanel{width:240px;height:100%;overflow-y:auto;border-left:1px solid var(--border);background:#fff;padding:16px 12px;flex-shrink:0}
+.sidePanelTitle{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--indigo);margin:0 0 14px}
+.sidePanelEmpty{font-size:12px;color:var(--gris-lt);text-align:center;padding:12px 0}
+.sidePanelGroup{margin-bottom:14px}
+.sidePanelCatRow{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.sidePanelCatDot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sidePanelCat{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--gris);flex:1}
+.sidePanelCatCount{font-size:10px;color:var(--gris-lt);background:var(--fond);padding:1px 5px;border-radius:8px}
+.sidePanelEvent{border-left:3px solid #ccc;padding:4px 8px;margin-bottom:3px;cursor:pointer;border-radius:0 3px 3px 0;background:var(--fond)}
+.sidePanelEvent:hover{opacity:.75}
+.sidePanelDate{display:block;font-size:10px;color:var(--gris-lt);margin-bottom:1px}
+.sidePanelEvTitle{display:block;font-size:11px;font-weight:500;color:var(--noir);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.semaineWrap{display:grid;grid-template-columns:repeat(7,1fr);height:100%;overflow-y:auto}
 .moisCell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;cursor:pointer;overflow:hidden;display:flex;flex-direction:column}
 .moisCellActive:hover{background:var(--indigo-lt)}
 .moisToday{background:var(--violet-lt)}
@@ -36,7 +50,6 @@
 .moisEvent:hover{opacity:.8}
 .moisTime{font-size:10px;opacity:.7}
 .moisMore{font-size:10px;color:var(--gris-lt);padding-left:4px}
-.semaineWrap{display:grid;grid-template-columns:repeat(7,1fr);height:100%}
 .semaineCol{border-right:1px solid var(--border);padding:12px 8px;cursor:pointer;min-height:200px}
 .semaineCol:last-child{border-right:none}
 .semaineCol:hover{background:var(--indigo-lt)}
@@ -51,7 +64,7 @@
 .semaineEvTitle{font-size:13px;font-weight:500;color:var(--noir);margin-bottom:2px}
 .semaineEvTime{font-size:11px;color:var(--gris)}
 .rappelBadge{font-size:11px;color:var(--gris);margin-top:4px;display:inline-block}
-.jourWrap{padding:24px;max-width:700px;margin:0 auto}
+.jourWrap{padding:24px;max-width:700px;margin:0 auto;height:100%;overflow-y:auto;box-sizing:border-box}
 .addBtn{background:var(--indigo);color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:12px;cursor:pointer;margin-bottom:20px;letter-spacing:.06em;text-transform:uppercase}
 .empty{color:var(--gris-lt);font-size:14px;text-align:center;padding:40px 0}
 .jourEvent{display:flex;border-radius:8px;overflow:hidden;margin-bottom:12px;border:1px solid var(--border);border-left:4px solid;cursor:pointer}
