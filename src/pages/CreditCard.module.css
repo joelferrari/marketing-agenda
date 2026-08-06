@@ -16,7 +16,7 @@
 
 /* ==== Contenu « Retro Spring » (maquette) — résumé + table stylée ==== */
 .dcSummary{display:flex;gap:14px;margin-bottom:16px;flex-wrap:wrap}
-.dcPill{flex:1;min-width:200px;background:var(--acc-lt);border-radius:14px;padding:16px 18px}
+.dcPill{flex:1;min-width:200px;background:var(--acc-lt);border:1px solid var(--acc-dk);border-radius:14px;padding:16px 18px}
 .dcPillLabel{font-size:11.5px;color:var(--acc-dk);font-weight:600;margin-bottom:6px}
 .dcPillVal{font-size:28px;font-weight:700;color:var(--noir);font-variant-numeric:tabular-nums}
 .dcPillUnit{font-size:15px;font-weight:500;color:var(--gris)}
