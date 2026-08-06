@@ -59,11 +59,13 @@
 .rowDate{font-size:12px;color:var(--gris)}
 .rowFile{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--acc);text-decoration:none;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .rowFile:hover{text-decoration:underline}
-.rowCat{font-size:11px;color:var(--acc-dk);background:var(--acc-lt);border:none;border-radius:20px;padding:2px 9px;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+.rowCat{font-size:11px;color:var(--acc-dk);background:var(--acc-lt);border:none;border-radius:20px;padding:3px 10px;display:inline-block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
 .rowDesc{font-size:13px;color:var(--noir);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .rowMontant{font-size:14px;font-weight:600;text-align:right}
-.rowDel{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:20px;text-align:center;line-height:1}
-.rowDel:hover{color:var(--rouge)}
+.rowDel{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:16px;line-height:1;padding:5px 7px;border-radius:6px;transition:.15s}
+.rowDel:hover{color:var(--rouge);background:var(--rouge-lt)}
+.btnView{background:none;border:none;color:var(--gris-lt);cursor:pointer;font-size:13px;line-height:1;padding:5px 7px;border-radius:6px;transition:.15s}
+.btnView:hover{color:var(--acc-dk);background:var(--acc-lt)}
 
 /* Modal */
 .overlay{position:fixed;inset:0;background:rgba(42,40,37,.4);display:flex;align-items:center;justify-content:center;z-index:100;padding:16px}
@@ -101,7 +103,7 @@
 .tabOn{background:var(--acc-soft);color:var(--acc-ink);font-weight:600}
 .listHeaderBudget{grid-template-columns:90px 1fr 90px 110px 1fr 90px 100px 72px}
 .rowBudget{grid-template-columns:90px 1fr 90px 110px 1fr 90px 100px 36px}
-.rowStatut{font-size:11px;padding:2px 6px;border-radius:4px;background:var(--fond);color:var(--gris);white-space:nowrap;align-self:center}
+.rowStatut{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;background:var(--fond);color:var(--gris);white-space:nowrap;align-self:center;display:inline-block;width:fit-content}
 .rowStatut[data-s="Confirmé"]{background:var(--vert-lt);color:var(--vert)}
 .rowStatut[data-s="Payé"]{background:var(--vert-lt);color:var(--vert)}
 .rowStatut[data-s="Annulé"]{background:var(--rouge-lt);color:var(--rouge)}
@@ -114,10 +116,17 @@
 .listHeaderFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 190px;min-width:1318px}
 .rowFactures{grid-template-columns:78px minmax(140px,1.2fr) 75px 95px 118px minmax(160px,1.4fr) 100px 100px 100px 85px 190px;min-width:1318px}
 
-.rowDateInput{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;color:var(--gris);width:100%;font-family:var(--font-ui)}
-.rowSelect{font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:4px;background:var(--fond);color:var(--gris);width:100%;font-family:var(--font-ui);cursor:pointer}
-.rowSelect[data-s="payee"]{background:var(--vert-lt);color:var(--vert);border-color:var(--vert)}
-.btnEnvoyer{background:var(--acc-soft);border:none;color:var(--acc-ink);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
+.rowDateInput{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;color:var(--gris);width:100%;font-family:var(--font-ui)}
+.rowSelect{
+  font-size:11px;font-weight:500;font-family:var(--font-ui);color:var(--gris);cursor:pointer;
+  width:100%;padding:4px 22px 4px 10px;border:1px solid var(--border);border-radius:20px;background-color:var(--fond);
+  appearance:none;-webkit-appearance:none;-moz-appearance:none;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 13px) center,calc(100% - 9px) center;
+  background-size:4px 4px,4px 4px;background-repeat:no-repeat;
+}
+.rowSelect[data-s="payee"]{background-color:var(--vert-lt);color:var(--vert);border-color:var(--vert)}
+.btnEnvoyer{background:var(--acc-soft);border:none;color:var(--acc-ink);border-radius:20px;padding:4px 11px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btnEnvoyer:hover{background:var(--acc-dk);color:#fff}
 .btnEnvoyer:disabled{opacity:.5;cursor:not-allowed}
-.vuBadge{font-size:10px;font-weight:600;color:var(--vert);background:var(--vert-lt);border-radius:4px;padding:3px 7px;white-space:nowrap}
+.vuBadge{font-size:11px;font-weight:600;color:var(--vert);background:var(--vert-lt);border-radius:20px;padding:3px 10px;white-space:nowrap;display:inline-flex;align-items:center;gap:4px}

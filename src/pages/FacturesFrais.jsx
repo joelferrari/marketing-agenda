@@ -378,7 +378,7 @@ export default function FacturesFrais({ user }) {
                     </a>
                   : <span className={styles.rowDesc} style={{fontStyle:'italic',color:'var(--gris-lt)'}}>—</span>
                 }
-                <span className={styles.rowCat} style={{background:'none',border:'none',padding:0,fontSize:'12px',color:'var(--gris)'}}>{r.entite||'—'}</span>
+                <span className={styles.rowCat}>{r.entite||'—'}</span>
                 <span className={styles.rowCat}>{r.categorie||'—'}</span>
                 {showMoyen && (
                   <span className={styles.rowCat}>{r.source==='carte_credit' ? 'Carte de crédit' : 'Facture'}</span>
@@ -402,9 +402,9 @@ export default function FacturesFrais({ user }) {
                 <span className={styles.rowMontant} style={{color:r.montant?'var(--rouge)':'var(--gris-lt)'}}>
                   {r.montant?`${parseFloat(r.montant).toFixed(2)} CHF`:'—'}
                 </span>
-                <div style={{display:'flex',gap:'4px',justifyContent:'flex-end',alignItems:'center'}}>
+                <div style={{display:'flex',gap:'6px',justifyContent:'flex-end',alignItems:'center'}}>
                   {showSuivi && r.envoye_le && (
-                    <span className={styles.vuBadge} title={`Envoyée le ${fmt(r.envoye_le)}`} style={{display:'inline-flex',alignItems:'center',gap:'4px'}}><IcoCheck/>Vu</span>
+                    <span className={styles.vuBadge} title={`Envoyée le ${fmt(r.envoye_le)}`}><IcoCheck/>Vu</span>
                   )}
                   {showSuivi && (
                     <button className={styles.btnEnvoyer} disabled={envoyingId===r.id}
@@ -412,8 +412,7 @@ export default function FacturesFrais({ user }) {
                       {envoyingId===r.id ? '…' : 'Envoyer'}
                     </button>
                   )}
-                  <button className={styles.btnView} onClick={e=>{e.stopPropagation();openEdit(r);}}
-                    style={{fontSize:'11px',padding:'4px 8px'}}>✎</button>
+                  <button className={styles.btnView} onClick={e=>{e.stopPropagation();openEdit(r);}}>✎</button>
                   <button className={styles.rowDel} onClick={e=>{e.stopPropagation();doDelRow(r.id);}}>×</button>
                 </div>
               </div>
