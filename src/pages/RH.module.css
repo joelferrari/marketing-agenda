@@ -15,11 +15,11 @@
 .pill{background:var(--fond);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--gris)}
 
 /* Calendrier */
-.calCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px}
-.calHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--acc-lt);border-bottom:1px solid var(--border)}
+.calCard{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:12px;flex:1;min-height:0;display:flex;flex-direction:column}
+.calHeader{display:grid;grid-template-columns:repeat(7,1fr);background:var(--acc-lt);border-bottom:1px solid var(--border);flex-shrink:0}
 .calHeaderCell{text-align:center;padding:8px 4px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-dk)}
-.calGrid{display:grid;grid-template-columns:repeat(7,1fr)}
-.calCell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 6px;min-height:80px;cursor:pointer;transition:opacity .15s;display:flex;flex-direction:column;gap:2px}
+.calGrid{display:grid;grid-template-columns:repeat(7,1fr);grid-auto-rows:1fr;flex:1;min-height:0}
+.calCell{border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px 6px;min-height:0;cursor:pointer;transition:opacity .15s;display:flex;flex-direction:column;gap:2px;overflow:hidden}
 .calCell:hover{opacity:.85}
 .calSun{background:var(--fond)!important;cursor:default}
 .calFuture{opacity:.55}
@@ -59,7 +59,7 @@
 
 @media(max-width:600px){
   .moisTitle{font-size:16px;min-width:140px}
-  .calCell{min-height:60px;padding:4px}
+  .calCell{padding:4px}
   .calHours{font-size:12px}
   .calTimes{display:none}
   .barChart{height:120px}
