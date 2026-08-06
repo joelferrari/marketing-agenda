@@ -67,14 +67,19 @@ export default function Home({ user, onNavigate }) {
         ))}
       </div>
 
-      <div className={styles.heading}>Aujourd'hui</div>
-      <div className={styles.todayCard}>
-        <DayEvents loading={loadingToday} events={todayEvents} empty="Aucun événement aujourd'hui" onNavigate={onNavigate}/>
-      </div>
-
-      <div className={styles.heading}>Demain</div>
-      <div className={styles.todayCard}>
-        <DayEvents loading={loadingTomorrow} events={tomorrowEvents} empty="Aucun événement demain" onNavigate={onNavigate}/>
+      <div className={styles.todayCols}>
+        <div>
+          <div className={styles.heading}>Aujourd'hui</div>
+          <div className={styles.todayCard}>
+            <DayEvents loading={loadingToday} events={todayEvents} empty="Aucun événement aujourd'hui" onNavigate={onNavigate}/>
+          </div>
+        </div>
+        <div>
+          <div className={styles.heading}>Demain</div>
+          <div className={styles.todayCard}>
+            <DayEvents loading={loadingTomorrow} events={tomorrowEvents} empty="Aucun événement demain" onNavigate={onNavigate}/>
+          </div>
+        </div>
       </div>
 
       <div className={styles.heading}>Modules</div>
