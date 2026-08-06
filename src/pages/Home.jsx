@@ -1,9 +1,30 @@
 import { useState, useEffect } from 'react';
 import { getModules, Arrow } from '../nav';
-import { getTodayEvents } from '../notifications';
+import { getTodayEvents, getTomorrowEvents } from '../notifications';
 import styles from './Home.module.css';
 
 const fmtH = (t) => t ? t.slice(0, 5) : '';
+
+function DayEvents({ loading, events, empty, onNavigate }) {
+  if (loading) return <p className={styles.todayEmpty}>Chargement…</p>;
+  if (events.length === 0) return <p className={styles.todayEmpty}>{empty}</p>;
+  return (
+    <div className={styles.todayList}>
+      {events.map(ev => (
+        <button key={ev.id} className={styles.todayItem} onClick={() => onNavigate('agenda')}>
+          <span className={styles.todayBar} style={{ background: ev.couleur || 'var(--acc)' }}/>
+          <span className={styles.todayTime}>
+            {ev.toute_la_journee ? 'Journée' : (fmtH(ev.heure_debut) || '—')}
+          </span>
+          <span className={styles.todayBody}>
+            <span className={styles.todayTitle}>{ev.titre}</span>
+            {ev.description && <span className={styles.todayDesc}>{ev.description}</span>}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /* Tableau de bord affiché DANS la coquille (AppShell fournit nav + header).
    NB : les 3 chiffres de KPI sont des placeholders — à brancher sur les
@@ -19,9 +40,12 @@ export default function Home({ user, onNavigate }) {
   const MODULES = getModules(user);
   const [todayEvents, setTodayEvents] = useState([]);
   const [loadingToday, setLoadingToday] = useState(true);
+  const [tomorrowEvents, setTomorrowEvents] = useState([]);
+  const [loadingTomorrow, setLoadingTomorrow] = useState(true);
 
   useEffect(() => {
     getTodayEvents().then(ev => { setTodayEvents(ev); setLoadingToday(false); });
+    getTomorrowEvents().then(ev => { setTomorrowEvents(ev); setLoadingTomorrow(false); });
   }, []);
 
   return (
@@ -45,26 +69,12 @@ export default function Home({ user, onNavigate }) {
 
       <div className={styles.heading}>Aujourd'hui</div>
       <div className={styles.todayCard}>
-        {loadingToday ? (
-          <p className={styles.todayEmpty}>Chargement…</p>
-        ) : todayEvents.length === 0 ? (
-          <p className={styles.todayEmpty}>Aucun événement aujourd'hui</p>
-        ) : (
-          <div className={styles.todayList}>
-            {todayEvents.map(ev => (
-              <button key={ev.id} className={styles.todayItem} onClick={() => onNavigate('agenda')}>
-                <span className={styles.todayBar} style={{ background: ev.couleur || 'var(--acc)' }}/>
-                <span className={styles.todayTime}>
-                  {ev.toute_la_journee ? 'Journée' : (fmtH(ev.heure_debut) || '—')}
-                </span>
-                <span className={styles.todayBody}>
-                  <span className={styles.todayTitle}>{ev.titre}</span>
-                  {ev.description && <span className={styles.todayDesc}>{ev.description}</span>}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
+        <DayEvents loading={loadingToday} events={todayEvents} empty="Aucun événement aujourd'hui" onNavigate={onNavigate}/>
+      </div>
+
+      <div className={styles.heading}>Demain</div>
+      <div className={styles.todayCard}>
+        <DayEvents loading={loadingTomorrow} events={tomorrowEvents} empty="Aucun événement demain" onNavigate={onNavigate}/>
       </div>
 
       <div className={styles.heading}>Modules</div>
