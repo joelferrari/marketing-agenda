@@ -1,4 +1,4 @@
-import { getModules, HOME_ACCENT, EXTERNAL, getTitles, IconHome, IconSearch, IconBell, IconLogout } from '../nav';
+import { getModules, HOME_ACCENT, EXTERNAL, getTitles, IconHome, IconBell, IconLogout } from '../nav';
 import styles from './AppShell.module.css';
 
 /* Coquille persistante : barre latérale + header unifié + panneau de contenu.
@@ -64,7 +64,6 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         <header className={styles.topbar}>
           <div className={styles.pageTitle}>{TITLES[page] || 'Accueil'}</div>
           <div className={styles.topbarRight}>
-            <div className={styles.search}><IconSearch/><span>Rechercher un module…</span></div>
             <button className={styles.bell} aria-label="Notifications"><IconBell/></button>
           </div>
         </header>
