@@ -58,6 +58,8 @@ export const addDemandeVacances  = (d)           => fetch(`${BASE}/vacances-dema
 export const getDemandesRecup = (uk='emilie') => fetch(`${BASE}/recup-demandes?user=${uk}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const addDemandeRecup  = (d)           => fetch(`${BASE}/recup-demandes`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 
+export const getDepenses         = ()   => fetch(`${BASE}/depenses`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+
 export const emailRH             = (d)  => fetch(`${BASE}/rh/email-export`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const getAttestations     = (uk='emilie') => fetch(`${BASE}/attestations?user=${uk}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const uploadAttestation   = (fd,uk='emilie') => { fd.append('user',uk); return fetch(`${BASE}/attestations`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json()); };

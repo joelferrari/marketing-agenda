@@ -30,8 +30,6 @@
 .topbar{height:60px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 24px;border-bottom:1px solid var(--border);background:var(--blanc)}
 .pageTitle{font-size:17px;font-weight:600;color:var(--noir);font-family:var(--font-disp);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .topbarRight{display:flex;align-items:center;gap:8px;flex-shrink:0}
-.bell{width:37px;height:37px;border-radius:10px;border:1px solid var(--border);background:var(--blanc);color:var(--gris);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.15s}
-.bell:hover{color:var(--acc);border-color:var(--acc)}
 
 .content{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;background:var(--fond)}
 
