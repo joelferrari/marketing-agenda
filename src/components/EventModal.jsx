@@ -7,9 +7,9 @@ const COLORS = [
   {label:'Fraise',val:'#e03131'},{label:'Sauge',val:'#5c940d'},
 ];
 
-const CATS = ['Vacances','Maladie','Récup. heures sup.','Marketing','Autre'];
+export const CATS = ['Vacances','Maladie','Récup. heures sup.','Marketing','Autre'];
 
-const CAT_COLORS = {
+export const CAT_COLORS = {
   'Vacances':'#fab005','Maladie':'#e03131','Récup. heures sup.':'#7950f2',
   'Marketing':'#3b5bdb','Autre':'#868e96',
 };
