@@ -5,9 +5,9 @@ import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepen
 
 const today   = () => new Date().toISOString().slice(0, 10);
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
+const daysFromNow = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 
-export async function getTodayEvents() {
-  const d = today();
+async function getEventsForDate(d) {
   try {
     const data = await getEvents({ dateDebut: d, dateFin: d });
     const list = Array.isArray(data) ? data : [];
@@ -15,6 +15,14 @@ export async function getTodayEvents() {
       .filter(e => (e.date_debut?.slice(0, 10) || '') <= d && (e.date_fin?.slice(0, 10) || e.date_debut?.slice(0, 10) || '') >= d)
       .sort((a, b) => (a.heure_debut || '').localeCompare(b.heure_debut || ''));
   } catch { return []; }
+}
+
+export async function getTodayEvents() {
+  return getEventsForDate(today());
+}
+
+export async function getTomorrowEvents() {
+  return getEventsForDate(daysFromNow(1));
 }
 
 // Factures marquées payées + demandes (vacances/récup/dépense) validées dans les 7 derniers jours.
