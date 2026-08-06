@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getMe } from './api';
+import { IconSun, IconMoon } from './nav';
 import AppShell from './components/AppShell';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -9,6 +10,7 @@ import FacturesFrais from './pages/FacturesFrais';
 import Caisse from './pages/Caisse';
 import RH from './pages/RH';
 import Depenses from './pages/Depenses';
+import FeuilleTemps from './pages/FeuilleTemps';
 import './index.css';
 
 export default function App() {
@@ -38,7 +40,7 @@ export default function App() {
   const ThemeToggle = () => (
     <button className="themeToggle" onClick={toggleTheme}
       title={theme === 'dark' ? 'Passer en clair' : 'Passer en sombre'} aria-label="Basculer le thème">
-      {theme === 'dark' ? '☀' : '☾'}
+      {theme === 'dark' ? <IconSun/> : <IconMoon/>}
     </button>
   );
 
@@ -53,6 +55,7 @@ export default function App() {
   else if (page === 'caisse')         content = <Caisse user={user}/>;
   else if (page === 'rh')             content = <RH user={user}/>;
   else if (page === 'depenses')       content = <Depenses user={user}/>;
+  else if (page === 'timesheet' && user?.prenom === 'Joël') content = <FeuilleTemps user={user}/>;
   else                                content = <Home user={user} onNavigate={setPage}/>;
 
   return (

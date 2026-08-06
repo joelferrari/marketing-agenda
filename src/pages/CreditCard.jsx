@@ -3,6 +3,7 @@ import { getTransactions, addTransaction, updateTransaction, deleteTransaction, 
          getAbonnements, addAbonnement, toggleAbonnement, deleteAbonnement,
          getInvCats, addInvCat, delInvCat } from '../api';
 import Skeleton from '../components/Skeleton';
+import { IconSettings } from '../nav';
 import styles from './CreditCard.module.css';
 
 const fmt = (n) => new Intl.NumberFormat('fr-CH',{style:'currency',currency:'CHF'}).format(n);
@@ -165,7 +166,7 @@ export default function CreditCard({ user }) {
         <div className={styles.toolbar}>
           <div/>
           <div className={styles.toolbarGroup}>
-            <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>{"⚙ Catégories"}</button>
+            <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)} style={{display:'inline-flex',alignItems:'center',gap:'6px'}}><IconSettings/>{"Catégories"}</button>
             <button className={styles.addBtn} onClick={()=>{ setEditing(null); setForm(makeForm()); setModal(true); }}>{"+ Ajouter"}</button>
           </div>
         </div>
@@ -290,7 +291,7 @@ export default function CreditCard({ user }) {
                 <div className={styles.typeToggle}>
                   <button type="button" className={`${styles.typeBtn} ${form.type==='depense'?styles.typeBtnDepense:''}`}
                     onClick={()=>setForm(p=>({...p,type:'depense'}))}>
-                    {"💳 Dépense"}
+                    {"Dépense"}
                   </button>
                   <button type="button" className={`${styles.typeBtn} ${form.type==='virement'?styles.typeBtnVirement:''}`}
                     onClick={()=>setForm(p=>({...p,type:'virement',categorie_principale:'',sous_categorie:'',est_abonnement:false,date_debut_abo:''}))}>
@@ -300,7 +301,7 @@ export default function CreditCard({ user }) {
               )}
               {editing && (
                 <p style={{fontSize:'12px',color:'var(--gris)',margin:0}}>
-                  {editing.type === 'depense' ? '💳 Dépense' : '↑ Virement'}
+                  {editing.type === 'depense' ? 'Dépense' : '↑ Virement'}
                 </p>
               )}
 

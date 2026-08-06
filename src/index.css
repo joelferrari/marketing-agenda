@@ -44,6 +44,7 @@
 [data-module="depenses"] { --acc:#e28a56; --acc-dk:#c9743f; --acc-lt:#fbeee2; --acc-soft:#fabb92; --acc-ink:#552c12; }
 [data-module="rh"]       { --acc:#8d8858; --acc-dk:#787245; --acc-lt:#f2f1e6; --acc-soft:#c7c19d; --acc-ink:#302f19; }
 [data-module="caisse"]   { --acc:#cf8078; --acc-dk:#b8675f; --acc-lt:#fbeeec; --acc-soft:#f5cec7; --acc-ink:#592923; }
+[data-module="timesheet"]{ --acc:#862e9c; --acc-dk:#6f2482; --acc-lt:#f3e8f6; --acc-soft:#d9b3e6; --acc-ink:#3a1042; }
 
 /* ======================= MODE SOMBRE ======================= */
 [data-theme="dark"] {
@@ -71,6 +72,7 @@
 [data-theme="dark"] [data-module="depenses"] { --acc:#f7ad7c; --acc-dk:#e28a56; --acc-lt:rgba(226,138,86,.18); --acc-soft:#f7ad7c; --acc-ink:#3a1d0c; }
 [data-theme="dark"] [data-module="rh"]       { --acc:#cbc48c; --acc-dk:#8d8858; --acc-lt:rgba(141,136,88,.20); --acc-soft:#cbc48c; --acc-ink:#22210f; }
 [data-theme="dark"] [data-module="caisse"]   { --acc:#f0b3ab; --acc-dk:#cf8078; --acc-lt:rgba(207,128,120,.18); --acc-soft:#f0b3ab; --acc-ink:#3a1815; }
+[data-theme="dark"] [data-module="timesheet"]{ --acc:#d9a8e6; --acc-dk:#862e9c; --acc-lt:rgba(134,46,156,.20); --acc-soft:#d9a8e6; --acc-ink:#2a1230; }
 
 /* Police d'affichage du site — mêmes fichiers .otf que le tunnel de réservation
    (rubis-spa-git/src/styles/global.css), servis à la racine de booking.rubisspa.ch. */

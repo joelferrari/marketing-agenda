@@ -1,9 +1,12 @@
-import { MODULES, HOME_ACCENT, EXTERNAL, TITLES, IconHome, IconSearch, IconBell, IconLogout } from '../nav';
+import { getModules, HOME_ACCENT, EXTERNAL, getTitles, IconHome, IconLogout } from '../nav';
+import NotificationBell from './NotificationBell';
 import styles from './AppShell.module.css';
 
 /* Coquille persistante : barre latérale + header unifié + panneau de contenu.
    Props : user, page, onNavigate(id), onLogout, children. */
 export default function AppShell({ user, page, onNavigate, onLogout, children }) {
+  const MODULES = getModules(user);
+  const TITLES = getTitles(user);
   const active = MODULES.find(m => m.id === page);
   const mod = active?.mod;               // token data-module du contenu affiché
   const prenom = user?.prenom || 'Émilie';
@@ -24,7 +27,7 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         <nav className={styles.nav}>
           <button className={styles.navItem} data-on={page === 'home'} onClick={() => onNavigate('home')}
             style={page === 'home' ? { background: HOME_ACCENT.soft, color: HOME_ACCENT.ink, fontWeight: 600 } : undefined}>
-            <span className={styles.navIcon}><IconHome/></span><span>Accueil</span>
+            <span className={styles.navIcon}><IconHome/></span><span className={styles.navLabel}>Accueil</span>
           </button>
           {MODULES.map(m => {
             const on = page === m.id;
@@ -42,7 +45,7 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         <div className={styles.navHeading}>Externe</div>
         {EXTERNAL.map(e => (
           <a key={e.href} className={styles.navItem} href={e.href} target="_blank" rel="noreferrer">
-            <span className={styles.navIcon}><e.Icon/></span><span>{e.label}</span>
+            <span className={styles.navIcon}><e.Icon/></span><span className={styles.navLabel}>{e.label}</span>
           </a>
         ))}
 
@@ -62,8 +65,7 @@ export default function AppShell({ user, page, onNavigate, onLogout, children })
         <header className={styles.topbar}>
           <div className={styles.pageTitle}>{TITLES[page] || 'Accueil'}</div>
           <div className={styles.topbarRight}>
-            <div className={styles.search}><IconSearch/><span>Rechercher un module…</span></div>
-            <button className={styles.bell} aria-label="Notifications"><IconBell/></button>
+            <NotificationBell user={user} onNavigate={onNavigate}/>
           </div>
         </header>
         <div className={styles.content}>{children}</div>

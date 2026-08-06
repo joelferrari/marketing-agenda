@@ -1,5 +1,9 @@
-import { MODULES, Arrow } from '../nav';
+import { useState, useEffect } from 'react';
+import { getModules, Arrow } from '../nav';
+import { getTodayEvents } from '../notifications';
 import styles from './Home.module.css';
+
+const fmtH = (t) => t ? t.slice(0, 5) : '';
 
 /* Tableau de bord affiché DANS la coquille (AppShell fournit nav + header).
    NB : les 3 chiffres de KPI sont des placeholders — à brancher sur les
@@ -12,6 +16,14 @@ const KPIS = [
 
 export default function Home({ user, onNavigate }) {
   const prenom = user?.prenom || 'Émilie';
+  const MODULES = getModules(user);
+  const [todayEvents, setTodayEvents] = useState([]);
+  const [loadingToday, setLoadingToday] = useState(true);
+
+  useEffect(() => {
+    getTodayEvents().then(ev => { setTodayEvents(ev); setLoadingToday(false); });
+  }, []);
+
   return (
     <div className={styles.wrap}>
       <div className={styles.head}>
@@ -29,6 +41,30 @@ export default function Home({ user, onNavigate }) {
             </div>
           </div>
         ))}
+      </div>
+
+      <div className={styles.heading}>Aujourd'hui</div>
+      <div className={styles.todayCard}>
+        {loadingToday ? (
+          <p className={styles.todayEmpty}>Chargement…</p>
+        ) : todayEvents.length === 0 ? (
+          <p className={styles.todayEmpty}>Aucun événement aujourd'hui</p>
+        ) : (
+          <div className={styles.todayList}>
+            {todayEvents.map(ev => (
+              <button key={ev.id} className={styles.todayItem} onClick={() => onNavigate('agenda')}>
+                <span className={styles.todayBar} style={{ background: ev.couleur || 'var(--acc)' }}/>
+                <span className={styles.todayTime}>
+                  {ev.toute_la_journee ? 'Journée' : (fmtH(ev.heure_debut) || '—')}
+                </span>
+                <span className={styles.todayBody}>
+                  <span className={styles.todayTitle}>{ev.titre}</span>
+                  {ev.description && <span className={styles.todayDesc}>{ev.description}</span>}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className={styles.heading}>Modules</div>

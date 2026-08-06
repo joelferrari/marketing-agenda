@@ -6,10 +6,32 @@ import dep from './Depenses.module.css';
 const BASE = '/mkt';
 const h = () => ({ 'Content-Type':'application/json', Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}` });
 
+const IcoSend = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+  </svg>
+);
+const IcoLink = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <path d="M10 13a5 5 0 007.5.5l2-2a5 5 0 00-7-7l-1.5 1.5"/>
+    <path d="M14 11a5 5 0 00-7.5-.5l-2 2a5 5 0 007 7l1.5-1.5"/>
+  </svg>
+);
+const IcoCheck = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
+const IcoX = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+  </svg>
+);
+
 const STATUT = {
   en_attente: { label:'En attente', color:'var(--orange)', bg:'var(--orange-lt)' },
-  validee:    { label:'Validée ✅',  color:'var(--vert)',   bg:'var(--vert-lt)' },
-  refusee:    { label:'Refusée ❌',  color:'var(--rouge)',  bg:'var(--rouge-lt)' },
+  validee:    { label:'Validée',    color:'var(--vert)',   bg:'var(--vert-lt)', Icon:IcoCheck },
+  refusee:    { label:'Refusée',    color:'var(--rouge)',  bg:'var(--rouge-lt)', Icon:IcoX },
 };
 
 export default function Depenses({ user }) {
@@ -76,8 +98,9 @@ export default function Depenses({ user }) {
               <input type="url" value={form.lien} onChange={e=>setForm(p=>({...p,lien:e.target.value}))}
                 placeholder="https://…"/>
             </div>
-            <button type="submit" className={dep.submitBtn} disabled={saving || !form.titre}>
-              {saving ? 'Envoi en cours…' : '📩 Envoyer à Nathalie pour validation'}
+            <button type="submit" className={dep.submitBtn} disabled={saving || !form.titre}
+              style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'7px'}}>
+              {saving ? 'Envoi en cours…' : <><IcoSend/>Envoyer à Nathalie pour validation</>}
             </button>
           </form>
         </div>
@@ -93,12 +116,14 @@ export default function Depenses({ user }) {
                 <div className={dep.depInfo}>
                   <span className={dep.depTitre}>{d.titre}</span>
                   {d.magasin && <span className={dep.depMeta}>{d.magasin}</span>}
-                  {d.lien && <a href={d.lien} target="_blank" rel="noopener noreferrer" className={dep.depLink}>🔗 Voir le produit</a>}
+                  {d.lien && <a href={d.lien} target="_blank" rel="noopener noreferrer" className={dep.depLink} style={{display:'inline-flex',alignItems:'center',gap:'5px'}}><IcoLink/>Voir le produit</a>}
                   <span className={dep.depDate}>{new Date(d.created_at).toLocaleDateString('fr-CH',{day:'numeric',month:'long',year:'numeric'})}</span>
                 </div>
                 <div className={dep.depRight}>
                   {d.prix && <span className={dep.depPrix}>{parseFloat(d.prix).toFixed(2)} CHF</span>}
-                  <span className={dep.statut} style={{color:st.color,background:st.bg}}>{st.label}</span>
+                  <span className={dep.statut} style={{color:st.color,background:st.bg,display:'inline-flex',alignItems:'center',gap:'5px'}}>
+                    {st.Icon && <st.Icon/>}{st.label}
+                  </span>
                 </div>
               </div>
             );

@@ -8,6 +8,12 @@ const JOURS_L  = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', '
 const ENT_COLORS = { "Mined'or": '#e8590c', 'Rubis Spa': '#c4737c', 'Rubis Time 20': '#1098ad', 'Edelschweiz': '#5f3dc4' };
 const entColor = e => ENT_COLORS[e] || '#adb5bd';
 
+const IcoSend = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+  </svg>
+);
+
 const today = () => new Date().toISOString().slice(0, 10);
 
 function addDays(dateStr, n) {
@@ -64,7 +70,7 @@ function buildGrid(rows, lundi) {
   return { days, lignes: [...map.values()] };
 }
 
-export default function FeuilleTemps({ user, viewKey = 'joel', onBack, onLogout }) {
+export default function FeuilleTemps({ user, viewKey = 'joel' }) {
   const [lundi,    setLundi]    = useState(lundiDe(today()));
   const [data,     setData]     = useState(null);
   const [loading,  setLoading]  = useState(true);
@@ -208,25 +214,8 @@ export default function FeuilleTemps({ user, viewKey = 'joel', onBack, onLogout 
   const groupes = Object.entries(groupesMap);
 
   return (
-    <div className={styles.page}>
+    <>
       {toast && <div className={`${styles.toast} ${toast.ok ? styles.toastOk : styles.toastErr}`}>{toast.txt}</div>}
-
-      {/* Header */}
-      <header className={styles.header}>
-        <div className={styles.headerLeft}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--rose)" strokeWidth="1.3" strokeLinecap="round" style={{ flexShrink: 0 }}>
-            <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-          <div>
-            <p className={styles.headerSub}>Rubis SPA</p>
-            <h1 className={styles.headerTitle}>{"Feuille de temps"}</h1>
-          </div>
-        </div>
-        <div className={styles.headerRight}>
-          <button className={styles.navSecondary} onClick={onBack}>{"← Accueil"}</button>
-          <button className={styles.navSecondary} onClick={onLogout}>{"Déconnexion"}</button>
-        </div>
-      </header>
 
       <main className={styles.main}>
 
@@ -251,7 +240,7 @@ export default function FeuilleTemps({ user, viewKey = 'joel', onBack, onLogout 
                 <span className={styles.summaryH}>{fmtH(h)}</span>
               </div>
             ))}
-            <div className={styles.summaryChip} style={{ borderColor: 'var(--rose)', background: '#fff5f5' }}>
+            <div className={styles.summaryChip} style={{ borderColor: 'var(--acc)', background: 'var(--acc-lt)' }}>
               <span className={styles.summaryLabel}>{"Total"}</span>
               <span className={styles.summaryH} style={{ color: 'var(--rouge)' }}>{fmtH(totalSemaine)}</span>
             </div>
@@ -385,12 +374,13 @@ export default function FeuilleTemps({ user, viewKey = 'joel', onBack, onLogout 
         {/* Actions */}
         <div className={styles.actions}>
           {saving && <span className={styles.savingDot}>{"Enregistrement…"}</span>}
-          <button className={styles.emailBtn} onClick={envoyerEmail} disabled={sending || !totalSemaine}>
-            {sending ? '…' : '✉ Envoyer à Grace'}
+          <button className={styles.emailBtn} onClick={envoyerEmail} disabled={sending || !totalSemaine}
+            style={{display:'inline-flex',alignItems:'center',gap:'7px'}}>
+            {sending ? '…' : <><IcoSend/>Envoyer à Grace</>}
           </button>
         </div>
 
       </main>
-    </div>
+    </>
   );
 }
