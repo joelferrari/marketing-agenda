@@ -51,6 +51,16 @@ const IcoCal = () => (
     <polyline points="9,16 11,18 15,14"/>
   </svg>
 );
+const IcoClock = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>
+  </svg>
+);
+const IcoRotate = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <path d="M3 12a9 9 0 1 1 2.6 6.3"/><polyline points="3,20 3,14 9,14"/>
+  </svg>
+);
 
 // ── Fenêtre d'impression avec typographie portail Rubis SPA ───
 function openPrint(title, sub, tableHTML) {
@@ -920,12 +930,12 @@ export default function RH({ user }) {
             <form onSubmit={submit} className={styles.modalBody}>
               {/* Toggle Travail / Récupération */}
               <div className={rh.typeToggle}>
-                {[{id:'travail',label:'🕐 Travail',color:'var(--acc)'},{id:'recup',label:'💜 Récupération',color:'var(--violet)'}].map(t=>(
+                {[{id:'travail',label:'Travail',Icon:IcoClock,color:'var(--acc)'},{id:'recup',label:'Récupération',Icon:IcoRotate,color:'var(--violet)'}].map(t=>(
                   <button key={t.id} type="button"
                     className={rh.typeBtn}
-                    style={form.type===t.id?{background:t.color,borderColor:t.color,color:'#fff'}:{}}
+                    style={{display:'flex',alignItems:'center',justifyContent:'center',gap:'6px',...(form.type===t.id?{background:t.color,borderColor:t.color,color:'#fff'}:{})}}
                     onClick={()=>setForm(p=>({...p,type:t.id}))}>
-                    {t.label}
+                    <t.Icon/>{t.label}
                   </button>
                 ))}
               </div>
@@ -1113,7 +1123,7 @@ export default function RH({ user }) {
             </div>
             {demForm.date_debut && demForm.date_fin && demForm.date_fin >= demForm.date_debut && (
               <div className={rh.preview} style={{background:'#e8eaf6',color:VERT}}>
-                <span>📅 {workDaysCount(demForm.date_debut, demForm.date_fin, viewKey)} jours</span>
+                <span style={{display:'flex',alignItems:'center',gap:'6px'}}><IcoCal/>{workDaysCount(demForm.date_debut, demForm.date_fin, viewKey)} jours</span>
                 <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
               </div>
             )}
@@ -1160,7 +1170,7 @@ export default function RH({ user }) {
             </div>
             {demRecupForm.date_jour && demRecupForm.heures_recup && (
               <div className={rh.preview} style={{background:'var(--violet-lt)',color:'var(--violet)'}}>
-                <span>💜 {demRecupForm.heures_recup} h de récupération</span>
+                <span style={{display:'flex',alignItems:'center',gap:'6px'}}><IcoRotate/>{demRecupForm.heures_recup} h de récupération</span>
                 <span style={{fontSize:'12px'}}>E-mail envoyé à Nathalie pour validation</span>
               </div>
             )}
@@ -1203,7 +1213,7 @@ export default function RH({ user }) {
             </div>
             {vacForm.date_debut && vacForm.date_fin && vacForm.date_fin >= vacForm.date_debut && (
               <div className={rh.preview} style={{background:'var(--orange-lt)',color:'var(--orange)'}}>
-                <span>📅 {workDaysCount(vacForm.date_debut, vacForm.date_fin, viewKey)} jours</span>
+                <span style={{display:'flex',alignItems:'center',gap:'6px'}}><IcoCal/>{workDaysCount(vacForm.date_debut, vacForm.date_fin, viewKey)} jours</span>
                 <span style={{fontSize:'12px'}}>{viewKey === 'joel' ? "Agenda personnel + calendrier marketing" : "Agenda spa bloque + calendrier marketing"}</span>
               </div>
             )}

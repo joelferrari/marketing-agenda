@@ -4,6 +4,7 @@ import {
   getBudget, addBudget, deleteBudget, updateBudget,
 } from '../api';
 import Skeleton from '../components/Skeleton';
+import { IconSettings } from '../nav';
 import styles from './FacturesFrais.module.css';
 
 const BASE     = import.meta.env.VITE_API_URL || '/mkt';
@@ -15,6 +16,12 @@ const SORT_OPTS = [
   {val:'categorie',lbl:'Catégorie'},{val:'montant_desc',lbl:'Montant ↓'},
 ];
 const STATUT_OPTS = ['Prévu','Confirmé','Payé','Annulé'];
+
+const IcoCheck = () => (
+  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <polyline points="20,6 9,17 4,12"/>
+  </svg>
+);
 
 // ── Export PDF ────────────────────────────────────────────────
 const exportPDF = (rows, filters, tab, cats) => {
@@ -274,7 +281,7 @@ export default function FacturesFrais({ user }) {
             </button>
           </div>
           <div className={styles.toolbarGroup}>
-            <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)}>⚙ Catégories</button>
+            <button className={styles.navSecondary} onClick={()=>setShowCats(s=>!s)} style={{display:'inline-flex',alignItems:'center',gap:'6px'}}><IconSettings/>Catégories</button>
             <button className={styles.addBtn} onClick={()=>setShowUpload(true)}>+ Ajouter</button>
             <button className={styles.navSecondary} onClick={()=>exportPDF(rows, filters, tab, cats)}>↓ PDF</button>
           </div>
@@ -397,7 +404,7 @@ export default function FacturesFrais({ user }) {
                 </span>
                 <div style={{display:'flex',gap:'4px',justifyContent:'flex-end',alignItems:'center'}}>
                   {showSuivi && r.envoye_le && (
-                    <span className={styles.vuBadge} title={`Envoyée le ${fmt(r.envoye_le)}`}>✓ Vu</span>
+                    <span className={styles.vuBadge} title={`Envoyée le ${fmt(r.envoye_le)}`} style={{display:'inline-flex',alignItems:'center',gap:'4px'}}><IcoCheck/>Vu</span>
                   )}
                   {showSuivi && (
                     <button className={styles.btnEnvoyer} disabled={envoyingId===r.id}

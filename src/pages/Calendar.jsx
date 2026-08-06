@@ -12,6 +12,12 @@ dayjs.locale('fr');
 const MONTHS = ['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
 const DAYS = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
 
+const IcoBell = () => (
+  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{display:'inline-block',verticalAlign:'-1.5px'}}>
+    <path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/>
+  </svg>
+);
+
 export default function Calendar({ user }) {
   const [date, setDate] = useState(dayjs());
   const [vue, setVue] = useState('mois');
@@ -106,7 +112,7 @@ export default function Calendar({ user }) {
                     <p className={styles.semaineEvTitle}>{ev.titre}</p>
                     {!ev.toute_la_journee&&ev.heure_debut&&<p className={styles.semaineEvTime}>{ev.heure_debut.slice(0,5)}{ev.heure_fin?` → ${ev.heure_fin.slice(0,5)}`:''}</p>}
                     {ev.description&&<p className={styles.semaineEvDesc}>{ev.description}</p>}
-                    {!!ev.rappel_email&&<span className={styles.rappelBadge}>🔔</span>}
+                    {!!ev.rappel_email&&<span className={styles.rappelBadge}><IcoBell/></span>}
                   </div>
                 ))}
               </div>
@@ -131,7 +137,7 @@ export default function Calendar({ user }) {
             <div className={styles.jourEvBody}>
               <p className={styles.jourEvTitle}>{ev.titre}</p>
               {ev.description&&<p className={styles.jourEvDesc}>{ev.description}</p>}
-              {!!ev.rappel_email&&<span className={styles.rappelBadge}>🔔 Rappel email</span>}
+              {!!ev.rappel_email&&<span className={styles.rappelBadge}><IcoBell/> Rappel email</span>}
             </div>
           </div>
         ))}

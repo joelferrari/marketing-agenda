@@ -8,6 +8,12 @@ const JOURS_L  = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', '
 const ENT_COLORS = { "Mined'or": '#e8590c', 'Rubis Spa': '#c4737c', 'Rubis Time 20': '#1098ad', 'Edelschweiz': '#5f3dc4' };
 const entColor = e => ENT_COLORS[e] || '#adb5bd';
 
+const IcoSend = () => (
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+  </svg>
+);
+
 const today = () => new Date().toISOString().slice(0, 10);
 
 function addDays(dateStr, n) {
@@ -368,8 +374,9 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
         {/* Actions */}
         <div className={styles.actions}>
           {saving && <span className={styles.savingDot}>{"Enregistrement…"}</span>}
-          <button className={styles.emailBtn} onClick={envoyerEmail} disabled={sending || !totalSemaine}>
-            {sending ? '…' : '✉ Envoyer à Grace'}
+          <button className={styles.emailBtn} onClick={envoyerEmail} disabled={sending || !totalSemaine}
+            style={{display:'inline-flex',alignItems:'center',gap:'7px'}}>
+            {sending ? '…' : <><IcoSend/>Envoyer à Grace</>}
           </button>
         </div>
 

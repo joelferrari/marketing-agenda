@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getMe } from './api';
+import { IconSun, IconMoon } from './nav';
 import AppShell from './components/AppShell';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -39,7 +40,7 @@ export default function App() {
   const ThemeToggle = () => (
     <button className="themeToggle" onClick={toggleTheme}
       title={theme === 'dark' ? 'Passer en clair' : 'Passer en sombre'} aria-label="Basculer le thème">
-      {theme === 'dark' ? '☀' : '☾'}
+      {theme === 'dark' ? <IconSun/> : <IconMoon/>}
     </button>
   );
 
