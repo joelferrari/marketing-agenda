@@ -1,11 +1,45 @@
 /* Agrégation des données existantes pour la cloche de notifications et le
    rappel "Aujourd'hui" de l'accueil — pas de nouvelle table en base, juste
    des requêtes sur les endpoints déjà utilisés par Agenda/Factures/RH/Dépenses. */
-import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepenses } from './api';
+import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepenses, getVacances } from './api';
 
 const today   = () => new Date().toISOString().slice(0, 10);
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
 const daysFromNow = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+
+// Jours ouvrés du user dans une plage (mar-sam Emilie, mar-ven Joël) —
+// même logique que RH.jsx (workDaysCount).
+function workDaysCount(dateDebut, dateFin, userKey) {
+  if (!dateDebut || !dateFin) return 0;
+  const wd = userKey === 'joel' ? [2, 3, 4, 5] : [2, 3, 4, 5, 6];
+  let n = 0;
+  const cur = new Date(dateDebut + 'T12:00:00');
+  const end = new Date(dateFin + 'T12:00:00');
+  while (cur <= end) {
+    if (wd.includes(cur.getDay())) n++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return n;
+}
+
+const PRENOMS = { emilie: 'Emilie', joel: 'Joël' };
+
+// Solde de vacances de l'utilisateur CONNECTÉ (pas toujours Emilie).
+export async function getVacationBalance(user) {
+  const viewKey = (user?.role === 'emilie' || user?.role === 'joel') ? user.role : 'emilie';
+  const droit = viewKey === 'joel' ? 16 : 20;
+  const annee = new Date().getFullYear();
+  try {
+    const data = await getVacances(viewKey);
+    const list = Array.isArray(data) ? data : [];
+    const pris = list
+      .filter(v => new Date(v.date_debut).getFullYear() === annee || new Date(v.date_fin).getFullYear() === annee)
+      .reduce((s, v) => s + workDaysCount(v.date_debut, v.date_fin, viewKey), 0);
+    return { prenom: PRENOMS[viewKey] || viewKey, pris, droit, restant: droit - pris };
+  } catch {
+    return { prenom: PRENOMS[viewKey] || viewKey, pris: 0, droit, restant: droit };
+  }
+}
 
 async function getEventsForDate(d) {
   try {

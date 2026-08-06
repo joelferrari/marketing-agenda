@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getModules, Arrow } from '../nav';
-import { getTodayEvents, getTomorrowEvents } from '../notifications';
+import { getTodayEvents, getTomorrowEvents, getVacationBalance } from '../notifications';
 import styles from './Home.module.css';
 
 const fmtH = (t) => t ? t.slice(0, 5) : '';
@@ -27,12 +27,12 @@ function DayEvents({ loading, events, empty, onNavigate }) {
 }
 
 /* Tableau de bord affiché DANS la coquille (AppShell fournit nav + header).
-   NB : les 3 chiffres de KPI sont des placeholders — à brancher sur les
-   endpoints réels (events du mois, factures en attente, solde vacances). */
+   NB : les 2 premiers chiffres de KPI sont des placeholders — à brancher
+   sur les endpoints réels (events du mois, factures en attente). Le solde
+   de vacances, lui, est réel et suit l'utilisateur connecté. */
 const KPIS = [
   { label: 'Événements ce mois', value: '12', hint: '+3',        hintColor: 'var(--vert)' },
   { label: 'Factures en attente', value: '3',  hint: 'à traiter', hintColor: 'var(--orange)' },
-  { label: 'Vacances Émilie',     value: '14', hint: '/ 20 jours', hintColor: 'var(--gris-lt)' },
 ];
 
 export default function Home({ user, onNavigate }) {
@@ -42,11 +42,13 @@ export default function Home({ user, onNavigate }) {
   const [loadingToday, setLoadingToday] = useState(true);
   const [tomorrowEvents, setTomorrowEvents] = useState([]);
   const [loadingTomorrow, setLoadingTomorrow] = useState(true);
+  const [vacances, setVacances] = useState(null);
 
   useEffect(() => {
     getTodayEvents().then(ev => { setTodayEvents(ev); setLoadingToday(false); });
     getTomorrowEvents().then(ev => { setTomorrowEvents(ev); setLoadingTomorrow(false); });
-  }, []);
+    getVacationBalance(user).then(setVacances);
+  }, [user]);
 
   return (
     <div className={styles.wrap}>
@@ -65,6 +67,15 @@ export default function Home({ user, onNavigate }) {
             </div>
           </div>
         ))}
+        <div className={styles.kpi}>
+          <div className={styles.kpiLabel}>Vacances {vacances?.prenom || prenom}</div>
+          <div className={styles.kpiValRow}>
+            <span className={styles.kpiVal}>{vacances ? vacances.pris : '—'}</span>
+            <span className={styles.kpiHint} style={{ color: 'var(--gris-lt)' }}>
+              {vacances ? `/ ${vacances.droit} jours` : ''}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className={styles.todayCols}>
