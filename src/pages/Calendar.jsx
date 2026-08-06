@@ -3,8 +3,10 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/fr';
 import isoWeek from 'dayjs/plugin/isoWeek';
 import { getEvents, createEvent, updateEvent, deleteEvent } from '../api';
-import EventModal from '../components/EventModal';
+import EventModal, { CATS, CAT_COLORS } from '../components/EventModal';
 import styles from './Calendar.module.css';
+
+const CATEGORY_ORDER = [...CATS, 'Sans catégorie'];
 
 dayjs.extend(isoWeek);
 dayjs.locale('fr');
@@ -160,8 +162,8 @@ export default function Calendar({ user }) {
     const evs = periodEvents();
     const label = vue==='jour' ? 'Ce jour' : vue==='semaine' ? 'Cette semaine' : 'Ce mois';
     const grouped = {};
-    evs.forEach(e => { const k=e.date_debut?.slice(0,10)||'?'; (grouped[k]=grouped[k]||[]).push(e); });
-    const days = Object.keys(grouped).sort();
+    evs.forEach(e => { const k=e.categorie||'Sans catégorie'; (grouped[k]=grouped[k]||[]).push(e); });
+    const cats = CATEGORY_ORDER.filter(c => grouped[c]?.length);
     return (
       <aside className={styles.summary}>
         <div className={styles.sumHead}>
@@ -170,17 +172,22 @@ export default function Calendar({ user }) {
         </div>
         <div className={styles.sumSub}>{dateTitle()}</div>
         {evs.length===0 && <div className={styles.sumEmpty}>Aucun événement sur la période.</div>}
-        {days.map(k => (
-          <div key={k}>
-            <div className={styles.sumDay}>{dayjs(k).format('dddd D MMM')}</div>
-            {grouped[k].map(ev => (
+        {cats.map(cat => (
+          <div key={cat}>
+            <div className={styles.sumDay}>
+              <span className={styles.sumCatDot} style={{background:CAT_COLORS[cat]||'#adb5bd'}}/>
+              {cat}
+              <span className={styles.sumCatCount}>{grouped[cat].length}</span>
+            </div>
+            {grouped[cat].map(ev => (
               <div key={ev.id} className={styles.sumItem} onClick={()=>setModal({event:ev})}>
                 <span className={styles.sumBar} style={{background:ev.couleur}}/>
                 <div className={styles.sumBody}>
                   <div className={styles.sumEvTitle}>{ev.titre}</div>
                   <div className={styles.sumEvMeta}>
+                    {dayjs(ev.date_debut).format('D MMM')}
+                    {' · '}
                     {ev.toute_la_journee ? 'Toute la journée' : (ev.heure_debut ? ev.heure_debut.slice(0,5) + (ev.heure_fin?` – ${ev.heure_fin.slice(0,5)}`:'') : '—')}
-                    {ev.description ? ` · ${ev.description}` : ''}
                   </div>
                 </div>
               </div>
