@@ -1,9 +1,11 @@
-import { MODULES, HOME_ACCENT, EXTERNAL, TITLES, IconHome, IconSearch, IconBell, IconLogout } from '../nav';
+import { getModules, HOME_ACCENT, EXTERNAL, getTitles, IconHome, IconSearch, IconBell, IconLogout } from '../nav';
 import styles from './AppShell.module.css';
 
 /* Coquille persistante : barre latérale + header unifié + panneau de contenu.
    Props : user, page, onNavigate(id), onLogout, children. */
 export default function AppShell({ user, page, onNavigate, onLogout, children }) {
+  const MODULES = getModules(user);
+  const TITLES = getTitles(user);
   const active = MODULES.find(m => m.id === page);
   const mod = active?.mod;               // token data-module du contenu affiché
   const prenom = user?.prenom || 'Émilie';

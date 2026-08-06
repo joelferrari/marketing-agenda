@@ -9,6 +9,7 @@ import FacturesFrais from './pages/FacturesFrais';
 import Caisse from './pages/Caisse';
 import RH from './pages/RH';
 import Depenses from './pages/Depenses';
+import FeuilleTemps from './pages/FeuilleTemps';
 import './index.css';
 
 export default function App() {
@@ -53,6 +54,7 @@ export default function App() {
   else if (page === 'caisse')         content = <Caisse user={user}/>;
   else if (page === 'rh')             content = <RH user={user}/>;
   else if (page === 'depenses')       content = <Depenses user={user}/>;
+  else if (page === 'timesheet' && user?.prenom === 'Joël') content = <FeuilleTemps user={user}/>;
   else                                content = <Home user={user} onNavigate={setPage}/>;
 
   return (

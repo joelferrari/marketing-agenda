@@ -1,4 +1,4 @@
-import { MODULES, Arrow } from '../nav';
+import { getModules, Arrow } from '../nav';
 import styles from './Home.module.css';
 
 /* Tableau de bord affiché DANS la coquille (AppShell fournit nav + header).
@@ -12,6 +12,7 @@ const KPIS = [
 
 export default function Home({ user, onNavigate }) {
   const prenom = user?.prenom || 'Émilie';
+  const MODULES = getModules(user);
   return (
     <div className={styles.wrap}>
       <div className={styles.head}>
