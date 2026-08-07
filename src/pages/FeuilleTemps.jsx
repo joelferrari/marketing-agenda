@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { getTimesheet, saveTimesheetEntry, deleteTimesheetEntry, emailTimesheet, getTimesheetSuggestions } from '../api';
+import { getTimesheet, saveTimesheetEntry, deleteTimesheetEntry, emailTimesheet, getTimesheetSuggestions, getTimesheetEnvois, getTimesheetRappel } from '../api';
 import styles from './FeuilleTemps.module.css';
 
 const ENTITES  = ["Mined'or", 'Rubis Spa', 'Rubis Time 20', 'Edelschweiz', ''];
@@ -11,6 +11,23 @@ const entColor = e => ENT_COLORS[e] || '#adb5bd';
 const IcoSend = () => (
   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
     <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/>
+  </svg>
+);
+const IcoWarning = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+  </svg>
+);
+const IcoChevron = ({ open }) => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    style={{display:'block',flexShrink:0,transform:open?'rotate(180deg)':'none',transition:'transform .15s'}}>
+    <polyline points="6,9 12,15 18,9"/>
+  </svg>
+);
+const IcoCheck = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{display:'block',flexShrink:0}}>
+    <polyline points="20,6 9,17 4,12"/>
   </svg>
 );
 
@@ -36,6 +53,11 @@ function fmtDate(dateStr) {
 
 function fmtDateLong(dateStr) {
   return new Date(dateStr + 'T12:00:00').toLocaleDateString('fr-CH', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function fmtSentAt(dateStr) {
+  if (!dateStr) return '';
+  return new Date(dateStr.replace(' ', 'T')).toLocaleDateString('fr-CH', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 function parseHeures(val) {
@@ -82,6 +104,9 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
   const [suggestions, setSuggestions] = useState([]);
   const [search,   setSearch]   = useState('');
   const [showNew,  setShowNew]  = useState(false);
+  const [envois,   setEnvois]   = useState([]);
+  const [rappels,  setRappels]  = useState([]);
+  const [showHisto, setShowHisto] = useState(false);
   const editRef = useRef({});
   const addRef  = useRef(null);
 
@@ -103,8 +128,20 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
     } catch { setSuggestions([]); }
   };
 
+  const loadEnvois = async () => {
+    try {
+      const e = await getTimesheetEnvois(viewKey);
+      setEnvois(Array.isArray(e) ? e : []);
+    } catch { setEnvois([]); }
+    try {
+      const r = await getTimesheetRappel(viewKey);
+      setRappels(Array.isArray(r) ? r : []);
+    } catch { setRappels([]); }
+  };
+
   useEffect(() => { load(); }, [lundi, viewKey]);
   useEffect(() => { loadSuggestions(); }, [viewKey]);
+  useEffect(() => { loadEnvois(); }, [viewKey]);
 
   // Fermer le menu d'ajout si clic à l'extérieur
   useEffect(() => {
@@ -117,6 +154,7 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
   const prevWeek = () => setLundi(l => addDays(l, -7));
   const nextWeek = () => setLundi(l => addDays(l, 7));
   const thisWeek = () => setLundi(lundiDe(today()));
+  const goToWeek = (l) => setLundi(l);
 
   const { days, lignes } = data ? buildGrid(data.rows, lundi) : { days: Array.from({ length: 7 }, (_, i) => addDays(lundi, i)), lignes: [] };
 
@@ -188,6 +226,7 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
       const r = await emailTimesheet({ lundi, user_key: viewKey });
       if (r.erreur) throw new Error(r.erreur);
       toast$('Rapport envoyé à Grace ✓');
+      loadEnvois();
     } catch(e) { toast$(e.message || 'Erreur envoi', false); }
     finally { setSending(false); }
   };
@@ -218,6 +257,27 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
       {toast && <div className={`${styles.toast} ${toast.ok ? styles.toastOk : styles.toastErr}`}>{toast.txt}</div>}
 
       <main className={styles.main}>
+
+        {/* Rappel — semaines terminées jamais envoyées à Grace */}
+        {rappels.length > 0 && (
+          <div className={styles.rappelBanner}>
+            <span className={styles.rappelIcon}><IcoWarning/></span>
+            <div className={styles.rappelBody}>
+              <span>
+                {rappels.length === 1
+                  ? "Une semaine terminée n'a pas encore été envoyée à Grace :"
+                  : `${rappels.length} semaines terminées n'ont pas encore été envoyées à Grace :`}
+              </span>
+              <div className={styles.rappelWeeks}>
+                {rappels.map(r => (
+                  <button key={r.lundi} className={styles.rappelWeekBtn} onClick={() => goToWeek(r.lundi)}>
+                    {fmtDate(r.lundi)} – {fmtDate(r.dimanche)} · {fmtH(r.total_heures)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Navigation semaine */}
         <div className={styles.weekNav}>
@@ -378,6 +438,30 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
             style={{display:'inline-flex',alignItems:'center',gap:'7px'}}>
             {sending ? '…' : <><IcoSend/>Envoyer à Grace</>}
           </button>
+        </div>
+
+        {/* Historique des envois */}
+        <div className={styles.histoWrap}>
+          <button className={styles.histoToggle} onClick={() => setShowHisto(s => !s)}>
+            <IcoChevron open={showHisto}/>
+            {`Historique des envois${envois.length ? ` (${envois.length})` : ''}`}
+          </button>
+          {showHisto && (
+            <div className={styles.histoList}>
+              {envois.length === 0 ? (
+                <div className={styles.histoEmpty}>{"Aucun envoi pour l'instant"}</div>
+              ) : envois.map(e => (
+                <button key={e.lundi} className={styles.histoRow} onClick={() => goToWeek(e.lundi)}>
+                  <span className={styles.histoWeekCol}>
+                    <IcoCheck/>
+                    <span className={styles.histoWeek}>{fmtDate(e.lundi)} – {fmtDate(e.dimanche)}</span>
+                  </span>
+                  <span className={styles.histoH}>{fmtH(parseFloat(e.total_heures))}</span>
+                  <span className={styles.histoDate}>{"Envoyé le "}{fmtSentAt(e.sent_at)}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
       </main>

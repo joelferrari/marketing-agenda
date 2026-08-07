@@ -74,3 +74,5 @@ export const updateTimesheetEntry = (id,d) => fetch(`${BASE}/timesheet/${id}`,{m
 export const deleteTimesheetEntry = (id) => fetch(`${BASE}/timesheet/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 export const emailTimesheet  = (d) => fetch(`${BASE}/timesheet/email`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const getTimesheetSuggestions = (uk='joel') => fetch(`${BASE}/timesheet/suggestions?user=${uk}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const getTimesheetEnvois = (uk='joel', limit=12) => fetch(`${BASE}/timesheet/envois?user=${uk}&limit=${limit}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const getTimesheetRappel = (uk='joel') => fetch(`${BASE}/timesheet/rappel?user=${uk}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
