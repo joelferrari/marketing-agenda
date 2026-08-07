@@ -1,7 +1,7 @@
 /* Agrégation des données existantes pour la cloche de notifications et le
    rappel "Aujourd'hui" de l'accueil — pas de nouvelle table en base, juste
    des requêtes sur les endpoints déjà utilisés par Agenda/Factures/RH/Dépenses. */
-import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepenses, getVacances } from './api';
+import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepenses, getVacances, getBilan } from './api';
 
 const today   = () => new Date().toISOString().slice(0, 10);
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
@@ -57,6 +57,45 @@ export async function getTodayEvents() {
 
 export async function getTomorrowEvents() {
   return getEventsForDate(daysFromNow(1));
+}
+
+// Nombre d'événements de l'agenda marketing dans le mois en cours.
+export async function getEventsThisMonthCount() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+  try {
+    const data = await getEvents({ dateDebut: start, dateFin: end });
+    const list = Array.isArray(data) ? data : [];
+    return list.filter(e => {
+      const es = e.date_debut?.slice(0, 10);
+      const ef = e.date_fin?.slice(0, 10) || es;
+      return es && ef >= start && es <= end;
+    }).length;
+  } catch { return 0; }
+}
+
+// Nombre de factures frais pas encore payées.
+export async function getPendingInvoicesCount() {
+  try {
+    const data = await getInvoices({});
+    const list = Array.isArray(data) ? data : [];
+    return list.filter(i => i.statut !== 'payee').length;
+  } catch { return 0; }
+}
+
+// Cumul d'heures sup. depuis janvier pour l'utilisateur CONNECTÉ (même
+// calcul que "Cumul {année}" dans RH.jsx : somme des heures_sup mensuelles
+// du bilan jusqu'au mois en cours inclus).
+export async function getOvertimeBalance(user) {
+  const viewKey = (user?.role === 'emilie' || user?.role === 'joel') ? user.role : 'emilie';
+  const now = new Date();
+  try {
+    const data = await getBilan({ annee: now.getFullYear(), user: viewKey });
+    const list = Array.isArray(data) ? data : [];
+    const mois = now.getMonth() + 1;
+    return list.filter(m => parseInt(m.mois) <= mois).reduce((s, m) => s + parseFloat(m.heures_sup || 0), 0);
+  } catch { return null; }
 }
 
 // Factures marquées payées + demandes (vacances/récup/dépense) validées dans les 7 derniers jours.

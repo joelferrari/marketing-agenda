@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import { getModules, Arrow } from '../nav';
-import { getTodayEvents, getTomorrowEvents, getVacationBalance } from '../notifications';
+import { getTodayEvents, getTomorrowEvents, getVacationBalance, getEventsThisMonthCount, getPendingInvoicesCount, getOvertimeBalance } from '../notifications';
 import styles from './Home.module.css';
 
 const fmtH = (t) => t ? t.slice(0, 5) : '';
+
+const fmtHeures = (h) => {
+  if (h === null || h === undefined || isNaN(h)) return '—';
+  const sign = h < 0 ? '-' : '+';
+  const abs = Math.abs(h);
+  const hh = Math.floor(abs);
+  const mm = Math.round((abs - hh) * 60);
+  return `${sign}${hh}h${mm.toString().padStart(2, '0')}`;
+};
 
 function DayEvents({ loading, events, empty, onNavigate }) {
   if (loading) return <p className={styles.todayEmpty}>Chargement…</p>;
@@ -27,14 +36,8 @@ function DayEvents({ loading, events, empty, onNavigate }) {
 }
 
 /* Tableau de bord affiché DANS la coquille (AppShell fournit nav + header).
-   NB : les 2 premiers chiffres de KPI sont des placeholders — à brancher
-   sur les endpoints réels (events du mois, factures en attente). Le solde
-   de vacances, lui, est réel et suit l'utilisateur connecté. */
-const KPIS = [
-  { label: 'Événements ce mois', value: '12', hint: '+3',        hintColor: 'var(--vert)' },
-  { label: 'Factures en attente', value: '3',  hint: 'à traiter', hintColor: 'var(--orange)' },
-];
-
+   Les 4 KPI sont branchés sur les vraies données et suivent l'utilisateur
+   connecté (vacances, heures sup.). */
 export default function Home({ user, onNavigate }) {
   const prenom = user?.prenom || 'Émilie';
   const MODULES = getModules(user);
@@ -43,11 +46,17 @@ export default function Home({ user, onNavigate }) {
   const [tomorrowEvents, setTomorrowEvents] = useState([]);
   const [loadingTomorrow, setLoadingTomorrow] = useState(true);
   const [vacances, setVacances] = useState(null);
+  const [eventsCount, setEventsCount] = useState(null);
+  const [pendingInvoices, setPendingInvoices] = useState(null);
+  const [overtime, setOvertime] = useState(null);
 
   useEffect(() => {
     getTodayEvents().then(ev => { setTodayEvents(ev); setLoadingToday(false); });
     getTomorrowEvents().then(ev => { setTomorrowEvents(ev); setLoadingTomorrow(false); });
     getVacationBalance(user).then(setVacances);
+    getEventsThisMonthCount().then(setEventsCount);
+    getPendingInvoicesCount().then(setPendingInvoices);
+    getOvertimeBalance(user).then(setOvertime);
   }, [user]);
 
   return (
@@ -58,15 +67,28 @@ export default function Home({ user, onNavigate }) {
       </div>
 
       <div className={styles.kpis}>
-        {KPIS.map(k => (
-          <div key={k.label} className={styles.kpi}>
-            <div className={styles.kpiLabel}>{k.label}</div>
-            <div className={styles.kpiValRow}>
-              <span className={styles.kpiVal}>{k.value}</span>
-              <span className={styles.kpiHint} style={{ color: k.hintColor }}>{k.hint}</span>
-            </div>
+        <div className={styles.kpi}>
+          <div className={styles.kpiLabel}>Événements ce mois</div>
+          <div className={styles.kpiValRow}>
+            <span className={styles.kpiVal}>{eventsCount ?? '—'}</span>
           </div>
-        ))}
+        </div>
+        <div className={styles.kpi}>
+          <div className={styles.kpiLabel}>Factures en attente</div>
+          <div className={styles.kpiValRow}>
+            <span className={styles.kpiVal}>{pendingInvoices ?? '—'}</span>
+            {pendingInvoices > 0 && <span className={styles.kpiHint} style={{ color: 'var(--orange)' }}>à traiter</span>}
+          </div>
+        </div>
+        <div className={styles.kpi}>
+          <div className={styles.kpiLabel}>Heures sup. {vacances?.prenom || prenom}</div>
+          <div className={styles.kpiValRow}>
+            <span className={styles.kpiVal} style={{ color: overtime == null ? 'var(--noir)' : overtime >= 0 ? 'var(--vert)' : 'var(--rouge)' }}>
+              {overtime == null ? '—' : fmtHeures(overtime)}
+            </span>
+            <span className={styles.kpiHint} style={{ color: 'var(--gris-lt)' }}>depuis janvier</span>
+          </div>
+        </div>
         <div className={styles.kpi}>
           <div className={styles.kpiLabel}>Vacances {vacances?.prenom || prenom}</div>
           <div className={styles.kpiValRow}>
