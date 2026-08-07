@@ -1,11 +1,45 @@
 /* Agrégation des données existantes pour la cloche de notifications et le
    rappel "Aujourd'hui" de l'accueil — pas de nouvelle table en base, juste
    des requêtes sur les endpoints déjà utilisés par Agenda/Factures/RH/Dépenses. */
-import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepenses } from './api';
+import { getEvents, getInvoices, getDemandesVacances, getDemandesRecup, getDepenses, getVacances, getBilan } from './api';
 
 const today   = () => new Date().toISOString().slice(0, 10);
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
 const daysFromNow = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+
+// Jours ouvrés du user dans une plage (mar-sam Emilie, mar-ven Joël) —
+// même logique que RH.jsx (workDaysCount).
+function workDaysCount(dateDebut, dateFin, userKey) {
+  if (!dateDebut || !dateFin) return 0;
+  const wd = userKey === 'joel' ? [2, 3, 4, 5] : [2, 3, 4, 5, 6];
+  let n = 0;
+  const cur = new Date(dateDebut + 'T12:00:00');
+  const end = new Date(dateFin + 'T12:00:00');
+  while (cur <= end) {
+    if (wd.includes(cur.getDay())) n++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return n;
+}
+
+const PRENOMS = { emilie: 'Emilie', joel: 'Joël' };
+
+// Solde de vacances de l'utilisateur CONNECTÉ (pas toujours Emilie).
+export async function getVacationBalance(user) {
+  const viewKey = (user?.role === 'emilie' || user?.role === 'joel') ? user.role : 'emilie';
+  const droit = viewKey === 'joel' ? 16 : 20;
+  const annee = new Date().getFullYear();
+  try {
+    const data = await getVacances(viewKey);
+    const list = Array.isArray(data) ? data : [];
+    const pris = list
+      .filter(v => new Date(v.date_debut).getFullYear() === annee || new Date(v.date_fin).getFullYear() === annee)
+      .reduce((s, v) => s + workDaysCount(v.date_debut, v.date_fin, viewKey), 0);
+    return { prenom: PRENOMS[viewKey] || viewKey, pris, droit, restant: droit - pris };
+  } catch {
+    return { prenom: PRENOMS[viewKey] || viewKey, pris: 0, droit, restant: droit };
+  }
+}
 
 async function getEventsForDate(d) {
   try {
@@ -23,6 +57,45 @@ export async function getTodayEvents() {
 
 export async function getTomorrowEvents() {
   return getEventsForDate(daysFromNow(1));
+}
+
+// Nombre d'événements de l'agenda marketing dans le mois en cours.
+export async function getEventsThisMonthCount() {
+  const now = new Date();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().slice(0, 10);
+  const end = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().slice(0, 10);
+  try {
+    const data = await getEvents({ dateDebut: start, dateFin: end });
+    const list = Array.isArray(data) ? data : [];
+    return list.filter(e => {
+      const es = e.date_debut?.slice(0, 10);
+      const ef = e.date_fin?.slice(0, 10) || es;
+      return es && ef >= start && es <= end;
+    }).length;
+  } catch { return 0; }
+}
+
+// Nombre de factures frais pas encore payées.
+export async function getPendingInvoicesCount() {
+  try {
+    const data = await getInvoices({});
+    const list = Array.isArray(data) ? data : [];
+    return list.filter(i => i.statut !== 'payee').length;
+  } catch { return 0; }
+}
+
+// Cumul d'heures sup. depuis janvier pour l'utilisateur CONNECTÉ (même
+// calcul que "Cumul {année}" dans RH.jsx : somme des heures_sup mensuelles
+// du bilan jusqu'au mois en cours inclus).
+export async function getOvertimeBalance(user) {
+  const viewKey = (user?.role === 'emilie' || user?.role === 'joel') ? user.role : 'emilie';
+  const now = new Date();
+  try {
+    const data = await getBilan({ annee: now.getFullYear(), user: viewKey });
+    const list = Array.isArray(data) ? data : [];
+    const mois = now.getMonth() + 1;
+    return list.filter(m => parseInt(m.mois) <= mois).reduce((s, m) => s + parseFloat(m.heures_sup || 0), 0);
+  } catch { return null; }
 }
 
 // Factures marquées payées + demandes (vacances/récup/dépense) validées dans les 7 derniers jours.
