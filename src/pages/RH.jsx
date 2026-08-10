@@ -685,14 +685,13 @@ export default function RH({ user }) {
                   const jours = workDaysCount(dm.date_debut, dm.date_fin, viewKey);
                   const s     = DEM_STATUT[dm.statut] || DEM_STATUT.en_attente;
                   return (
-                    <div key={dm.id} className={styles.row} style={{alignItems:'center',gap:'8px'}}>
-                      <span className={styles.rowDate}>{debut.toLocaleDateString('fr-CH')}</span>
-                      <span style={{color:'var(--gris-lt)'}}>→</span>
-                      <span className={styles.rowDate}>{fin.toLocaleDateString('fr-CH')}</span>
-                      <span style={{color:'var(--gris)',fontWeight:500}}>{jours}j</span>
-                      {dm.commentaire && <span className={styles.rowAuteur}>{dm.commentaire}</span>}
-                      <div style={{flex:1}}/>
-                      <span style={{fontSize:'11px',fontWeight:600,color:s.color,background:s.bg,padding:'3px 8px',borderRadius:'4px',whiteSpace:'nowrap'}}>
+                    <div key={dm.id} className={rh.demRow}>
+                      <span className={rh.demDate}>{debut.toLocaleDateString('fr-CH')}</span>
+                      <span className={rh.demArrow}>→</span>
+                      <span className={rh.demDate}>{fin.toLocaleDateString('fr-CH')}</span>
+                      <span className={rh.demJours}>{jours}j</span>
+                      <span className={rh.demComment}>{dm.commentaire || ''}</span>
+                      <span className={rh.demBadge} style={{color:s.color,background:s.bg}}>
                         {s.label}
                       </span>
                     </div>
@@ -776,12 +775,11 @@ export default function RH({ user }) {
                 {demandesRecup.map(dr => {
                   const s = DEM_STATUT[dr.statut] || DEM_STATUT.en_attente;
                   return (
-                    <div key={dr.id} className={styles.row} style={{alignItems:'center',gap:'8px'}}>
-                      <span className={styles.rowDate}>{new Date(dr.date_jour+'T12:00:00').toLocaleDateString('fr-CH')}</span>
-                      <span style={{color:'var(--violet)',fontWeight:500}}>{dr.heures_recup} h</span>
-                      {dr.commentaire && <span className={styles.rowAuteur}>{dr.commentaire}</span>}
-                      <div style={{flex:1}}/>
-                      <span style={{fontSize:'11px',fontWeight:600,color:s.color,background:s.bg,padding:'3px 8px',borderRadius:'4px',whiteSpace:'nowrap'}}>
+                    <div key={dr.id} className={rh.demRow}>
+                      <span className={rh.demDate}>{new Date(dr.date_jour+'T12:00:00').toLocaleDateString('fr-CH')}</span>
+                      <span className={rh.demJours} style={{color:'var(--violet)'}}>{dr.heures_recup} h</span>
+                      <span className={rh.demComment}>{dr.commentaire || ''}</span>
+                      <span className={rh.demBadge} style={{color:s.color,background:s.bg}}>
                         {s.label}
                       </span>
                     </div>
