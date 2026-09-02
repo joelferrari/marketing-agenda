@@ -1,14 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat, envoyerInvoice,
-  getBudget, addBudget, deleteBudget, updateBudget,
+  getBudget, addBudget, deleteBudget, updateBudget, deleteInvoiceFile,
 } from '../api';
 import Skeleton from '../components/Skeleton';
 import { IconSettings } from '../nav';
 import styles from './FacturesFrais.module.css';
 
 const BASE     = import.meta.env.VITE_API_URL || '/mkt';
-const fileUrl  = (id, type) => `${BASE}/${type === 'budget' ? 'budget' : 'invoices'}/${id}/file`;
+const budgetFileUrl = (id) => `${BASE}/budget/${id}/file`;
+const invoiceFileUrl = (invoiceId, f) => f.legacy || f.id == null
+  ? `${BASE}/invoices/${invoiceId}/file`
+  : `${BASE}/invoices/${invoiceId}/files/${f.id}`;
 const fmt      = (dt) => dt ? new Date(dt).toLocaleDateString('fr-CH', {day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
 
 const SORT_OPTS = [
@@ -91,7 +94,7 @@ export default function FacturesFrais({ user }) {
   const [editing,    setEditing]    = useState(null); // {id, tab} en cours d'édition
   const [showCats,   setShowCats]  = useState(false);
   const [dragOver,   setDragOver]  = useState(false);
-  const [file,       setFile]      = useState(null);
+  const [files,      setFiles]     = useState([]);
   const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',moyen:'facture',periodicite:''});
   const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'});
   const [newCat,     setNewCat]    = useState('');
@@ -141,15 +144,20 @@ export default function FacturesFrais({ user }) {
     setFilters(r); loadData(r, tab);
   };
 
-  const handleFile = (f) => {
-    if (!f) return;
-    if (!['application/pdf','image/jpeg','image/png'].includes(f.type)) { toast$('PDF, JPEG ou PNG',false); return; }
-    if (f.size > 20*1024*1024) { toast$('Max 20 MB',false); return; }
-    setFile(f);
+  const handleFiles = (fileList) => {
+    const incoming = Array.from(fileList || []);
+    const valid = [];
+    for (const f of incoming) {
+      if (!['application/pdf','image/jpeg','image/png'].includes(f.type)) { toast$(`${f.name} : PDF, JPEG ou PNG`,false); continue; }
+      if (f.size > 20*1024*1024) { toast$(`${f.name} : Max 20 MB`,false); continue; }
+      valid.push(f);
+    }
+    if (valid.length) setFiles(fs => [...fs, ...valid]);
   };
+  const removeNewFile = (idx) => setFiles(fs => fs.filter((_,i) => i !== idx));
 
   const ENTITES_FF = ["Mined'or", 'Rubis Spa'];
-  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',moyen:'facture',periodicite:''}); };
+  const resetForm = () => { setFiles([]); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',moyen:'facture',periodicite:''}); };
   const estAbonnement = (form.categorie||'').toLowerCase().includes('abonnement');
 
   const upload = async () => {
@@ -164,9 +172,9 @@ export default function FacturesFrais({ user }) {
           statut: form.statut,
         });
       } else {
-        if (!file) { toast$('Sélectionnez un fichier',false); setUploading(false); return; }
         const fd = new FormData();
-        fd.append('file',file); fd.append('description',form.description);
+        files.forEach(f => fd.append('files',f));
+        fd.append('description',form.description);
         fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
         fd.append('categorie',form.categorie); fd.append('entite',form.entite||'');
         fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
@@ -207,7 +215,7 @@ export default function FacturesFrais({ user }) {
           categorie: form.categorie, date_prevue: form.date_prevue, statut: form.statut,
         });
       } else {
-        // FormData pour supporter l'ajout/remplacement de fichier
+        // FormData — les nouveaux fichiers s'ajoutent à ceux déjà attachés
         const fd = new FormData();
         fd.append('description', form.description);
         fd.append('montant',     form.montant);
@@ -218,7 +226,7 @@ export default function FacturesFrais({ user }) {
           fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
           fd.append('periodicite', estAbonnement ? form.periodicite : '');
         }
-        if (file) fd.append('file', file);
+        files.forEach(f => fd.append('files', f));
         await updateInvoice(editing.id, fd);
       }
       toast$('Modifié ✓');
@@ -232,6 +240,17 @@ export default function FacturesFrais({ user }) {
     if (tab === 'budget') await deleteBudget(id);
     else await deleteInvoice(id);
     toast$('Supprimé'); loadData(filters, tab);
+  };
+
+  // Supprime un fichier déjà attaché à la facture en cours d'édition
+  const removeExistingFile = async (f) => {
+    if (!editing || f.id == null) return;
+    if (!window.confirm(`Supprimer ${f.original_name} ?`)) return;
+    try {
+      await deleteInvoiceFile(editing.id, f.id);
+      setEditing(e => ({ ...e, files: e.files.filter(x => x.id !== f.id) }));
+      loadData(filters, tab);
+    } catch(e) { toast$(e.message || 'Erreur', false); }
   };
 
   // Édition instantanée d'un seul champ dans la ligne (Reçu le / Statut / Payée le)
@@ -377,15 +396,28 @@ export default function FacturesFrais({ user }) {
                       onChange={e=>updateInlineField(r.id,'date_facture',e.target.value)}/>
                   : <span className={styles.rowDate}>{fmt(dateField(r))}</span>
                 }
-                {r.filename
-                  ? <a href={fileUrl(r.id,tab)} target="_blank" rel="noreferrer" className={styles.rowFile}>
-                      {r.mimetype?.startsWith('image/')
-                        ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-                        : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                      }
-                      {r.original_name}
-                    </a>
-                  : <span className={styles.rowDesc} style={{fontStyle:'italic',color:'var(--gris-lt)'}}>—</span>
+                {tab==='budget'
+                  ? (r.filename
+                      ? <a href={budgetFileUrl(r.id)} target="_blank" rel="noreferrer" className={styles.rowFile}>
+                          {r.mimetype?.startsWith('image/')
+                            ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                            : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                          }
+                          {r.original_name}
+                        </a>
+                      : <span className={styles.rowDesc} style={{fontStyle:'italic',color:'var(--gris-lt)'}}>—</span>)
+                  : ((r.files||[]).length
+                      ? <div className={styles.rowFiles} title={r.files.map(f=>f.original_name).join(', ')}>
+                          {r.files.map(f => (
+                            <a key={f.id ?? f.filename} href={invoiceFileUrl(r.id,f)} target="_blank" rel="noreferrer" className={styles.rowFileIcon}>
+                              {f.mimetype?.startsWith('image/')
+                                ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                              }
+                            </a>
+                          ))}
+                        </div>
+                      : <span className={styles.rowDesc} style={{fontStyle:'italic',color:'var(--gris-lt)'}}>—</span>)
                 }
                 <span className={styles.rowCat}>{r.entite||'—'}</span>
                 <span className={styles.rowCat}>{r.categorie||'—'}</span>
@@ -438,20 +470,43 @@ export default function FacturesFrais({ user }) {
               <button className={styles.modalClose} onClick={()=>{setShowUpload(false);setEditing(null);resetForm();}}>✕</button>
             </div>
             <div className={styles.modalBody}>
-              {/* Drop zone — pour factures (création et édition) */}
+              {/* Fichiers déjà attachés (édition) */}
+              {tab!=='budget' && editing && (editing.files||[]).length > 0 && (
+                <div className={styles.mf}>
+                  <label>Fichiers attachés</label>
+                  <div className={styles.fileChips}>
+                    {editing.files.map(f => (
+                      <div key={f.id ?? f.filename} className={styles.fileChip}>
+                        <a href={invoiceFileUrl(editing.id,f)} target="_blank" rel="noreferrer">{f.original_name}</a>
+                        {f.id != null && (
+                          <button onClick={()=>removeExistingFile(f)} className={styles.clearFile}>✕</button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Drop zone — plusieurs fichiers optionnels, pour factures (création et édition) */}
               {tab!=='budget' && (
                 <div className={styles.dropZone}
-                  style={{borderColor:dragOver?'var(--acc)':file?'var(--vert)':'var(--border)',background:dragOver?'var(--acc-lt)':file?'var(--vert-lt)':'var(--blanc)'}}
+                  style={{borderColor:dragOver?'var(--acc)':files.length?'var(--vert)':'var(--border)',background:dragOver?'var(--acc-lt)':files.length?'var(--vert-lt)':'var(--blanc)'}}
                   onDragOver={e=>{e.preventDefault();setDragOver(true);}}
                   onDragLeave={()=>setDragOver(false)}
-                  onDrop={e=>{e.preventDefault();setDragOver(false);handleFile(e.dataTransfer.files[0]);}}
+                  onDrop={e=>{e.preventDefault();setDragOver(false);handleFiles(e.dataTransfer.files);}}
                   onClick={()=>fileRef.current?.click()}>
-                  <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{display:'none'}} onChange={e=>handleFile(e.target.files[0])}/>
-                  {file ? (
-                    <div className={styles.filePreview}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--vert)" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span className={styles.fileName}>{file.name}</span>
-                      <button onClick={e=>{e.stopPropagation();setFile(null);}} className={styles.clearFile}>✕</button>
+                  <input ref={fileRef} type="file" multiple accept=".pdf,.jpg,.jpeg,.png" style={{display:'none'}}
+                    onChange={e=>{handleFiles(e.target.files);e.target.value='';}}/>
+                  {files.length ? (
+                    <div className={styles.filePreview} style={{flexDirection:'column',alignItems:'stretch'}}>
+                      {files.map((f,i) => (
+                        <div key={i} style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--vert)" strokeWidth="2" strokeLinecap="round" style={{flexShrink:0}}><polyline points="20 6 9 17 4 12"/></svg>
+                          <span className={styles.fileName} style={{flex:1,textAlign:'left'}}>{f.name}</span>
+                          <button onClick={e=>{e.stopPropagation();removeNewFile(i);}} className={styles.clearFile}>✕</button>
+                        </div>
+                      ))}
+                      <span className={styles.dropSub}>Cliquez ou glissez pour ajouter d'autres fichiers</span>
                     </div>
                   ) : (
                     <div className={styles.dropHint}>
@@ -459,7 +514,7 @@ export default function FacturesFrais({ user }) {
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                       </svg>
                       <span>Glissez ou <strong>cliquez pour parcourir</strong></span>
-                      <span className={styles.dropSub}>PDF, JPEG, PNG — max 20 MB</span>
+                      <span className={styles.dropSub}>PDF, JPEG, PNG — max 20 MB — plusieurs fichiers possibles, optionnel</span>
                     </div>
                   )}
                 </div>
