@@ -470,20 +470,43 @@ export default function FacturesFrais({ user }) {
               <button className={styles.modalClose} onClick={()=>{setShowUpload(false);setEditing(null);resetForm();}}>✕</button>
             </div>
             <div className={styles.modalBody}>
-              {/* Drop zone — pour factures (création et édition) */}
+              {/* Fichiers déjà attachés (édition) */}
+              {tab!=='budget' && editing && (editing.files||[]).length > 0 && (
+                <div className={styles.mf}>
+                  <label>Fichiers attachés</label>
+                  <div className={styles.fileChips}>
+                    {editing.files.map(f => (
+                      <div key={f.id ?? f.filename} className={styles.fileChip}>
+                        <a href={invoiceFileUrl(editing.id,f)} target="_blank" rel="noreferrer">{f.original_name}</a>
+                        {f.id != null && (
+                          <button onClick={()=>removeExistingFile(f)} className={styles.clearFile}>✕</button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Drop zone — plusieurs fichiers optionnels, pour factures (création et édition) */}
               {tab!=='budget' && (
                 <div className={styles.dropZone}
-                  style={{borderColor:dragOver?'var(--acc)':file?'var(--vert)':'var(--border)',background:dragOver?'var(--acc-lt)':file?'var(--vert-lt)':'var(--blanc)'}}
+                  style={{borderColor:dragOver?'var(--acc)':files.length?'var(--vert)':'var(--border)',background:dragOver?'var(--acc-lt)':files.length?'var(--vert-lt)':'var(--blanc)'}}
                   onDragOver={e=>{e.preventDefault();setDragOver(true);}}
                   onDragLeave={()=>setDragOver(false)}
-                  onDrop={e=>{e.preventDefault();setDragOver(false);handleFile(e.dataTransfer.files[0]);}}
+                  onDrop={e=>{e.preventDefault();setDragOver(false);handleFiles(e.dataTransfer.files);}}
                   onClick={()=>fileRef.current?.click()}>
-                  <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" style={{display:'none'}} onChange={e=>handleFile(e.target.files[0])}/>
-                  {file ? (
-                    <div className={styles.filePreview}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--vert)" strokeWidth="2" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      <span className={styles.fileName}>{file.name}</span>
-                      <button onClick={e=>{e.stopPropagation();setFile(null);}} className={styles.clearFile}>✕</button>
+                  <input ref={fileRef} type="file" multiple accept=".pdf,.jpg,.jpeg,.png" style={{display:'none'}}
+                    onChange={e=>{handleFiles(e.target.files);e.target.value='';}}/>
+                  {files.length ? (
+                    <div className={styles.filePreview} style={{flexDirection:'column',alignItems:'stretch'}}>
+                      {files.map((f,i) => (
+                        <div key={i} style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--vert)" strokeWidth="2" strokeLinecap="round" style={{flexShrink:0}}><polyline points="20 6 9 17 4 12"/></svg>
+                          <span className={styles.fileName} style={{flex:1,textAlign:'left'}}>{f.name}</span>
+                          <button onClick={e=>{e.stopPropagation();removeNewFile(i);}} className={styles.clearFile}>✕</button>
+                        </div>
+                      ))}
+                      <span className={styles.dropSub}>Cliquez ou glissez pour ajouter d'autres fichiers</span>
                     </div>
                   ) : (
                     <div className={styles.dropHint}>
@@ -491,7 +514,7 @@ export default function FacturesFrais({ user }) {
                         <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
                       </svg>
                       <span>Glissez ou <strong>cliquez pour parcourir</strong></span>
-                      <span className={styles.dropSub}>PDF, JPEG, PNG — max 20 MB</span>
+                      <span className={styles.dropSub}>PDF, JPEG, PNG — max 20 MB — plusieurs fichiers possibles, optionnel</span>
                     </div>
                   )}
                 </div>
