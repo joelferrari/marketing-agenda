@@ -54,6 +54,7 @@
 .empty{text-align:center;color:var(--gris-lt);padding:32px;font-size:14px;margin:0}
 .list{background:var(--blanc);border:1px solid var(--border);border-radius:12px;overflow:hidden}
 .listHeader{display:grid;grid-template-columns:90px 1fr 90px 110px 1fr 100px 72px;gap:12px;padding:12px 20px;background:var(--acc-lt);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc-dk)}
+.listHeader span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .row{display:grid;grid-template-columns:90px 1fr 90px 110px 1fr 100px 72px;gap:12px;padding:14px 20px;align-items:center;border-top:1px solid var(--border);transition:background .1s}
 .row:hover{background:var(--acc-lt)}
 .rowDate{font-size:12px;color:var(--gris)}
@@ -113,8 +114,8 @@
    colonnes. */
 .listScroll{overflow-x:auto}
 
-.listHeaderFactures{grid-template-columns:90px minmax(140px,1.2fr) 75px 95px 90px 118px minmax(160px,1.4fr) 100px 100px 85px 190px;min-width:1308px}
-.rowFactures{grid-template-columns:90px minmax(140px,1.2fr) 75px 95px 90px 118px minmax(160px,1.4fr) 100px 100px 85px 190px;min-width:1308px}
+.listHeaderFactures{grid-template-columns:90px minmax(140px,1.2fr) 75px 95px 115px 118px minmax(160px,1.4fr) 100px 100px 85px 190px;min-width:1333px}
+.rowFactures{grid-template-columns:90px minmax(140px,1.2fr) 75px 95px 115px 118px minmax(160px,1.4fr) 100px 100px 85px 190px;min-width:1333px}
 
 .rowDateInput{font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;color:var(--gris);width:100%;font-family:var(--font-ui)}
 .rowSelect{
