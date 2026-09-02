@@ -21,6 +21,7 @@ export const getInvCats     = ()     => fetch(`${BASE}/invoices/categories`,{hea
 export const addInvCat      = (nom)  => fetch(`${BASE}/invoices/categories`,{method:'POST',headers:h(),body:JSON.stringify({nom})}).then(r=>r.json());
 export const delInvCat      = (id)   => fetch(`${BASE}/invoices/categories/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 export const envoyerInvoice = (id)   => fetch(`${BASE}/invoices/${id}/envoyer`,{method:'POST',headers:h()}).then(r=>r.json());
+export const deleteInvoiceFile = (id,fileId) => fetch(`${BASE}/invoices/${id}/files/${fileId}`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
 export const getFacturesCeline    = (p={}) => fetch(`${BASE}/factures-celine?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const uploadFactureCeline  = (fd)   => fetch(`${BASE}/factures-celine/upload`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json());
