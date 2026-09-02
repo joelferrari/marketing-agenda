@@ -92,7 +92,7 @@ export default function FacturesFrais({ user }) {
   const [showCats,   setShowCats]  = useState(false);
   const [dragOver,   setDragOver]  = useState(false);
   const [file,       setFile]      = useState(null);
-  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:'',moyen:'facture'});
+  const [form,       setForm]      = useState({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',moyen:'facture',periodicite:''});
   const [filters,    setFilters]   = useState({dateDebut:'',dateFin:'',categorie:'',moyenPaiement:'',sort:'date_desc'});
   const [newCat,     setNewCat]    = useState('');
   const fileRef = useRef();
@@ -149,7 +149,8 @@ export default function FacturesFrais({ user }) {
   };
 
   const ENTITES_FF = ["Mined'or", 'Rubis Spa'];
-  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',recu_le:'',moyen:'facture'}); };
+  const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',moyen:'facture',periodicite:''}); };
+  const estAbonnement = (form.categorie||'').toLowerCase() === 'abonnement';
 
   const upload = async () => {
     setUploading(true);
@@ -168,7 +169,9 @@ export default function FacturesFrais({ user }) {
         fd.append('file',file); fd.append('description',form.description);
         fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
         fd.append('categorie',form.categorie); fd.append('entite',form.entite||'');
-        fd.append('recu_le',form.recu_le||''); fd.append('user_id',user?.id||'');
+        fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
+        fd.append('periodicite', estAbonnement ? form.periodicite : '');
+        fd.append('user_id',user?.id||'');
         d = await uploadInvoice(fd);
       }
       if (d?.erreur) throw new Error(d.erreur);
@@ -188,8 +191,8 @@ export default function FacturesFrais({ user }) {
       date_facture: r.date_facture?.slice(0,10) || r.created_at?.slice(0,10) || '',
       date_prevue:  r.date_prevue?.slice(0,10) || '',
       statut:       r.statut || 'Prévu',
-      recu_le:      r.recu_le?.slice(0,10) || '',
       moyen:        r.source === 'carte_credit' ? 'carte_credit' : 'facture',
+      periodicite:  r.periodicite || '',
     });
     setShowUpload(true);
   };
@@ -211,8 +214,10 @@ export default function FacturesFrais({ user }) {
         fd.append('categorie',   form.categorie);
         fd.append('entite',      form.entite||'');
         fd.append('date_facture',form.date_facture);
-        fd.append('recu_le',     form.recu_le||'');
-        if (tab === 'factures') fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
+        if (tab === 'factures') {
+          fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
+          fd.append('periodicite', estAbonnement ? form.periodicite : '');
+        }
         if (file) fd.append('file', file);
         await updateInvoice(editing.id, fd);
       }
@@ -355,9 +360,9 @@ export default function FacturesFrais({ user }) {
               <span>Fichier</span>
               <span>{"Entité"}</span>
               <span>{"Catégorie"}</span>
+              {tab==='factures' && <span>Annuel/Mensuel</span>}
               {showMoyen && <span>Facture / Carte de crédit</span>}
               <span>Description</span>
-              {showSuivi && <span>Reçu le</span>}
               {tab==='budget' && <span>Statut</span>}
               {showSuivi && <span>Statut</span>}
               {showSuivi && <span>Payée le</span>}
