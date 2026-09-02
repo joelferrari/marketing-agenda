@@ -150,7 +150,7 @@ export default function FacturesFrais({ user }) {
 
   const ENTITES_FF = ["Mined'or", 'Rubis Spa'];
   const resetForm = () => { setFile(null); setForm({description:'',montant:'',categorie:'',entite:'',date_facture:'',date_prevue:'',statut:'Prévu',moyen:'facture',periodicite:''}); };
-  const estAbonnement = (form.categorie||'').toLowerCase() === 'abonnement';
+  const estAbonnement = (form.categorie||'').toLowerCase().includes('abonnement');
 
   const upload = async () => {
     setUploading(true);
