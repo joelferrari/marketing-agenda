@@ -372,7 +372,11 @@ export default function FacturesFrais({ user }) {
             {!rows.length && <p className={styles.empty}>Aucune ligne trouvée</p>}
             {rows.map(r => (
               <div key={r.id} className={`${styles.row} ${tab==='budget'?styles.rowBudget:''} ${tab==='factures'?styles.rowFactures:''}`}>
-                <span className={styles.rowDate}>{fmt(dateField(r))}</span>
+                {tab==='factures'
+                  ? <input type="date" className={styles.rowDateInput} value={r.date_facture?.slice(0,10)||''}
+                      onChange={e=>updateInlineField(r.id,'date_facture',e.target.value)}/>
+                  : <span className={styles.rowDate}>{fmt(dateField(r))}</span>
+                }
                 {r.filename
                   ? <a href={fileUrl(r.id,tab)} target="_blank" rel="noreferrer" className={styles.rowFile}>
                       {r.mimetype?.startsWith('image/')
@@ -385,14 +389,13 @@ export default function FacturesFrais({ user }) {
                 }
                 <span className={styles.rowCat}>{r.entite||'—'}</span>
                 <span className={styles.rowCat}>{r.categorie||'—'}</span>
+                {tab==='factures' && (
+                  <span className={styles.rowCat}>{r.periodicite||'—'}</span>
+                )}
                 {showMoyen && (
                   <span className={styles.rowCat}>{r.source==='carte_credit' ? 'Carte de crédit' : 'Facture'}</span>
                 )}
                 <span className={styles.rowDesc}>{r.description||'—'}</span>
-                {showSuivi && (
-                  <input type="date" className={styles.rowDateInput} value={r.recu_le?.slice(0,10)||''}
-                    onChange={e=>updateInlineField(r.id,'recu_le',e.target.value)}/>
-                )}
                 {tab==='budget' && <span className={styles.rowStatut} data-s={r.statut}>{r.statut||'—'}</span>}
                 {showSuivi && (
                   <select className={styles.rowSelect} data-s={r.statut||'non_payee'} value={r.statut||'non_payee'}
@@ -469,11 +472,6 @@ export default function FacturesFrais({ user }) {
                     <input type="date" value={form.date_facture} onChange={e=>setForm(p=>({...p,date_facture:e.target.value}))}/>
                   </div>
               }
-              {showSuivi && (
-                <div className={styles.mf}><label>Reçu le</label>
-                  <input type="date" value={form.recu_le} onChange={e=>setForm(p=>({...p,recu_le:e.target.value}))}/>
-                </div>
-              )}
               {showMoyen && (
                 <div className={styles.mf}><label>Facture / Carte de crédit</label>
                   <select value={form.moyen} onChange={e=>setForm(p=>({...p,moyen:e.target.value}))}>
@@ -494,6 +492,15 @@ export default function FacturesFrais({ user }) {
                   {cats.map(c=><option key={c.id} value={c.nom}>{c.nom}</option>)}
                 </select>
               </div>
+              {tab==='factures' && estAbonnement && (
+                <div className={styles.mf}><label>Annuel/Mensuel</label>
+                  <select value={form.periodicite} onChange={e=>setForm(p=>({...p,periodicite:e.target.value}))}>
+                    <option value="">{"— Non spécifié —"}</option>
+                    <option value="Mensuel">Mensuel</option>
+                    <option value="Annuel">Annuel</option>
+                  </select>
+                </div>
+              )}
               <div className={styles.mf}><label>Description</label>
                 <input value={form.description} onChange={e=>setForm(p=>({...p,description:e.target.value}))} placeholder="Matériel, abonnement…"/>
               </div>
