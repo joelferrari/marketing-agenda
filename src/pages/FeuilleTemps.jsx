@@ -220,12 +220,12 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
   };
 
   const envoyerEmail = async () => {
-    if (!window.confirm(`Envoyer le rapport de la semaine du ${fmtDateLong(lundi)} à Grace (grace@rubis.com.cn) ?`)) return;
+    if (!window.confirm(`Envoyer le rapport de la semaine du ${fmtDateLong(lundi)} à Apple (taolu@rubis.com.cn), avec Céline en copie ?`)) return;
     setSending(true);
     try {
       const r = await emailTimesheet({ lundi, user_key: viewKey });
       if (r.erreur) throw new Error(r.erreur);
-      toast$('Rapport envoyé à Grace ✓');
+      toast$('Rapport envoyé à Apple ✓');
       loadEnvois();
     } catch(e) { toast$(e.message || 'Erreur envoi', false); }
     finally { setSending(false); }
@@ -258,15 +258,15 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
 
       <main className={styles.main}>
 
-        {/* Rappel — semaines terminées jamais envoyées à Grace */}
+        {/* Rappel — semaines terminées jamais envoyées */}
         {rappels.length > 0 && (
           <div className={styles.rappelBanner}>
             <span className={styles.rappelIcon}><IcoWarning/></span>
             <div className={styles.rappelBody}>
               <span>
                 {rappels.length === 1
-                  ? "Une semaine terminée n'a pas encore été envoyée à Grace :"
-                  : `${rappels.length} semaines terminées n'ont pas encore été envoyées à Grace :`}
+                  ? "Une semaine terminée n'a pas encore été envoyée à Apple :"
+                  : `${rappels.length} semaines terminées n'ont pas encore été envoyées à Apple :`}
               </span>
               <div className={styles.rappelWeeks}>
                 {rappels.map(r => (
@@ -436,7 +436,7 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
           {saving && <span className={styles.savingDot}>{"Enregistrement…"}</span>}
           <button className={styles.emailBtn} onClick={envoyerEmail} disabled={sending || !totalSemaine}
             style={{display:'inline-flex',alignItems:'center',gap:'7px'}}>
-            {sending ? '…' : <><IcoSend/>Envoyer à Grace</>}
+            {sending ? '…' : <><IcoSend/>Envoyer à Apple</>}
           </button>
         </div>
 
