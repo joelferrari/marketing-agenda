@@ -220,12 +220,12 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
   };
 
   const envoyerEmail = async () => {
-    if (!window.confirm(`Envoyer le rapport de la semaine du ${fmtDateLong(lundi)} à Apple (taolu@rubis.com.cn), avec Céline en copie ?`)) return;
+    if (!window.confirm(`Envoyer le rapport de la semaine du ${fmtDateLong(lundi)} à Apple et Rose (taolu@rubis.com.cn, rose.xu@rubis.com.cn), avec Céline en copie ?`)) return;
     setSending(true);
     try {
       const r = await emailTimesheet({ lundi, user_key: viewKey });
       if (r.erreur) throw new Error(r.erreur);
-      toast$('Rapport envoyé à Apple ✓');
+      toast$('Rapport envoyé à Apple et Rose ✓');
       loadEnvois();
     } catch(e) { toast$(e.message || 'Erreur envoi', false); }
     finally { setSending(false); }
@@ -265,8 +265,8 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
             <div className={styles.rappelBody}>
               <span>
                 {rappels.length === 1
-                  ? "Une semaine terminée n'a pas encore été envoyée à Apple :"
-                  : `${rappels.length} semaines terminées n'ont pas encore été envoyées à Apple :`}
+                  ? "Une semaine terminée n'a pas encore été envoyée à Apple et Rose :"
+                  : `${rappels.length} semaines terminées n'ont pas encore été envoyées à Apple et Rose :`}
               </span>
               <div className={styles.rappelWeeks}>
                 {rappels.map(r => (
@@ -436,7 +436,7 @@ export default function FeuilleTemps({ user, viewKey = 'joel' }) {
           {saving && <span className={styles.savingDot}>{"Enregistrement…"}</span>}
           <button className={styles.emailBtn} onClick={envoyerEmail} disabled={sending || !totalSemaine}
             style={{display:'inline-flex',alignItems:'center',gap:'7px'}}>
-            {sending ? '…' : <><IcoSend/>Envoyer à Apple</>}
+            {sending ? '…' : <><IcoSend/>Envoyer à Apple et Rose</>}
           </button>
         </div>
 
