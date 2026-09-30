@@ -117,17 +117,30 @@ const getFirstDayOfMonth = (year, month) => {
   return d === 0 ? 7 : d; // 1=lun ... 7=dim
 };
 
-// Nombre de jours ouvrés du user dans une plage date_debut/date_fin (mar-sam
-// Emilie, mar-ven Joël) — un lundi/dimanche dans la plage ne doit pas compter
-// comme un jour de vacances consommé.
+// Jours ouvrés par personne — même règle que le backend (services/joursOuvres.js).
+// getDay() : 0 = dimanche … 6 = samedi.
+//  - Emilie : mardi → samedi.
+//  - Joël   : mardi → vendredi jusqu'au 27.09.2026, puis lundi → jeudi (jour off
+//             déplacé du lundi au vendredi dès le lundi 28.09.2026).
+// La règle dépend de la date : les semaines d'avant gardent l'ancien rythme.
+const BASCULE_JOEL = '2026-09-28';
+const isoLocal = (d) => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+const joursOuvres = (userKey, dateStr) =>
+  userKey !== 'joel' ? [2,3,4,5,6] : (String(dateStr).slice(0,10) >= BASCULE_JOEL ? [1,2,3,4] : [2,3,4,5]);
+const estJourOuvre = (userKey, d) => {
+  const date = d instanceof Date ? d : new Date(String(d).slice(0,10) + 'T12:00:00');
+  return joursOuvres(userKey, isoLocal(date)).includes(date.getDay());
+};
+
+// Nombre de jours ouvrés du user dans une plage date_debut/date_fin — un jour
+// off dans la plage ne doit pas compter comme un jour de vacances consommé.
 const workDaysCount = (dateDebut, dateFin, userKey) => {
   if (!dateDebut || !dateFin) return 0;
-  const wd = userKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
   let n = 0;
   const cur = new Date(dateDebut + 'T12:00:00');
   const end = new Date(dateFin + 'T12:00:00');
   while (cur <= end) {
-    if (wd.includes(cur.getDay())) n++;
+    if (estJourOuvre(userKey, cur)) n++;
     cur.setDate(cur.getDate() + 1);
   }
   return n;
@@ -446,10 +459,7 @@ export default function RH({ user }) {
   // user (mar-sam Emilie, mar-ven Joël) — sinon un lundi (jour off pour les
   // deux) était compté dans "X jours"/"X travaillées" alors que heuresSup
   // l'excluait déjà correctement via entry.delta.
-  const isExtraDay = (dateStr) => {
-    const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
-    return !wd.includes(new Date(dateStr + 'T12:00:00').getDay());
-  };
+  const isExtraDay = (dateStr) => !estJourOuvre(viewKey, dateStr);
 
   // Stats mois courant
   const totalH     = entries.filter(e=>e.type!=='recup' && !isExtraDay(e.date_jour?.slice(0,10))).reduce((s,e) => s + (parseFloat(e.heures)||0), 0);
@@ -585,13 +595,12 @@ export default function RH({ user }) {
             const moisMax = NOW.getMonth() + 1;
             const CREDIT_MENSUEL = CREDIT_MENS;
             const debitParMois = {};
-            const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
             vacances.forEach(v => {
               const debut = new Date(v.date_debut + 'T12:00:00');
               const fin   = new Date((v.date_fin || v.date_debut) + 'T12:00:00');
               const cur = new Date(debut);
               while (cur <= fin) {
-                if (cur.getFullYear() === anneeVacBilan && wd.includes(cur.getDay())) {
+                if (cur.getFullYear() === anneeVacBilan && estJourOuvre(viewKey, cur)) {
                   const m = cur.getMonth() + 1;
                   debitParMois[m] = (debitParMois[m] || 0) + 1;
                 }
@@ -978,9 +987,7 @@ export default function RH({ user }) {
                   const [ha,ma]=(form.heure_arrivee||'10:00').split(':').map(Number);
                   const [hd,md]=(form.heure_depart||'19:00').split(':').map(Number);
                   const total=(hd+md/60)-(ha+ma/60);
-                  const wd = viewKey === 'joel' ? [2,3,4,5] : [2,3,4,5,6];
-                  const dow = modal?.date_jour ? new Date(modal.date_jour + 'T12:00:00').getDay() : -1;
-                  const extra = !wd.includes(dow);
+                  const extra = modal?.date_jour ? !estJourOuvre(viewKey, modal.date_jour) : true;
                   const cibleEff = extra ? 0 : CIBLE;
                   const delta = extra && viewKey !== 'joel' ? 0 : total - cibleEff;
                   const isNeutre = extra && viewKey !== 'joel';
