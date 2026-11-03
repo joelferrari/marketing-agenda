@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import {
   getInvoices, uploadInvoice, deleteInvoice, updateInvoice, getInvCats, addInvCat, delInvCat, envoyerInvoice,
-  getBudget, addBudget, deleteBudget, updateBudget, deleteInvoiceFile,
+  getBudget, addBudget, deleteBudget, updateBudget, deleteInvoiceFile, ouvrirFichierProtege,
 } from '../api';
 import Skeleton from '../components/Skeleton';
 import { IconSettings } from '../nav';
@@ -398,7 +398,7 @@ export default function FacturesFrais({ user }) {
                 }
                 {tab==='budget'
                   ? (r.filename
-                      ? <a href={budgetFileUrl(r.id)} target="_blank" rel="noreferrer" className={styles.rowFile}>
+                      ? <a href={budgetFileUrl(r.id)} onClick={e=>{e.preventDefault();ouvrirFichierProtege(budgetFileUrl(r.id));}} target="_blank" rel="noreferrer" className={styles.rowFile}>
                           {r.mimetype?.startsWith('image/')
                             ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                             : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -409,7 +409,7 @@ export default function FacturesFrais({ user }) {
                   : ((r.files||[]).length
                       ? <div className={styles.rowFiles} title={r.files.map(f=>f.original_name).join(', ')}>
                           {r.files.map(f => (
-                            <a key={f.id ?? f.filename} href={invoiceFileUrl(r.id,f)} target="_blank" rel="noreferrer" className={styles.rowFileIcon}>
+                            <a key={f.id ?? f.filename} href={invoiceFileUrl(r.id,f)} onClick={e=>{e.preventDefault();ouvrirFichierProtege(invoiceFileUrl(r.id,f));}} target="_blank" rel="noreferrer" className={styles.rowFileIcon}>
                               {f.mimetype?.startsWith('image/')
                                 ? <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
                                 : <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
@@ -477,7 +477,7 @@ export default function FacturesFrais({ user }) {
                   <div className={styles.fileChips}>
                     {editing.files.map(f => (
                       <div key={f.id ?? f.filename} className={styles.fileChip}>
-                        <a href={invoiceFileUrl(editing.id,f)} target="_blank" rel="noreferrer">{f.original_name}</a>
+                        <a href={invoiceFileUrl(editing.id,f)} onClick={e=>{e.preventDefault();ouvrirFichierProtege(invoiceFileUrl(editing.id,f));}} target="_blank" rel="noreferrer">{f.original_name}</a>
                         {f.id != null && (
                           <button onClick={()=>removeExistingFile(f)} className={styles.clearFile}>✕</button>
                         )}
