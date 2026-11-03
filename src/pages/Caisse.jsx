@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getCaisse, addCaisse, deleteCaisse } from '../api';
+import { getCaisse, addCaisse, deleteCaisse, uploadCaisseFichier, getCaisseFichier, deleteCaisseFichier } from '../api';
 import Skeleton from '../components/Skeleton';
 import styles from './CreditCard.module.css';
 
@@ -13,6 +13,8 @@ export default function Caisse({ user }) {
   const [modal,   setModal]   = useState(false);
   const [toast,   setToast]   = useState(null);
   const [form,    setForm]    = useState({ date_transaction:today(), description:'', type:'sortie', montant:'' });
+  const [fichier, setFichier] = useState(null);   // justificatif choisi dans le formulaire
+  const [envoi,   setEnvoi]   = useState(null);   // id de la ligne dont le fichier est en cours d'envoi
 
   const toast$ = (txt, ok=true) => { setToast({txt,ok}); setTimeout(()=>setToast(null), 3000); };
 
@@ -32,11 +34,41 @@ export default function Caisse({ user }) {
   const submit = async (e) => {
     e.preventDefault();
     if (!form.description || !form.montant) return;
-    await addCaisse({ ...form, montant: parseFloat(form.montant) });
+    const res = await addCaisse({ ...form, montant: parseFloat(form.montant) });
+    if (fichier && res?.id) {
+      const up = await uploadCaisseFichier(res.id, fichier).catch(() => null);
+      if (!up?.ok) toast$(up?.erreur || 'Ligne enregistrée, mais le fichier n\'a pas pu être joint', false);
+    }
     toast$(`${form.type === 'entree' ? 'Entrée' : 'Sortie'} enregistrée ✓`);
     setModal(false);
     setForm({ date_transaction:today(), description:'', type:'sortie', montant:'' });
+    setFichier(null);
     load();
+  };
+
+  const joindre = async (id, file) => {
+    if (!file) return;
+    setEnvoi(id);
+    const res = await uploadCaisseFichier(id, file).catch(() => null);
+    setEnvoi(null);
+    if (res?.ok) { toast$('Fichier joint ✓'); load(); }
+    else toast$(res?.erreur || 'Envoi impossible', false);
+  };
+
+  // Ouvre la fenêtre tout de suite (sinon bloquée comme pop-up), puis y charge le fichier
+  const ouvrir = async (id) => {
+    const w = window.open('', '_blank');
+    try {
+      const blob = await getCaisseFichier(id);
+      const url = URL.createObjectURL(blob);
+      if (w) w.location.href = url; else window.location.href = url;
+    } catch (e) { if (w) w.close(); toast$(e.message, false); }
+  };
+
+  const retirer = async (id) => {
+    if (!window.confirm('Retirer le fichier joint ?')) return;
+    await deleteCaisseFichier(id);
+    toast$('Fichier retiré'); load();
   };
 
   const remove = async (id) => {
@@ -78,11 +110,11 @@ export default function Caisse({ user }) {
         )}
 
         {!loading && transactions.length > 0 && (() => {
-          const cols = '110px 1fr 130px 130px 40px';
+          const cols = '110px 1fr 130px 170px 130px 40px';
           return (
           <div className={styles.dcTable}>
             <div className={styles.dcHead} style={{gridTemplateColumns:cols}}>
-              <span>Date</span><span>Libellé</span><span>Source</span><span style={{textAlign:'right'}}>Montant</span><span/>
+              <span>Date</span><span>Libellé</span><span>Source</span><span>Justificatif</span><span style={{textAlign:'right'}}>Montant</span><span/>
             </div>
             {transactions.map(t => (
               <div key={t.id} className={styles.dcRow} style={{gridTemplateColumns:cols}}>
@@ -93,6 +125,24 @@ export default function Caisse({ user }) {
                     ? <span className={styles.dcCat} style={{background:'var(--vert-lt)',color:'var(--vert)'}}>POS · auto</span>
                     : <span className={styles.dcCat}>{t.auteur_prenom || 'Manuel'}</span>
                   }
+                </span>
+                <span style={{display:'flex',alignItems:'center',gap:'6px',minWidth:0}}>
+                  {t.source === 'pos' ? null : t.fichier_nom ? (
+                    <>
+                      <button type="button" onClick={()=>ouvrir(t.id)} title={t.fichier_nom}
+                        style={{background:'none',border:'none',padding:0,cursor:'pointer',color:'var(--accent, #7694ae)',fontSize:'12px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',textAlign:'left'}}>
+                        📎 {t.fichier_nom}
+                      </button>
+                      <button type="button" onClick={()=>retirer(t.id)} title="Retirer le fichier"
+                        style={{background:'none',border:'none',padding:0,cursor:'pointer',color:'var(--gris, #999)',fontSize:'13px'}}>×</button>
+                    </>
+                  ) : (
+                    <label style={{cursor:'pointer',fontSize:'12px',color:'var(--gris, #888)',whiteSpace:'nowrap'}}>
+                      {envoi === t.id ? 'Envoi…' : '+ Joindre un fichier'}
+                      <input type="file" accept=".pdf,image/*" style={{display:'none'}}
+                        onChange={e=>{ joindre(t.id, e.target.files?.[0]); e.target.value=''; }}/>
+                    </label>
+                  )}
                 </span>
                 <span className={styles.dcAmount} style={{color: t.type === 'entree' ? 'var(--vert)' : 'var(--rouge)'}}>
                   {t.type === 'entree' ? '+' : '-'}{fmt(t.montant)}
@@ -145,6 +195,10 @@ export default function Caisse({ user }) {
                 <input type="number" min="0" step="0.05" value={form.montant}
                   onChange={e=>setForm(p=>({...p, montant:e.target.value}))}
                   placeholder="0.00" required/>
+              </div>
+              <div className={styles.mf}>
+                <label>Justificatif <span style={{fontWeight:'normal',opacity:.6}}>(facultatif · PDF ou photo)</span></label>
+                <input type="file" accept=".pdf,image/*" onChange={e=>setFichier(e.target.files?.[0] || null)}/>
               </div>
               <div className={styles.modalFooter}>
                 <button type="button" className={styles.btnCancel} onClick={()=>setModal(false)}>Annuler</button>
