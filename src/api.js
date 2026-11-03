@@ -81,3 +81,15 @@ export const emailTimesheet  = (d) => fetch(`${BASE}/timesheet/email`,{method:'P
 export const getTimesheetSuggestions = (uk='joel') => fetch(`${BASE}/timesheet/suggestions?user=${uk}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const getTimesheetEnvois = (uk='joel', limit=12) => fetch(`${BASE}/timesheet/envois?user=${uk}&limit=${limit}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const getTimesheetRappel = (uk='joel') => fetch(`${BASE}/timesheet/rappel?user=${uk}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+
+// Ouvre un fichier protégé (en-tête d'auth requis) : la fenêtre est ouverte tout
+// de suite pour éviter le blocage pop-up, puis on y charge le fichier.
+export const ouvrirFichierProtege = async (url) => {
+  const w = window.open('', '_blank');
+  try {
+    const r = await fetch(url, { headers: { Authorization: `Bearer ${localStorage.getItem('mkt_token')||''}` }, cache: 'no-store' });
+    if (!r.ok) throw new Error('Fichier introuvable');
+    const blobUrl = URL.createObjectURL(await r.blob());
+    if (w) w.location.href = blobUrl; else window.location.href = blobUrl;
+  } catch (e) { if (w) w.close(); alert(e.message); }
+};
