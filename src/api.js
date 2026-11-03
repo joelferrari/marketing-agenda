@@ -32,6 +32,10 @@ export const envoyerFactureCeline = (id)   => fetch(`${BASE}/factures-celine/${i
 export const getCaisse      = ()    => fetch(`${BASE}/caisse`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const addCaisse      = (d)   => fetch(`${BASE}/caisse`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
 export const deleteCaisse   = (id)  => fetch(`${BASE}/caisse/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+// Justificatif d'une ligne manuelle de caisse (PDF / photo)
+export const uploadCaisseFichier = (id, file) => { const fd=new FormData(); fd.append('file', file); return fetch(`${BASE}/caisse/${id}/fichier`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json()); };
+export const getCaisseFichier    = (id)  => fetch(`${BASE}/caisse/${id}/fichier`,{headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('Fichier introuvable'); return r.blob(); });
+export const deleteCaisseFichier = (id)  => fetch(`${BASE}/caisse/${id}/fichier`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
 export const getBudget      = (p={}) => fetch(`${BASE}/budget?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const addBudget      = (d)    => fetch(`${BASE}/budget`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
