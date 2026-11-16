@@ -36,6 +36,13 @@ export const deleteCaisse   = (id)  => fetch(`${BASE}/caisse/${id}`,{method:'DEL
 export const uploadCaisseFichier = (id, file) => { const fd=new FormData(); fd.append('file', file); return fetch(`${BASE}/caisse/${id}/fichier`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json()); };
 export const getCaisseFichier    = (id)  => fetch(`${BASE}/caisse/${id}/fichier`,{headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('Fichier introuvable'); return r.blob(); });
 export const deleteCaisseFichier = (id)  => fetch(`${BASE}/caisse/${id}/fichier`,{method:'DELETE',headers:h()}).then(r=>r.json());
+// Avances (compte dédié alimenté par Céline) — même fonctionnement que la caisse
+export const getAvances     = ()    => fetch(`${BASE}/avances`,{headers:h(),cache:'no-store'}).then(r=>r.json());
+export const addAvance      = (d)   => fetch(`${BASE}/avances`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());
+export const deleteAvance   = (id)  => fetch(`${BASE}/avances/${id}`,{method:'DELETE',headers:h()}).then(r=>r.json());
+export const uploadAvanceFichier = (id, file) => { const fd=new FormData(); fd.append('file', file); return fetch(`${BASE}/avances/${id}/fichier`,{method:'POST',headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},body:fd}).then(r=>r.json()); };
+export const getAvanceFichier    = (id)  => fetch(`${BASE}/avances/${id}/fichier`,{headers:{Authorization:`Bearer ${localStorage.getItem('mkt_token')||''}`},cache:'no-store'}).then(r=>{ if(!r.ok) throw new Error('Fichier introuvable'); return r.blob(); });
+export const deleteAvanceFichier = (id)  => fetch(`${BASE}/avances/${id}/fichier`,{method:'DELETE',headers:h()}).then(r=>r.json());
 
 export const getBudget      = (p={}) => fetch(`${BASE}/budget?${new URLSearchParams(p)}`,{headers:h(),cache:'no-store'}).then(r=>r.json());
 export const addBudget      = (d)    => fetch(`${BASE}/budget`,{method:'POST',headers:h(),body:JSON.stringify(d)}).then(r=>r.json());

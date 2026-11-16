@@ -177,7 +177,7 @@ export default function FacturesFrais({ user }) {
         fd.append('description',form.description);
         fd.append('montant',form.montant); fd.append('date_facture',form.date_facture);
         fd.append('categorie',form.categorie); fd.append('entite',form.entite||'');
-        fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
+        fd.append('source', ['carte_credit','avance'].includes(form.moyen) ? form.moyen : '');
         fd.append('periodicite', estAbonnement ? form.periodicite : '');
         fd.append('user_id',user?.id||'');
         d = await uploadInvoice(fd);
@@ -199,7 +199,7 @@ export default function FacturesFrais({ user }) {
       date_facture: r.date_facture?.slice(0,10) || r.created_at?.slice(0,10) || '',
       date_prevue:  r.date_prevue?.slice(0,10) || '',
       statut:       r.statut || 'Prévu',
-      moyen:        r.source === 'carte_credit' ? 'carte_credit' : 'facture',
+      moyen:        ['carte_credit','avance'].includes(r.source) ? r.source : 'facture',
       periodicite:  r.periodicite || '',
     });
     setShowUpload(true);
@@ -223,7 +223,7 @@ export default function FacturesFrais({ user }) {
         fd.append('entite',      form.entite||'');
         fd.append('date_facture',form.date_facture);
         if (tab === 'factures') {
-          fd.append('source', form.moyen === 'carte_credit' ? 'carte_credit' : '');
+          fd.append('source', ['carte_credit','avance'].includes(form.moyen) ? form.moyen : '');
           fd.append('periodicite', estAbonnement ? form.periodicite : '');
         }
         files.forEach(f => fd.append('files', f));
@@ -349,11 +349,12 @@ export default function FacturesFrais({ user }) {
               </select>
             </div>
             {showMoyen && (
-              <div className={styles.mf}><label>Facture / Carte de crédit</label>
+              <div className={styles.mf}><label>Moyen de paiement</label>
                 <select value={filters.moyenPaiement} onChange={e=>setFilter('moyenPaiement',e.target.value)}>
                   <option value="">Toutes</option>
                   <option value="facture">Facture</option>
                   <option value="carte_credit">Carte de crédit</option>
+                  <option value="avance">Avance</option>
                 </select>
               </div>
             )}
@@ -380,7 +381,7 @@ export default function FacturesFrais({ user }) {
               <span>{"Entité"}</span>
               <span>{"Catégorie"}</span>
               {tab==='factures' && <span>Annuel/Mensuel</span>}
-              {showMoyen && <span>Facture / Carte de crédit</span>}
+              {showMoyen && <span>Moyen</span>}
               <span>Description</span>
               {tab==='budget' && <span>Statut</span>}
               {showSuivi && <span>Statut</span>}
@@ -425,7 +426,7 @@ export default function FacturesFrais({ user }) {
                   <span className={styles.rowCat}>{r.periodicite||'—'}</span>
                 )}
                 {showMoyen && (
-                  <span className={styles.rowCat}>{r.source==='carte_credit' ? 'Carte de crédit' : 'Facture'}</span>
+                  <span className={styles.rowCat}>{r.source==='carte_credit' ? 'Carte de crédit' : r.source==='avance' ? 'Avance' : 'Facture'}</span>
                 )}
                 <span className={styles.rowDesc}>{r.description||'—'}</span>
                 {tab==='budget' && <span className={styles.rowStatut} data-s={r.statut}>{r.statut||'—'}</span>}
@@ -528,10 +529,11 @@ export default function FacturesFrais({ user }) {
                   </div>
               }
               {showMoyen && (
-                <div className={styles.mf}><label>Facture / Carte de crédit</label>
+                <div className={styles.mf}><label>Moyen de paiement</label>
                   <select value={form.moyen} onChange={e=>setForm(p=>({...p,moyen:e.target.value}))}>
                     <option value="facture">Facture</option>
                     <option value="carte_credit">Carte de crédit</option>
+                    <option value="avance">Avance (compte dédié)</option>
                   </select>
                 </div>
               )}

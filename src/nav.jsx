@@ -10,6 +10,7 @@ export const IconReceipt = () => (<svg {...s()}><path d="M6 3h12v18l-2-1.4-2 1.4
 export const IconDepenses = () => (<svg {...s()}><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/><path d="M9 15l2 2 4-4"/></svg>);
 export const IconRH = () => (<svg {...s()}><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg>);
 export const IconCaisse = () => (<svg {...s()}><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><path d="M12 12v4M10 14h4"/></svg>);
+export const IconAvances = () => (<svg {...s()}><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 21h18"/></svg>);
 export const IconAdmin = () => (<svg {...s()}><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>);
 export const IconPOS = () => (<svg {...s()}><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>);
 export const IconClock = () => (<svg {...s()}><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>);
@@ -37,6 +38,7 @@ export const getModules = (user) => [
     { id:'timesheet',    mod:'timesheet', label:'Feuille de temps',    desc:'Tâches hebdo par projet et entité',       color:'#862e9c', deep:'#6f2482', soft:'#d9b3e6', ink:'#3a1042', Icon:IconClock },
   ] : []),
   { id:'caisse',         mod:'caisse',    label:'Caisse cash',         desc:'Suivi espèces, import POS auto',          color:'#cf8078', deep:'#b8675f', soft:'#f5cec7', ink:'#592923', Icon:IconCaisse },
+  { id:'avances',        mod:'avances',   label:'Avances',             desc:'Compte d\'avances, factures frais payées', color:'#7694ae', deep:'#5f7d97', soft:'#b4c8d9', ink:'#1f3040', Icon:IconAvances },
 ];
 
 export const EXTERNAL = [
@@ -47,5 +49,5 @@ export const EXTERNAL = [
 export const getTitles = (user) => ({
   home:'Accueil', agenda:'Agenda Marketing', carte:'Carte de crédit',
   'factures-frais':'Factures frais', depenses:'Demandes de dépense',
-  rh:rhLabel(user), caisse:'Caisse cash', timesheet:'Feuille de temps',
+  rh:rhLabel(user), caisse:'Caisse cash', avances:'Avances', timesheet:'Feuille de temps',
 });
