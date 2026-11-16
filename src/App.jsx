@@ -8,6 +8,7 @@ import Calendar from './pages/Calendar';
 import CreditCard from './pages/CreditCard';
 import FacturesFrais from './pages/FacturesFrais';
 import Caisse from './pages/Caisse';
+import Avances from './pages/Avances';
 import RH from './pages/RH';
 import Depenses from './pages/Depenses';
 import FeuilleTemps from './pages/FeuilleTemps';
@@ -53,6 +54,7 @@ export default function App() {
   else if (page === 'carte')          content = <CreditCard user={user}/>;
   else if (page === 'factures-frais') content = <FacturesFrais user={user}/>;
   else if (page === 'caisse')         content = <Caisse user={user}/>;
+  else if (page === 'avances')        content = <Avances user={user}/>;
   else if (page === 'rh')             content = <RH user={user}/>;
   else if (page === 'depenses')       content = <Depenses user={user}/>;
   else if (page === 'timesheet' && user?.prenom === 'Joël') content = <FeuilleTemps user={user}/>;
