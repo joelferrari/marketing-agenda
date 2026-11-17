@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getMe } from './api';
-import { IconSun, IconMoon } from './nav';
+import { IconSun, IconMoon, AVANCES_ACTIF } from './nav';
 import AppShell from './components/AppShell';
 import Login from './pages/Login';
 import Home from './pages/Home';
@@ -54,7 +54,7 @@ export default function App() {
   else if (page === 'carte')          content = <CreditCard user={user}/>;
   else if (page === 'factures-frais') content = <FacturesFrais user={user}/>;
   else if (page === 'caisse')         content = <Caisse user={user}/>;
-  else if (page === 'avances')        content = <Avances user={user}/>;
+  else if (page === 'avances' && AVANCES_ACTIF) content = <Avances user={user}/>;
   else if (page === 'rh')             content = <RH user={user}/>;
   else if (page === 'depenses')       content = <Depenses user={user}/>;
   else if (page === 'timesheet' && user?.prenom === 'Joël') content = <FeuilleTemps user={user}/>;

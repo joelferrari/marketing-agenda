@@ -28,6 +28,9 @@ export const HOME_ACCENT = { soft:'#a4bda8', deep:'#6f9179', ink:'#213328' };
 /* color = teinte moyenne (icône) · soft = pastel opaque (fond pastille/tuile) · ink = texte foncé sur pastel */
 const rhLabel = (user) => user?.role === 'admin' ? 'RH — Admin' : `RH — ${user?.prenom || 'Emilie'}`;
 
+// Module Avances désactivé pour le moment (pas utilisé) : passer à true pour le réafficher.
+export const AVANCES_ACTIF = false;
+
 export const getModules = (user) => [
   { id:'agenda',         mod:'agenda',    label:'Agenda Marketing',    desc:'Campagnes, newsletters et événements',   color:'#c56e6e', deep:'#af5b5b', soft:'#eba5a5', ink:'#571f1f', Icon:IconCalendar },
   { id:'carte',          mod:'carte',     label:'Carte de crédit',     desc:'Dépenses et virements de la carte',       color:'#e39b45', deep:'#c9842f', soft:'#ffca8c', ink:'#553611', Icon:IconCard },
@@ -38,7 +41,7 @@ export const getModules = (user) => [
     { id:'timesheet',    mod:'timesheet', label:'Feuille de temps',    desc:'Tâches hebdo par projet et entité',       color:'#862e9c', deep:'#6f2482', soft:'#d9b3e6', ink:'#3a1042', Icon:IconClock },
   ] : []),
   { id:'caisse',         mod:'caisse',    label:'Caisse cash',         desc:'Suivi espèces, import POS auto',          color:'#cf8078', deep:'#b8675f', soft:'#f5cec7', ink:'#592923', Icon:IconCaisse },
-  { id:'avances',        mod:'avances',   label:'Avances',             desc:'Compte d\'avances, factures frais payées', color:'#7694ae', deep:'#5f7d97', soft:'#b4c8d9', ink:'#1f3040', Icon:IconAvances },
+  ...(AVANCES_ACTIF ? [{ id:'avances',        mod:'avances',   label:'Avances',             desc:'Compte d\'avances, factures frais payées', color:'#7694ae', deep:'#5f7d97', soft:'#b4c8d9', ink:'#1f3040', Icon:IconAvances }] : []),
 ];
 
 export const EXTERNAL = [

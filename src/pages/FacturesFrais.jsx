@@ -4,7 +4,7 @@ import {
   getBudget, addBudget, deleteBudget, updateBudget, deleteInvoiceFile, ouvrirFichierProtege,
 } from '../api';
 import Skeleton from '../components/Skeleton';
-import { IconSettings } from '../nav';
+import { IconSettings, AVANCES_ACTIF } from '../nav';
 import styles from './FacturesFrais.module.css';
 
 const BASE     = import.meta.env.VITE_API_URL || '/mkt';
@@ -354,7 +354,7 @@ export default function FacturesFrais({ user }) {
                   <option value="">Toutes</option>
                   <option value="facture">Facture</option>
                   <option value="carte_credit">Carte de crédit</option>
-                  <option value="avance">Avance</option>
+                  {AVANCES_ACTIF && <option value="avance">Avance</option>}
                 </select>
               </div>
             )}
@@ -533,7 +533,7 @@ export default function FacturesFrais({ user }) {
                   <select value={form.moyen} onChange={e=>setForm(p=>({...p,moyen:e.target.value}))}>
                     <option value="facture">Facture</option>
                     <option value="carte_credit">Carte de crédit</option>
-                    <option value="avance">Avance (compte dédié)</option>
+                    {AVANCES_ACTIF && <option value="avance">Avance (compte dédié)</option>}
                   </select>
                 </div>
               )}
